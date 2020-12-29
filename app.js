@@ -26,6 +26,11 @@ app.get('/login', function(req, res) {
 
 app.post('/login', function(req, res) {
     console.log(req.body);
+    const dbpwd = createPasswordHash(req.body.password);
+    // load user from db
+    // compare password 
+    // create cookie
+    // return response
     throw Error('Method login not implemented');
 });
 
@@ -35,6 +40,12 @@ app.get('/register', function(req, res) {
 
 app.post('/register', function(req, res) {
     console.log('Register: ' + req.body);
+    // check password restrictions 
+    const dbpwd = createPasswordHash(req.body.password);
+    // create user object and set dbpwd
+    // save new user to db
+    // create cookie
+    // return response
     throw Error('Method register not implemented');
 });
 
