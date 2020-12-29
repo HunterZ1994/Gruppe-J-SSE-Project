@@ -16,6 +16,13 @@ function createPasswordHash(value) {
     return res;
 }
 
+function createResponseHTML(contentHTML) {
+    // read header and Navigation
+    // append content 
+    // append possible footer
+    // return string or file
+}
+
 app.get('/', function(req, res) {
     res.sendFile(htmlPath + '/index.html');
 });
@@ -47,6 +54,38 @@ app.post('/register', function(req, res) {
     // create cookie
     // return response
     throw Error('Method register not implemented');
+});
+
+app.get('/article/add', function(req, res) {
+    // return add article page
+});
+
+app.post('/article/add', function(req, res) {
+    // load article object
+    // check validity
+    // save to db
+    // fail -> return addArticle Page with filled form and error message
+    // return index page with articles of user and success message
+});
+
+app.delete('/article/delete', function(req, res) {
+    // read id from query
+    // delete article
+    // fail return index with articles and error message
+    // success return index with articles and success message
+});
+
+
+app.get('/article/edit', function(req, res) {
+    // return article form filed
+});
+
+app.post('/article/edit', function(req, res) {
+    // get json from body
+    // check validity 
+    // update in db
+    // fail --> return filled editArticle with error message
+    // success --> return index with sucess
 });
 
 var port = process.env.PORT || 8080;
