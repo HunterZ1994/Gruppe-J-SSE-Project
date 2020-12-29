@@ -18,6 +18,14 @@ create TABLE Users (
     PRIMARY KEY(UserId)
 );
 
+create Table Carts (
+    CartId int NOT NULL AUTO_INCREMENT,
+    User int NOT NULL,
+
+    PRIMARY KEY (CartId),
+    FOREIGN KEY (User) REFERENCES Users(UserId)
+); 
+
 create TABLE Articles (
     ArticleId int NOT NULL AUTO_INCREMENT,
     ArticleName varchar(255) NOT NULL,
@@ -28,6 +36,16 @@ create TABLE Articles (
 
     PRIMARY KEY(ArticleId),
     FOREIGN KEY (Seller) REFERENCES Users(UserId)
+);
+
+create TABLE Holds (
+    Cart int NOT NULL,
+    Article int NOT NULL,
+    ArticleAmount int NOT NULL,
+
+    PRIMARY KEY(Cart, Article),
+    FOREIGN KEY (Article) REFERENCES Articles(ArticleId),
+    FOREIGN KEY (Cart) REFERENCES Carts(CartId)
 );
 
 create TABLE Comments (
@@ -58,3 +76,7 @@ VALUES ("Pfannenwender", "Hydrodynamischer Pfannenwender mit Turbo", 100, "/imag
 
 INSERT INTO Comments (ComText, User, Article) 
     VALUES ("Was ein super Pfannenwender!", 3, 1); 
+
+INSERT INTO Carts (User) VALUES (3);
+
+INSERT INTO Holds (Cart, Article, ArticleAmount) VALUES (1, 1, 10);
