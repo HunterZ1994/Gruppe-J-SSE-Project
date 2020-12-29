@@ -4,3 +4,9 @@ npm-debug.log
 .nyc
 .env
 .DS_Store
+.idea/workspace.xml
+.idea/Gruppe-J-SSE-Project.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+package-lock.json
