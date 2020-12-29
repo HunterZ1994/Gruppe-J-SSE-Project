@@ -8,8 +8,12 @@ var htmlPath = path.join(__dirname) + '/html';
 var app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 
-function createHash(value) {
-    return crypto.createHash('sha256').update(value).digest('hex');
+function createPasswordHash(value) {
+    let res = value;
+    for (i = 0; i < 1000, i++;) {
+        res = crypto.createHash('sha256').update(res).digest('hex'),
+    }
+    return res;
 }
 
 app.get('/', function(req, res) {
@@ -30,9 +34,7 @@ app.get('/register', function(req, res) {
 });
 
 app.post('/register', function(req, res) {
-    const formValues = req.body;
     console.log('Register: ' + req.body);
-    console.log('Hash: ' + createHash(formValues.password));
     throw Error('Method register not implemented');
 });
 
