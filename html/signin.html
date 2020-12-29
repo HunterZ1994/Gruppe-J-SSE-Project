@@ -5,16 +5,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Anmeldung</title>
+    <style>
+        .bottom-space {
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 
 <body>
-    <form id="login" method="post">
+    <form id="login" method="POST" class="column">
         <h1>Anmeldung</h1>
-        <input type="email" name="email" id="email">
-        <input type="password" name="password" id="password">
 
-        <button>Anmelden</button>
-        <button></button>
+        <div class="row bottom-space">
+            <label for="email">E-Mail Adresse</label>
+            <input type="email" name="email" id="email">
+        </div>
+
+        <div class="row bottom-space">
+            <label for="password">Passwort</label>
+            <input type="password" name="password" id="password">
+        </div>
+
+        <div class="row bottom-space">
+            <a href="/forgot-password">Passwort vergessen?</a>
+        </div>
+
+        <button type="submit">Anmelden</button>
     </form>
 </body>
 </html>
