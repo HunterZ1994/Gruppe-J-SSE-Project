@@ -24,6 +24,7 @@ function createResponseHTML(contentHTML) {
 }
 
 app.get('/', function(req, res) {
+    // should decide on user login what to return
     res.sendFile(htmlPath + '/index.html');
 });
 
@@ -56,6 +57,15 @@ app.post('/register', function(req, res) {
     throw Error('Method register not implemented');
 });
 
+//#region vendor
+
+function createVendorIndexPage() {
+    // read all articles of vendor from db
+    // place in html 
+    // add into index.html
+    // return hmtl 
+}
+
 app.get('/article/add', function(req, res) {
     // return add article page
 });
@@ -87,6 +97,8 @@ app.post('/article/edit', function(req, res) {
     // fail --> return filled editArticle with error message
     // success --> return index with sucess
 });
+
+//#endregion
 
 var port = process.env.PORT || 8080;
 
