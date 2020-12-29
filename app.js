@@ -11,7 +11,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 function createPasswordHash(value) {
     let res = value;
     for (i = 0; i < 1000, i++;) {
-        res = crypto.createHash('sha256').update(res).digest('hex'),
+        res = crypto.createHash('sha256').update(res).digest('hex');
     }
     return res;
 }
