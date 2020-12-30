@@ -3,14 +3,15 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const crypto = require('crypto');
+const index = require('./js/index');
 
-var htmlPath = path.join(__dirname) + '/html';
-var app = express();
+const htmlPath = path.join(__dirname) + '/html';
+const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 
 function createPasswordHash(value) {
     let res = value;
-    for (i = 0; i < 1000, i++;) {
+    for (let i = 0; i < 1000, i++;) {
         res = crypto.createHash('sha256').update(res).digest('hex');
     }
     return res;
@@ -25,7 +26,9 @@ function createResponseHTML(contentHTML) {
 
 app.get('/', function(req, res) {
     // should decide on user login what to return
-    res.sendFile(htmlPath + '/index.html');
+    index.createIndex({loggedIn: true, role: 'vendor'}).then(result => {
+        res.send(result);
+    })
 });
 
 app.get('/login', function(req, res) {
@@ -40,6 +43,11 @@ app.post('/login', function(req, res) {
     // create cookie
     // return response
     throw Error('Method login not implemented');
+});
+
+app.get('/logout', function(req, res) {
+    // TODO: logout
+    res.sendFile(htmlPath + '/index.html');
 });
 
 app.get('/register', function(req, res) {
@@ -57,7 +65,24 @@ app.post('/register', function(req, res) {
     throw Error('Method register not implemented');
 });
 
-//#region vendor
+app.get('/search', function (req, res)  {
+    let searchKeyWord = encodeURI(req.query.key)
+    console.log(searchKeyWord)
+    // getSearchedArticles(searchKeyWord)
+    throw Error('Method search not implemented')
+});
+
+// #region admin
+
+app.get('/adminPanel', function(req, res) {
+    // TODO: check for role
+    // TODO: return admin page
+    throw Error('Method adminPanel not implemented')
+});
+
+// #endregion
+
+// #region vendor
 
 function createVendorIndexPage() {
     // read all articles of vendor from db
@@ -100,8 +125,8 @@ app.post('/article/edit', function(req, res) {
 
 //#endregion
 
-var port = process.env.PORT || 8080;
+const port = process.env.PORT || 8080;
 
-var server = app.listen(port, function() {
+const server = app.listen(port, function () {
     console.log("Server listening on port %s...", port);
 });
