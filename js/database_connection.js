@@ -20,6 +20,19 @@ function getSearchedArticles(key = '') {
     })
 }
 
+function getUserByUName(username =''){
+    return new Promise((resolve, reject) => {
+        pool.getConnection().then(con => {
+            let sql = 'select * from users'
+            sql += (username === '') ? ' limit 10' : ' where Email like \'%' + username + '%\''
+            con.query({sql: sql})
+                .then(rows => {
+                    resolve(rows)
+                }).catch(err => console.log(err))
+        }).catch(err => console.log(err))
+    })
+}
+
 module.exports = {
-    getSearchedArticles,
+    getSearchedArticles, getUserByUName,
 }
