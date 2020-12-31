@@ -33,6 +33,18 @@ function getUserByUName(username =''){
     })
 }
 
+function addUser(email, pwordhash, firstName, lastName, street, houseNr, postalCode){
+    return new Promise((resolve, reject) =>{
+        pool.getConnection().then(con => {
+            let sql = 'INSERT INTO users (Email , FirstName, SureName, Street , HouseNr, City, PostCode, Userrole, PwdHash)'
+            sql += `VALUES ('${email}', '${firstName}', '${lastName}', '${street}', '${houseNr}', '${postalCode}', 'customer', '${pwordhash}');`
+            con.query({sql: sql}).then(rows => {
+                resolve(rows)
+            }).catch(err => console.log(err))
+        }).catch(err => reject(err))
+    });
+}
+
 module.exports = {
     getSearchedArticles, getUserByUName,
 }

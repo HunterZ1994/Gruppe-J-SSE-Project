@@ -34,6 +34,7 @@ app.use('/css', express.static(__dirname + '/css'));
 
 app.get('/', function(req, res) {
     // TODO: replace hard-coded userInfo with info from cookie
+    // TODO: 
     index.createIndex(userInfo).then(result => {
         res.send(result);
     })
