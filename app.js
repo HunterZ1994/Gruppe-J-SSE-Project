@@ -7,22 +7,20 @@ const index = require('./js/index');
 const cart = require('./js/cart');
 const search_results = require('./js/search_results');
 const db_conector = require("./js/database_connection");
+const cookieParser = require('cookie-parser');
 
 const htmlPath = path.join(__dirname) + '/html';
 const app = express();
 
 app.use(express.urlencoded());
 app.use(express.json());
+app.use(cookieParser());
 
 // TODO: replace hard-coded user info with cookie
 const userInfo = {loggedIn: true, role: 'customer'};
 
 function createPasswordHash(value) {
-    let res = value;
-    for (let i = 0; i < 1000, i++;) {
-        res = crypto.createHash('sha256').update(res).digest('hex');
-    }
-    return res;
+   return crypto.createHash('sha256').update(value).digest('hex');
 }
 
 function createResponseHTML(contentHTML) {
@@ -38,6 +36,7 @@ app.use('/css', express.static(__dirname + '/css'));
 
 app.get('/', function(req, res) {
     // TODO: replace hard-coded userInfo with info from cookie
+    console.log(req.cookies)
     index.createIndex(userInfo).then(result => {
         res.send(result);
     })
@@ -52,22 +51,22 @@ app.post('/login', function(req, res) {
     const dbpwd = createPasswordHash(req.body.password);
     db_conector.getUserByUName(req.body.email).then(result =>{
         const users = result[0];
-        console.log(users);
-        if(this.dbpwd === users.PwdHash){
-            this.userInfo = {loggedIn: true, userID: users.UserId, role: users.userRole}
+        if(dbpwd.toUpperCase() === users.PwdHash){
+            this.userInfo = {loggedIn: true,userID: users.UserId, role: users.Userrole}
+            res.cookie('userInfo', userInfo).redirect('/')
         }
-    }) ;
+    });
     // load user from db
     // compare password 
     // create cookie
     // return response
     // throw Error('Method login not implemented');
-    res.send();
 });
 
 app.get('/logout', function(req, res) {
     // TODO: logout
-    res.sendFile(htmlPath + '/index.html');
+    userInfo.loggedIn = false
+    res.redirect('/');
 });
 
 app.get('/register', function(req, res) {
