@@ -72,8 +72,8 @@ INSERT INTO Users (Email, FirstName, SureName, Street, HouseNr, City, PostCode, 
     VALUES ("wiener@hardwareBay.de", "Peter", "Wiener", "Wienerstreet", 10, "Wienertown", 1234, 0, 0, "29FEB5D3B68F493955A9C688197C580C99CD2EC416221D3537CE00C48C5765F2");
 
 INSERT INTO Articles (ArticleName, Descpt, Amount, ImagePath, Seller) 
-VALUES ("Pfannenwender", "Hydrodynamischer Pfannenwender mit Turbo", 100, "/images/articlenumber/image.png", 1),
-        ("Node", "Node.js mit Turbo", 100, "/images/articlenumber/image2.png", 1);
+VALUES ("Pfannenwender", "Hydrodynamischer Pfannenwender mit Turbo", 100, "/images/hydrodyn_pfannenwender.jpg", 1),
+        ("Node", "Node.js mit Turbo", 100, "/images/node_logo.jpg", 1);
 
 INSERT INTO Comments (ComText, User, Article) 
     VALUES ("Was ein super Pfannenwender!", 3, 1); 

@@ -24,8 +24,11 @@ function createResponseHTML(contentHTML) {
     // return string or file
 }
 
+app.use(express.static('public'));
+app.use('/images', express.static(__dirname + '/assets/images'));
+
 app.get('/', function(req, res) {
-    // should decide on user login what to return
+    // TODO: replace hard-coded userInfo with info from cookie
     index.createIndex({loggedIn: true, role: 'vendor'}).then(result => {
         res.send(result);
     })

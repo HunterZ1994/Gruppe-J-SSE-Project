@@ -15,7 +15,6 @@ const createIndex = (userInfo) => {
         let nav = navigation.createNavigationHTML(userInfo)
 
         Promise.all([readIndex(nav), getSearchedArticles()]).then(results => {
-            // console.log(results[1])
             const articles = buildArticles(results[1])
             resolve(results[0].replace('{ articles }', articles))
         })
@@ -42,16 +41,30 @@ function getSearchedArticles(key = '') {
                 .then(rows => {
                     con.end()
                     resolve(rows)
-                    for(let i of rows) {
-                        console.log(i)
-                    }
                 }).catch(err => console.log(err))
         }).catch(err => console.log(err))
     })
 }
 
 function buildArticles(articles) {
-    return ''
+    let artTable = '<table>\n'
+    artTable += '   <tr>\n'
+    artTable += '       <th>Name</th>\n'
+    artTable += '       <th>Description</th>\n'
+    artTable += '       <th>Price</th>\n'
+    artTable += '       <th>Image</th>\n'
+    artTable += '   </tr>\n'
+    for(let article of articles) {
+        artTable += '   <tr>\n'
+        artTable += '       <td><a href="/product/' + article.ArticleId + '">' + article.ArticleName + '</a></td>\n'
+        artTable += '       <td>' + article.Descpt + '</td>\n'
+        artTable += '       <td>' + article.Amount + '$</td>\n'
+        artTable += '       <td><img src="' + article.ImagePath
+            + '" style="max-height: 150px; max-width: 150px;"></td>\n'
+        artTable += '   </tr>\n'
+    }
+    artTable += '</table>'
+    return artTable
 }
 
 module.exports = {
