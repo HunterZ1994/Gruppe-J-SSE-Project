@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const fs = require('fs');
 const crypto = require('crypto');
 const index = require('./js/index');
+const cart = require('./js/cart');
 
 const htmlPath = path.join(__dirname) + '/html';
 const app = express();
@@ -29,7 +30,7 @@ app.use('/images', express.static(__dirname + '/assets/images'));
 
 app.get('/', function(req, res) {
     // TODO: replace hard-coded userInfo with info from cookie
-    index.createIndex({loggedIn: true, role: 'vendor'}).then(result => {
+    index.createIndex({loggedIn: true, role: 'customer'}).then(result => {
         res.send(result);
     })
 });
@@ -125,6 +126,20 @@ app.post('/article/edit', function(req, res) {
     // fail --> return filled editArticle with error message
     // success --> return index with sucess
 });
+
+// cart
+
+app.get('/cart', (req, res) =>{
+   // TODO: replace hard-coded userInfo with info from cookie
+   cart.createCart({loggedIn: true, role: 'vendor'}).then(result => {
+    res.send(result);
+    })
+})
+
+app.delete('/cart', (req, res) =>{
+    console.log(req.query.id);
+    res.send('Youve deleted an item from your cart')
+}) 
 
 //#endregion
 

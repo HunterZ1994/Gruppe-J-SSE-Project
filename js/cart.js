@@ -1,48 +1,28 @@
 const navigation = require('./navigation')
 const fs = require('fs')
+const db_conector = require('./database_connection');
 
-const mariadb = require('mariadb');
-const pool = mariadb.createPool({
-    host: 'localhost',
-    port: 3306, 
-    user:'root', 
-    password: 'Westernby1994',
-    database: 'hardwarebay',
-});
+console.log("cart script loaded")
 
-const createIndex = (userInfo) => {
+const createCart = (userInfo) => {
     return new Promise((resolve, reject) => {
         let nav = navigation.createNavigationHTML(userInfo)
 
-        Promise.all([readIndex(nav), getSearchedArticles()]).then(results => {
+        Promise.all([readCart(nav), db_conector.getArticleWithID()]).then(results => {
             const articles = buildArticles(results[1])
             resolve(results[0].replace('{ articles }', articles))
         })
     })
 }
 
-function readIndex(nav) {
+function readCart(nav) {
     return new Promise((resolve, reject) => {
-        fs.readFile(__dirname + '/../html/index.html', 'utf8', function (err, html) {
+        fs.readFile(__dirname + '/../html/cart.html', 'utf8', function (err, html) {
             if (err) {
                 throw err
             }
             resolve(html.replace('{ navigation }', nav))
         })
-    })
-}
-
-function getSearchedArticles(key = '') {
-    return new Promise((resolve, reject) => {
-        pool.getConnection().then(con => {
-            let sql = 'select * from articles'
-            sql += (key === '') ? '' : ' where \'ArticleName\' like \'%' + key + '%\''
-            con.query({sql: sql})
-                .then(rows => {
-                    con.end()
-                    resolve(rows)
-                }).catch(err => console.log(err))
-        }).catch(err => console.log(err))
     })
 }
 
@@ -67,6 +47,12 @@ function buildArticles(articles) {
     return artTable
 }
 
+function goToCheckout(){
+    // window.alert("Going to checkout");
+    console.log("Going to checkout!")
+}
+
+
 module.exports = {
-    createIndex,
+    createCart,
 }
