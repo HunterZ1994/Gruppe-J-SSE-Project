@@ -2,8 +2,8 @@ const createNavigationHTML = (userInfo) => {
     let nav = ''
     nav += '<nav>\n'
     nav += '    <a href="/" style="float: left">Main Page</a>\n'
-
-    if (userInfo.loggedIn) {
+    
+    if (userInfo && userInfo.loggedIn) {
         nav += '    <a href="/logout" style="float: left">Logout</a>\n'
 
         if (userInfo.role === 'admin') {

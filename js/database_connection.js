@@ -28,8 +28,8 @@ function getUserByUName(username =''){
             con.query({sql: sql})
                 .then(rows => {
                     resolve(rows)
-                }).catch(err => console.log(err))
-        }).catch(err => console.log(err))
+                }).catch(err => reject(err))
+        }).catch(err => reject(err))
     })
 }
 
@@ -71,18 +71,29 @@ function addArticle(article, userId) {
     });
 }
 
-function addUser(email, pwordhash, firstName, lastName, street, houseNr, postalCode){
+function addUser(user){
     return new Promise((resolve, reject) =>{
         pool.getConnection().then(con => {
-            let sql = 'INSERT INTO users (Email , FirstName, SureName, Street , HouseNr, City, PostCode, Userrole, PwdHash)'
-            sql += `VALUES ('${email}', '${firstName}', '${lastName}', '${street}', '${houseNr}', '${postalCode}', 'customer', '${pwordhash}');`
-            con.query({sql: sql}).then(rows => {
-                resolve(rows)
-            }).catch(err => console.log(err))
+            let sql = 'INSERT INTO users (Email , FirstName, SureName, Street , HouseNr, PostCode, City, Userrole, PwdHash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+            const values = [user.email, user.firstName, user.sureName, user.street, user.houseNr, user.postalCode, user.city, 'customer', user.pwHash];
+            con.query(sql, values, (err, data) =>{}).then(rows => {
+                resolve(rows);
+            }).catch(err => reject(err))
         }).catch(err => reject(err))
     });
 } 
 
+function checkIfEmailExists(user){
+    return new Promise((resolve, reject) =>{
+        pool.getConnection().then(con =>{
+            let sql = 'select * from users where Email = ?';
+            con.query(sql, user.email).then(rows =>{
+                resolve(rows);
+            }).catch(err => reject(err));
+        }).catch(err => reject(err));
+    }).catch(err => console.log(err));
+}
+
 module.exports = {
-    getSearchedArticles, getUserByUName, getArtcileById, addArticle, getArtcileByName
+    getSearchedArticles, getUserByUName, getArtcileById, addArticle, getArtcileByName, addUser,checkIfEmailExists,
 }

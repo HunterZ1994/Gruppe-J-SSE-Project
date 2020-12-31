@@ -1,5 +1,6 @@
 const navigation = require('./navigation')
 const fs = require('fs')
+const crypto = require('crypto');
 
 function buildArticlesTable(articles) {
     let artTable = ''
@@ -41,8 +42,13 @@ function readHtmlAndAddNav(userInfo, filename) {
     })
 }
 
+function createPasswordHash(value) {
+    return crypto.createHash('sha256').update(value).digest('hex');
+}
+
 
 module.exports = {
     buildArticlesTable,
     readHtmlAndAddNav,
+    createPasswordHash,
 }

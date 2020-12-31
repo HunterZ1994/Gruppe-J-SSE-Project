@@ -2,8 +2,6 @@ const navigation = require('./navigation')
 const fs = require('fs')
 const db_conector = require('./database_connection');
 
-console.log("cart script loaded")
-
 const createCart = (userInfo) => {
     return new Promise((resolve, reject) => {
         let nav = navigation.createNavigationHTML(userInfo)
@@ -48,7 +46,6 @@ function buildArticles(articles) {
 }
 
 function goToCheckout(){
-    // window.alert("Going to checkout");
     console.log("Going to checkout!")
 }
 
