@@ -13,6 +13,7 @@ create TABLE Users (
     PostCode int,
     Userrole varchar(10) NOT NULL,
     PwdHash varchar(255) NOT NULL,
+    Blocked boolean,
 
     CHECK (Userrole IN("customer", "admin", "vendor")),
     PRIMARY KEY(UserId)

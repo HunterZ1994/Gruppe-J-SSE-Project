@@ -1,8 +1,8 @@
 const express = require('express');
 const path = require('path');
-const bodyParser = require('body-parser');
 const fs = require('fs');
 const crypto = require('crypto');
+const formidable = require('formidable');
 const index = require('./js/index');
 const cart = require('./js/cart');
 const search_results = require('./js/search_results');
@@ -10,10 +10,12 @@ const db_conector = require("./js/database_connection");
 
 const htmlPath = path.join(__dirname) + '/html';
 const app = express();
-app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(express.urlencoded());
+app.use(express.json());
 
 // TODO: replace hard-coded user info with cookie
-const userInfo = {loggedIn: true, role: 'customer'}
+const userInfo = {loggedIn: true, role: 'customer'};
 
 function createPasswordHash(value) {
     let res = value;
@@ -52,7 +54,7 @@ app.post('/login', function(req, res) {
         const users = result[0];
         console.log(users);
         if(this.dbpwd === users.PwdHash){
-            this.userInfo = {loggedIn: true,userID = users.UserId, role: users.userRole}
+            this.userInfo = {loggedIn: true, userID: users.UserId, role: users.userRole}
         }
     }) ;
     // load user from db
@@ -113,11 +115,36 @@ function createVendorIndexPage() {
 app.get('/article/add', function(req, res) {
     // check user info
     // return only if vendor
+    
     res.sendFile(htmlPath + '/article/articleForm.html');
 });
 
 app.post('/article/add', function(req, res) {
-    console.log(req.body);
+    const form = new formidable.IncomingForm();
+    const userid = 1;
+    form.parse(req, function(err, fields, files){
+        const article = fields;
+
+        db_conector.addArticle({...fields, imagePath: path.join(__dirname, 'assets')+ `/images/${userid}/${article.articleName}/${files.image.name}`}, 1)
+        .then(res => {
+             // file upload and saving
+            const oldpath = files.image.path;
+            const newpath = path.join(__dirname, 'assets')+ `/images/${userid}/${article.articleName}/${files.image.name}`;
+            const rawData = fs.readFileSync(oldpath);
+            if (!fs.existsSync(path.join(__dirname, 'assets')+ `/images/${userid}/${article.articleName}`)) {
+                fs.mkdirSync(path.join(__dirname, 'assets')+ `/images/${userid}/${article.articleName}`);
+            }
+            fs.writeFile(newpath, rawData, function(err) {
+                if (!err) {
+                    res.send('sucess');
+                } else {
+                    console.log(err);
+                }
+            });
+        })
+        .catch(err => {});
+    });
+
     // load article object
     // check validity
     // save to db
@@ -148,18 +175,18 @@ app.post('/article/edit', function(req, res) {
 // cart
 
 app.get('/cart', (req, res) =>{
-   // TODO: replace hard-coded userInfo with info from cookie
-   cart.createCart({loggedIn: true, role: 'vendor'}).then(result => {
-    res.send(result);
-    })
-})
+    // TODO: replace hard-coded userInfo with info from cookie
+    cart.createCart({loggedIn: true, role: 'vendor'}).then(result => {
+     res.send(result);
+     })
+ })
+ 
+ app.delete('/cart', (req, res) =>{
+     console.log(req.query.id);
+     res.send('Youve deleted an item from your cart')
+ }) 
 
-app.delete('/cart', (req, res) =>{
-    console.log(req.query.id);
-    res.send('Youve deleted an item from your cart')
-}) 
-
-//#endregion
+ //#endregion
 
 const port = process.env.PORT || 8080;
 
