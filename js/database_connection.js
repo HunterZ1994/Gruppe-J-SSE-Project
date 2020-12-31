@@ -68,8 +68,10 @@ function addArticle(article, userId) {
            })
            .catch(err => reject(err))
        }).catch(err => reject(err)); 
+    });
+}
 
-       function addUser(email, pwordhash, firstName, lastName, street, houseNr, postalCode){
+function addUser(email, pwordhash, firstName, lastName, street, houseNr, postalCode){
     return new Promise((resolve, reject) =>{
         pool.getConnection().then(con => {
             let sql = 'INSERT INTO users (Email , FirstName, SureName, Street , HouseNr, City, PostCode, Userrole, PwdHash)'
@@ -79,7 +81,7 @@ function addArticle(article, userId) {
             }).catch(err => console.log(err))
         }).catch(err => reject(err))
     });
-}
+} 
 
 module.exports = {
     getSearchedArticles, getUserByUName, getArtcileById, addArticle, getArtcileByName
