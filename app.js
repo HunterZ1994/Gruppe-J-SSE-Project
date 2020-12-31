@@ -7,7 +7,7 @@ const index = require('./js/index');
 const cart = require('./js/cart');
 const search_results = require('./js/search_results');
 const db_conector = require("./js/database_connection");
-var cookieParser = require('cookie-parser');
+const cookieParser = require('cookie-parser');
 
 const htmlPath = path.join(__dirname) + '/html';
 const app = express();
@@ -34,6 +34,7 @@ app.use('/css', express.static(__dirname + '/css'));
 
 app.get('/', function(req, res) {
     // TODO: replace hard-coded userInfo with info from cookie
+    console.log(req.cookie)
     index.createIndex(userInfo).then(result => {
         res.send(result);
     })
@@ -48,12 +49,9 @@ app.post('/login', function(req, res) {
     const dbpwd = createPasswordHash(req.body.password);
     db_conector.getUserByUName(req.body.email).then(result =>{
         const users = result[0];
-        if(dbpwd.toUpperCase() == users.PwdHash){
+        if(dbpwd.toUpperCase() === users.PwdHash){
             this.userInfo = {loggedIn: true,userID: users.UserId, role: users.Userrole}
-            index.createIndex(userInfo).then(result => {
-                res.cookie('userInfo', userInfo).send(result);
-            })
-            
+            res.cookie('userInfo', userInfo).redirect('/')
         }
     });
     // load user from db
