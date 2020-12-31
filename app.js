@@ -7,10 +7,12 @@ const index = require('./js/index');
 const cart = require('./js/cart');
 const search_results = require('./js/search_results');
 const db_conector = require("./js/database_connection");
+var cookieParser = require('cookie-parser');
 
 const htmlPath = path.join(__dirname) + '/html';
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // TODO: replace hard-coded user info with cookie
 const userInfo = {loggedIn: true, role: 'customer'}
@@ -51,8 +53,11 @@ app.post('/login', function(req, res) {
     db_conector.getUserByUName(req.body.email).then(result =>{
         const users = result[0];
         console.log(users);
+        this.userInfo = {loggedIn: true,userID: users.UserId, role: users.Userrole}
+        console.log(this.userInfo);
         if(this.dbpwd === users.PwdHash){
-            this.userInfo = {loggedIn: true,userID: users.UserId, role: users.userRole}
+            this.userInfo = {loggedIn: true,userID: users.UserId, role: users.Userrole}
+            console.log(this.userInfo);
         }
     });
     // load user from db
