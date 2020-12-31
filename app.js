@@ -4,10 +4,14 @@ const bodyParser = require('body-parser');
 const fs = require('fs');
 const crypto = require('crypto');
 const index = require('./js/index');
+const search_results = require('./js/search_results');
 
 const htmlPath = path.join(__dirname) + '/html';
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
+
+// TODO: replace hard-coded user info with cookie
+const userInfo = {loggedIn: true, role: 'customer'}
 
 function createPasswordHash(value) {
     let res = value;
@@ -26,10 +30,11 @@ function createResponseHTML(contentHTML) {
 
 app.use(express.static('public'));
 app.use('/images', express.static(__dirname + '/assets/images'));
+app.use('/css', express.static(__dirname + '/css'));
 
 app.get('/', function(req, res) {
     // TODO: replace hard-coded userInfo with info from cookie
-    index.createIndex({loggedIn: true, role: 'vendor'}).then(result => {
+    index.createIndex(userInfo).then(result => {
         res.send(result);
     })
 });
@@ -69,10 +74,11 @@ app.post('/register', function(req, res) {
 });
 
 app.get('/search', function (req, res)  {
-    let searchKeyWord = encodeURI(req.query.key)
-    console.log(searchKeyWord)
-    // getSearchedArticles(searchKeyWord)
-    throw Error('Method search not implemented')
+    let key = encodeURI(req.query.key)
+    // TODO: replace hard-coded userInfo with info from cookie
+    search_results.createSearchResults(userInfo, key).then(result => {
+        res.send(result);
+    })
 });
 
 // #region admin
