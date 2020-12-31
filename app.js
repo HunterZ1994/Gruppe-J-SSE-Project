@@ -66,8 +66,7 @@ app.post('/login', function(req, res) {
 app.get('/logout', function(req, res) {
     // TODO: logout
     userInfo.loggedIn = false
-    res.send('<h1>Logged out successfully</h1>');
-    req.get({url: 'http://end-point', headers: req.headers});
+    res.redirect('/');
 });
 
 app.get('/register', function(req, res) {
