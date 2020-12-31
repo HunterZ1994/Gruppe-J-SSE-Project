@@ -1,4 +1,5 @@
 const navigation = require('./navigation')
+const fs = require('fs')
 
 function buildArticlesTable(articles) {
     let artTable = ''

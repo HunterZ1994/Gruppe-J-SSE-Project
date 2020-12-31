@@ -1,4 +1,3 @@
-const fs = require('fs')
 const db_connection = require('./database_connection')
 const tools = require('./tools')
 
