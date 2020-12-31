@@ -52,9 +52,9 @@ app.post('/login', function(req, res) {
         const users = result[0];
         console.log(users);
         if(this.dbpwd === users.PwdHash){
-            this.userInfo = {loggedIn: true,userID = users.UserId, role: users.userRole}
+            this.userInfo = {loggedIn: true,userID: users.UserId, role: users.userRole}
         }
-    }) ;
+    });
     // load user from db
     // compare password 
     // create cookie
@@ -65,7 +65,9 @@ app.post('/login', function(req, res) {
 
 app.get('/logout', function(req, res) {
     // TODO: logout
-    res.sendFile(htmlPath + '/index.html');
+    userInfo.loggedIn = false
+    res.send('<h1>Logged out successfully</h1>');
+    req.get({url: 'http://end-point', headers: req.headers});
 });
 
 app.get('/register', function(req, res) {

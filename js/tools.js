@@ -1,3 +1,5 @@
+const navigation = require('./navigation')
+
 function buildArticlesTable(articles) {
     let artTable = ''
 
@@ -13,7 +15,7 @@ function buildArticlesTable(articles) {
             artTable += '   <tr>\n'
             artTable += '       <td><a href="/product/' + article.ArticleId + '">' + article.ArticleName + '</a></td>\n'
             artTable += '       <td>' + article.Descpt + '</td>\n'
-            artTable += '       <td>' + article.Amount + '$</td>\n'
+            artTable += '       <td>' + article.Price + '$</td>\n'
             artTable += '       <td><img src="' + article.ImagePath
                 + '" style="max-height: 150px; max-width: 150px;"></td>\n'
             artTable += '   </tr>\n'
@@ -27,6 +29,19 @@ function buildArticlesTable(articles) {
     return artTable
 }
 
+function readHtmlAndAddNav(userInfo, filename) {
+    return new Promise((resolve, reject) => {
+        fs.readFile(__dirname + '/../html/' + filename, 'utf8', function (err, html) {
+            if (err) {
+                throw err
+            }
+            resolve(html.replace('{ navigation }', navigation.createNavigationHTML(userInfo)))
+        })
+    })
+}
+
+
 module.exports = {
     buildArticlesTable,
+    readHtmlAndAddNav,
 }
