@@ -1,34 +1,19 @@
 const mariadb = require('mariadb');
-const express = require('express');
 const pool = mariadb.createPool({
-     host: 'localhost',
-     port: 3306, 
-     user:'root', 
-     password: 'Westernby1994',
-     database: 'hardwarebay',
+    host: 'localhost',
+    user:'hardwarebay',
+    password: '123',
+    database: 'hardwarebay',
+    port: '3306',
 });
 
-// pool.getConnection().then(conn =>{
-//     conn.query("SELECT * FROM users;")
-//     .then((rows) =>{
-//         console.log(rows);
-//     }).catch(err =>{
-//         console.log(err);
-//         conn.end();
-//     }) 
-// }).catch(err => {
-//     //not connected
-//     console.log(err);
-//   });
-
-function getArticleWithID(id = ''){
+function getSearchedArticles(key = '') {
     return new Promise((resolve, reject) => {
         pool.getConnection().then(con => {
             let sql = 'select * from articles'
-            sql += (id === '') ? '' : ' where \'ArticleName\' like \'%' + id + '%\''
+            sql += (key === '') ? ' limit 10' : ' where ArticleName like \'%' + key + '%\''
             con.query({sql: sql})
                 .then(rows => {
-                    con.end()
                     resolve(rows)
                 }).catch(err => console.log(err))
         }).catch(err => console.log(err))
@@ -36,5 +21,5 @@ function getArticleWithID(id = ''){
 }
 
 module.exports = {
-    getArticleWithID,
+    getSearchedArticles,
 }

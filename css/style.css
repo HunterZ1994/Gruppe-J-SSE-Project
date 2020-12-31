@@ -8,4 +8,10 @@
     flex-flow: column;
 }
 
+.item-table-component, .item-table-component th, td {
+    border: 1px solid black;
+}
 
+nav * {
+    padding: 5px;
+}
