@@ -18,11 +18,7 @@ app.use(cookieParser());
 const userInfo = {loggedIn: true, role: 'customer'}
 
 function createPasswordHash(value) {
-    let res = value;
-    for (let i = 0; i < 1000, i++;) {
-        res = crypto.createHash('sha256').update(res).digest('hex');
-    }
-    return res;
+   return crypto.createHash('sha256').update(value).digest('hex');
 }
 
 function createResponseHTML(contentHTML) {
@@ -52,12 +48,12 @@ app.post('/login', function(req, res) {
     const dbpwd = createPasswordHash(req.body.password);
     db_conector.getUserByUName(req.body.email).then(result =>{
         const users = result[0];
-        console.log(users);
-        this.userInfo = {loggedIn: true,userID: users.UserId, role: users.Userrole}
-        console.log(this.userInfo);
-        if(this.dbpwd === users.PwdHash){
+        if(dbpwd.toUpperCase() == users.PwdHash){
             this.userInfo = {loggedIn: true,userID: users.UserId, role: users.Userrole}
-            console.log(this.userInfo);
+            index.createIndex(userInfo).then(result => {
+                res.cookie('userInfo', userInfo).send(result);
+            })
+            
         }
     });
     // load user from db
@@ -65,7 +61,6 @@ app.post('/login', function(req, res) {
     // create cookie
     // return response
     // throw Error('Method login not implemented');
-    res.send();
 });
 
 app.get('/logout', function(req, res) {
