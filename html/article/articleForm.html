@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="de-DE">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HardwareBay</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<form method="POST" action="add" class="column" enctype="multipart/form-data">
+    <div class="row" name>
+        <label for="articleName">Artikelbezeichnung</label>
+        <input name="articleName" type="text" required/>
+    </div>
+
+    <div class="row" beschreibung>
+        <label for="description">Beschreibung</label>
+        <input name="description" type="text" required/>
+    </div>
+
+    <div class="row">
+        <label for="amount">Preis</label>
+        <input name="amount" type="number" required/>
+    </div>
+
+    <div class="row" image>
+        <label for="image">Beschreibung</label>
+        <input name="image" type="file" accept="image/png, image/jpeg"/>
+    </div>
+    
+
+    <button type="submit">Hinzufügen</button>
+</form>

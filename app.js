@@ -101,10 +101,13 @@ function createVendorIndexPage() {
 }
 
 app.get('/article/add', function(req, res) {
-    // return add article page
+    // check user info
+    // return only if vendor
+    res.sendFile(htmlPath + '/article/articleForm.html');
 });
 
 app.post('/article/add', function(req, res) {
+    console.log(req.body);
     // load article object
     // check validity
     // save to db
