@@ -5,7 +5,7 @@ const formidable = require('formidable');
 const index = require('./js/index');
 const cart = require('./js/cart');
 const search_results = require('./js/search_results');
-const db_conector = require("./js/database_connection");
+const db_connector = require("./js/database_connection");
 const cookieParser = require('cookie-parser');
 const { userInfo } = require('os');
 const tools = require("./js/tools");
@@ -45,7 +45,7 @@ app.get('/login', function (req, res) {
 
 app.post('/login', function (req, res) {
     const dbpwd = tools.createPasswordHash(req.body.password);
-    db_conector.getUserByUName(req.body.email).then(result => {
+    db_connector.getUserByUName(req.body.email).then(result => {
         if(Object.keys(result).length>1){
             const users = result[0];
             if (dbpwd.toUpperCase() === users.PwdHash.toUpperCase()) {
@@ -76,12 +76,12 @@ app.get('/register', function (req, res) {
 app.post('/register', function (req, res) {
     var user = req.body;
     user.pwHash = tools.createPasswordHash(user.password);
-    db_conector.checkIfEmailExists(user).then(result =>{
+    db_connector.checkIfEmailExists(user).then(result =>{
         if(Object.keys(result).length>1){
             this.userInfo = { loggedIn: false, userID: users.UserId, role: users.Userrole }
                 res.cookie('userInfo', this.userInfo).sendFile(htmlPath + '/signup_error.html');
         }else{
-             db_conector.addUser(user).then(result =>{
+             db_connector.addUser(user).then(result =>{
                  if(result.warningStatus == 0){
                     this.userInfo = { loggedIn: true, userID: user.email, role: 'customer' }
                     res.cookie('userInfo', this.userInfo).redirect('/');
@@ -136,7 +136,7 @@ app.post('/article/add', function (req, res) {
     form.parse(req, function (err, fields, files) {
         const article = fields;
 
-        db_conector.addArticle({ ...fields, imagePath: path.join(__dirname, 'assets') + `/images/${userid}/${article.articleName}/${files.image.name}` }, 1)
+        db_connector.addArticle({ ...fields, imagePath: path.join(__dirname, 'assets') + `/images/${userid}/${article.articleName}/${files.image.name}` }, 1)
             .then(res => {
                 // file upload and saving
                 const oldpath = files.image.path;
