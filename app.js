@@ -10,6 +10,10 @@ const cookieParser = require('cookie-parser');
 const { userInfo } = require('os');
 const tools = require("./js/tools");
 const { BADQUERY } = require('dns');
+const { reset } = require('nodemon');
+const articleForm = require('./js/articleForm');
+const errorHanlder = require('./js/errorHandler');
+const htmlParser = require('node-html-parser');
 
 const htmlPath = path.join(__dirname) + '/html';
 const app = express();
@@ -19,14 +23,8 @@ app.use(express.json());
 app.use(cookieParser());
 
 // TODO: replace hard-coded user info with cookie
-// const userInfo = { loggedIn: false, role: 'customer' };
+const fakeUserInfo = { loggedIn: false, role: 'customer' };
 
-function createResponseHTML(contentHTML) {
-    // read header and Navigation
-    // append content 
-    // append possible footer
-    // return string or file
-}
 
 app.use(express.static('public'));
 app.use('/images', express.static(__dirname + '/assets/images'));
@@ -116,74 +114,193 @@ app.get('/adminPanel', function (req, res) {
 
 // #region vendor
 
-function createVendorIndexPage() {
-    // read all articles of vendor from db
-    // place in html 
-    // add into index.html
-    // return hmtl 
-}
-
 app.get('/article/add', function (req, res) {
-    // check user info
-    // return only if vendor
-
-    res.sendFile(htmlPath + '/article/articleForm.html');
+    articleForm.createArticleForm(fakeUserInfo).then(html => res.send(html));
 });
 
 app.post('/article/add', function (req, res) {
-    const form = new formidable.IncomingForm();
+    // TODO: Replace with real creadentials -> DB Checking, else ins. deser.
     const userid = 1;
+    const isVerndor = 'vendor' == 'vendor'
+
+    if (!isVerndor) {
+        errorHanlder.createErrorResponse(fakeUserInfo, 403, "Access Denied")
+        .then(html => {
+            res.status = 403;
+            res.send(html);
+        }); 
+    }
+
+    const form = new formidable.IncomingForm();
     form.parse(req, function (err, fields, files) {
         const article = fields;
+        const articleIsValid = article.articleName && article.descpt && article.price;
 
-        db_conector.addArticle({ ...fields, imagePath: path.join(__dirname, 'assets') + `/images/${userid}/${article.articleName}/${files.image.name}` }, 1)
-            .then(res => {
+        if (!articleIsValid) {
+            errorHanlder.createErrorResponse(fakeUserInfo, 400, "Bad Request")
+            .then(html => {
+                res.status = 400;
+                res.send(html);
+            });  
+        }
+
+        const imagePath = `./assets/images/${userid}/${article.articleName}`;
+        db_conector.addArticle({ ...fields, imagePath: imagePath + `/${files.image.name}`}, userid)
+            .then(rows => {
                 // file upload and saving
                 const oldpath = files.image.path;
-                const newpath = path.join(__dirname, 'assets') + `/images/${userid}/${article.articleName}/${files.image.name}`;
+                const newpath = imagePath;
                 const rawData = fs.readFileSync(oldpath);
-                if (!fs.existsSync(path.join(__dirname, 'assets') + `/images/${userid}/${article.articleName}`)) {
-                    fs.mkdirSync(path.join(__dirname, 'assets') + `/images/${userid}/${article.articleName}`);
+                if (!fs.existsSync(imagePath)) {
+                    fs.mkdirSync(imagePath);
                 }
                 fs.writeFile(newpath, rawData, function (err) {
-                    if (!err) {
-                        res.send('sucess');
-                    } else {
-                        console.log(err);
-                    }
+                    const message = err ? 'Speichern des Bildes fehlgeschlagen' : 'Hinzufügen erfolgreich';
+                    // TODO replace fakeUserInfo
+                    index.createIndex(fakeUserInfo).then(html => {
+                        const root = htmlParser.parse(html);
+                        root.querySelector('#head').appendChild(`<script> window.alert(${message}) </script>`);
+                        res.send(root.toString());
+                    }).catch(err => console.log(err)); 
                 });
             })
-            .catch(err => { });
+            .catch(err => { 
+                errorHanlder.createErrorResponse(fakeUserInfo, 500, "Internal Server Error")
+                .then(html => {
+                    res.status = 500;
+                    res.send(html);
+                }); 
+            });
     });
-
-    // load article object
-    // check validity
-    // save to db
-    // fail -> return addArticle Page with filled form and error message
-    // return index page with articles of user and success message
 });
 
 app.delete('/article/delete', function (req, res) {
-    // read id from query
-    // delete article
-    // fail return index with articles and error message
-    // success return index with articles and success message
+    // TODO: Replace with real creadentials -> DB Checking, else ins. deser.
+    const userId = 1;
+    const isVendor = 'vendor' === 'vendor';
+    const articleId = req.params.articleId;
+    
+    if (!isVendor) {
+        // TODO: replace with html answer
+        res.status(403).send({error: 'forbidden :('});
+    }
+
+    if (!articleId) {
+        // TODO: replace with html answer
+        res.status(400).send({error: 'no article ID :('});
+    }
+
+    db_conector.deleteArticle(articleId)
+        // TODO: Reploace with html answer -> index + window.alert success
+        .then(res => res.status(200).send('Delete Success'))
+        // TODO: Replace with html answer -> index + window.alert error
+        .catch(err => res.status(500).send({err, message: 'Something bad happend'}));
 });
 
 
 app.get('/article/edit', function (req, res) {
-    // return article form filed
+    // TODO: Replace with real creadentials -> DB Checking, else ins. deser.
+    const userId = 1;
+    const isVendor = 'vendor' === 'vendor';
+    const articleId = req.query.articleId;
+
+    if (!isVendor) {
+        errorHanlder.createErrorResponse(fakeUserInfo, 403, "Access Denied")
+        .then(html => {
+            res.status = 403;
+            res.send(html);
+        });  
+    }
+
+    if (!articleId) {
+        errorHanlder.createErrorResponse(fakeUserInfo, 400, "Bad Request")
+            .then(html => {
+                res.status = 400;
+                res.send(html);
+            });  
+    }
+
+    db_conector.getArtcileById(articleId)
+        .then(rows => {
+            const dbArticle = rows[0];
+            articleForm.createArticleForm(fakeUserInfo, dbArticle)
+                .then(html => {
+                    res.send(html);
+                })
+                .catch(err => console.log(err));
+        })
+        .catch(err => {
+            errorHanlder.createErrorResponse(fakeUserInfo, 500, "Internal Server Error")
+            .then(html => {
+                res.status = 500;
+                res.send(html);
+            });  
+        });
 });
 
 app.post('/article/edit', function (req, res) {
-    // get json from body
-    // check validity 
-    // update in db
-    // fail --> return filled editArticle with error message
-    // success --> return index with sucess
+    // TODO: Replace with real creadentials -> DB Checking, else ins. deser.
+    const userId = 1;
+    const isVendor = 'vendor' === 'vendor';
+
+    if (!isVendor) {
+        errorHanlder.createErrorResponse(fakeUserInfo, 403, "Access Denied")
+        .then(html => {
+            res.status = 403;
+            res.send(html);
+        });  
+    }
+
+    const form = new formidable.IncomingForm();
+    form.parse(req, function (err, fields, files) {
+        const article = fields;
+        const articleIsValid = article.articleId && article.articleName && article.descpt && article.price;
+
+        if (!articleIsValid) {
+            errorHanlder.createErrorResponse(fakeUserInfo, 400, "Bad Request")
+            .then(html => {
+                res.status = 400;
+                res.send(html);
+            });  
+        }
+
+        // reading article for comparsion
+        db_conector.getArtcileById(article.articleId)
+            .then(rows => {
+                const dbArticle = rows[0];
+                for (const key of Object.keys(article)) {
+                    switch(key.toLowerCase()) {
+                        case 'imagepath': 
+                            break;
+
+                        case "articleid":
+                            break;
+
+                        default: 
+                            dbArticle[key] = article[key];
+                            break;
+                    }
+                }
+                db_conector.updateArticle(dbArticle).then(rows => {
+                    const message = "Bearbeiten erfolgreich"
+                    index.createIndex(fakeUserInfo).then(html => {
+                        const root = htmlParser.parse(html);
+                        root.querySelector('#head').appendChild(`<script> window.alert(${message}) </script>`);
+                        res.send(root.toString());
+                    }).catch(err => console.log(err)); 
+                }).catch(err => console.log(err));
+            })
+            .catch(err => {
+                errorHanlder.createErrorResponse(fakeUserInfo, 500, "Internal Server Error")
+                .then(html => {
+                    res.status = 500;
+                    res.send(html);
+                });  
+            });
+    });
 });
 
-// cart
+//#region cart
 
 app.get('/cart', (req, res) => {
     // TODO: replace hard-coded userInfo with info from cookie
@@ -198,6 +315,11 @@ app.delete('/cart', (req, res) => {
 })
 
 //#endregion
+
+// #region comments
+
+
+// #endregion
 
 const port = process.env.PORT || 8080;
 

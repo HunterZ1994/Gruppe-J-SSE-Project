@@ -7,7 +7,8 @@
     "cookie-parser": "^1.4.5",
     "express": "^4.17.1",
     "formidable": "^1.2.2",
-    "mariadb": "^2.5.2"
+    "mariadb": "^2.5.2",
+    "node-html-parser": "^2.0.1"
   },
   "devDependencies": {
     "nodemon": "^2.0.6"
