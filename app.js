@@ -197,7 +197,6 @@ app.delete('/article/delete', function (req, res) {
         .catch(err => res.status(500).send({err, message: 'Something bad happend'}));
 });
 
-
 app.get('/article/edit', function (req, res) {
     // TODO: Replace with real creadentials -> DB Checking, else ins. deser.
     const userId = 1;
