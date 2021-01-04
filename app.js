@@ -42,9 +42,28 @@ app.get('/', function (req, res) {
     })
 });
 
-app.get('/login', function (req, res) {
-    res.sendFile(htmlPath + '/signin.html');
-});
+app.get('/', function(request, response) {
+    response.sendFile(path.join(__dirname + '/signin.html'));
+ });
+ 
+ app.post('/login', function (req, res) {
+     var dbpwd = tools.createPasswordHash(req.body.password);
+     db_connection.getUserByUName(req.body.email).then(result => {
+         if(Object.keys(result).length>1){
+             var users = result[0];
+             if (dbpwd.toUpperCase() === users.PwdHash.toUpperCase()) {
+                 this.userInfo = { loggedIn: true, userID: users.UserId, role: users.Userrole };
+                 res.cookie('userInfo', this.userInfo).redirect('/');
+             }else{
+                 this.userInfo = { loggedIn: false, userID: users.UserId, role: users.Userrole };
+                 res.cookie('userInfo', this.userInfo).sendFile(htmlPath + '/signin_error.html');
+             }
+         }else{
+             this.userInfo = { loggedIn: false, userID: "", role: "" };
+             res.cookie('userInfo', this.userInfo).sendFile(htmlPath + '/signin_error.html');
+         }
+     });
+ });
 
 app.get('/logout', function (req, res) {
     // TODO: logout
@@ -53,9 +72,32 @@ app.get('/logout', function (req, res) {
     res.cookie('userInfo', userInfo).redirect('/');
 });
 
-app.get('/register', function (req, res) {
-    res.sendFile(htmlPath + '/signup.html');
-});
+app.get('/', function(request, response) {
+    response.sendFile(path.join(__dirname + '/signup.html'));
+ });
+ 
+ app.post('/register', function (req, res) {
+     var user = req.body;
+     user.pwHash = tools.createPasswordHash(user.password);
+     db_connection.checkIfEmailExists(user).then(result =>{
+         if(Object.keys(result).length>1){
+             this.userInfo = { loggedIn: false, userID: users.UserId, role: users.Userrole }
+                 res.cookie('userInfo', this.userInfo).sendFile(htmlPath + '/signup_error.html');
+         }else{
+             db_connection.addUser(user).then(result =>{
+                  if(result.warningStatus == 0){
+                     this.userInfo = { loggedIn: true, userID: user.email, role: 'customer' }
+                     res.cookie('userInfo', this.userInfo).redirect('/');
+                 }else{
+                     res.sendStatus(BADQUERY);
+                  }
+             });
+         }
+     }).catch(err =>{
+         console.log(err);
+     })
+    
+ });
 
 //#endregion
 
