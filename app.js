@@ -6,7 +6,7 @@ const formidable = require('formidable');
 const cookieParser = require('cookie-parser');
 const { userInfo } = require('os');
 const tools = require("./js/tools");
-const { BADQUERY } = require('dns');
+const { BADQUERY, resolve4 } = require('dns');
 const { reset } = require('nodemon');
 const htmlParser = require('node-html-parser');
 const jimp = require('jimp');
@@ -119,7 +119,12 @@ app.get('/adminPanel', function (req, res) {
 
 app.get('/article/add', function (req, res) {
     // TODO: Replace userInfo
-    vendor.createArticleForm(fakeUserInfo).then(html => res.send(html));
+    vendor.createArticleForm(fakeUserInfo)
+    .then(html => res.send(html))
+    .catch(err => {
+        res.status = err.code;
+        res.send(err.html);
+    });
 });
 
 app.post('/article/add', function (req, res) {
@@ -130,9 +135,9 @@ app.post('/article/add', function (req, res) {
     if (!isVerndor) {
         // TODO: Replace fakeUserInfo
         errorHanlder.createErrorResponse(fakeUserInfo, 403, "Access Denied")
-        .then(html => {
-            res.status = 403;
-            res.send(html);
+        .then(err => {
+            res.status = err.status;
+            res.send(err.html);
         }); 
     }
 
@@ -142,7 +147,10 @@ app.post('/article/add', function (req, res) {
         // TODO: Replace fakeUserInfo
         vendor.addArticle(fakeUserInfo, fields, files)
             .then(html => res.send(html))
-            .catch(err => res.send(err));
+            .catch(err =>{
+                res.status = err.code;
+                res.send(err.html);
+            });
     });
 });
 
@@ -155,16 +163,19 @@ app.delete('/article/delete', function (req, res) {
     if (!isVendor) {
         // TODO: replace userInfo
         errorHanlder.createErrorResponse(fakeUserInfo, 403, "Access Denied")
-        .then(html => {
-            res.status = 403;
-            res.send(html);
-        }); 
+        .then(err =>{
+            res.status = err.code;
+            res.send(err.html);
+        });
     }
 
     // TODO: replace userInfo
     vendor.deleteArticle(fakeUserInfo, article)
         .then(html => res.send(html))
-        .catch(err => res.send(err));
+        .catch(err =>{
+            res.status = err.code;
+            res.send(err.html);
+        });
 });
 
 
@@ -177,16 +188,19 @@ app.get('/article/edit', function (req, res) {
     if (!isVendor) {
         // TODO: Replace userInfo
         errorHanlder.createErrorResponse(fakeUserInfo, 403, "Access Denied")
-        .then(html => {
-            res.status = 403;
-            res.send(html);
-        });  
+        .then(err =>{
+            res.status = err.code;
+            res.send(err.html);
+        }); 
     }
 
     // TODO: Replace userInfo
     vendor.createArticleForm(fakeUserInfo, articleId)
     .then(html => res.send(html))
-    .catch(errHtml => res.send(errHtml));
+    .catch(err =>{
+        res.status = err.code;
+        res.send(err.html);
+    });
 });
 
 app.post('/article/edit', function (req, res) {
@@ -197,9 +211,9 @@ app.post('/article/edit', function (req, res) {
     if (!isVendor) {
         // TODO: replace userInfo
         errorHanlder.createErrorResponse(fakeUserInfo, 403, "Access Denied")
-        .then(html => {
-            res.status = 403;
-            res.send(html);
+        .then(err => {
+            res.status = err.code;
+            res.send(err.html);
         });  
     }
 
@@ -207,7 +221,10 @@ app.post('/article/edit', function (req, res) {
     form.parse(req, function (err, fields, files) {
         vendor.updateArticle(fakeUserInfo, fields, files)
         .then(html => res.send(html))
-        .catch(html => res.send(html));
+        .catch(err =>{
+            res.status = err.code;
+            res.send(err.html);
+        });
     });
 });
 

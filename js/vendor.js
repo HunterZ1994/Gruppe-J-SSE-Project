@@ -1,5 +1,5 @@
 const tools = require('./tools');
-const db_connector = require('./database_connection');
+const db_conector = require('./database_connection');
 const index = require('./index');
 const errorHandler = require('./errorHandler');
 const htmlParser = require('node-html-parser');
@@ -197,9 +197,8 @@ function deleteArticle(userInfo, article) {
         const articleId = article.articleId;
         if (!articleId) {
             errorHanlder.createErrorResponse(userInfo, 400, "Bad Request, No Article Id")
-            .then(html => {
-                res.status = 400;
-                res.send(html);
+            .then(err => {
+                reject(err);
             }); 
         }
     

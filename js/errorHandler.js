@@ -7,6 +7,7 @@ function createErrorResponse(userInfo, statusCode, message) {
         .them(html => {
             const root = htmlParser.parse(html);
             root.querySelector('#errorMessage').set_content(`Error: ${statusCode} => ${message}`);
+            resolve({code: statusCode,  html: root.toString});
         })
         .catch(err => reject(err));
     });
