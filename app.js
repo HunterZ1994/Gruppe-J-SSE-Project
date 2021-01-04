@@ -66,8 +66,10 @@ app.post('/login', function (req, res) {
 
 app.get('/logout', function (req, res) {
     // TODO: logout
-    let userInfo = req.cookies.userInfo;
+    const userInfo = req.cookies.userInfo;
     userInfo.loggedIn = false;
+    userInfo.role = 'customer';
+    delete userInfo.userID;
     res.cookie('userInfo', userInfo).redirect('/');
 });
 
