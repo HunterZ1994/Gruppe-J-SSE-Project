@@ -42,7 +42,7 @@ app.get('/', function (req, res) {
     })
 });
 
-app.get('/', function(request, response) {
+app.get('/login', function(request, response) {
     response.sendFile(path.join(__dirname + '/signin.html'));
  });
  
@@ -72,7 +72,7 @@ app.get('/logout', function (req, res) {
     res.cookie('userInfo', userInfo).redirect('/');
 });
 
-app.get('/', function(request, response) {
+app.get('/register', function(request, response) {
     response.sendFile(path.join(__dirname + '/signup.html'));
  });
  
