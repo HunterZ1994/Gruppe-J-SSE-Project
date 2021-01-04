@@ -83,7 +83,7 @@ function updateArticle(article) {
 function deleteArticle(articleId) {
     return new Promise((resolve, reject) => {
         pool.getConnection().then(con => {
-            const sql = "DELETE FROM articles WHERE articleId = ?";
+            const sql = "DELETE FROM articles WHERE ArticleId = ?";
             con.query(sql, articleId).then(res => resolve(res)).catch(err => reject(err));
         }).catch(err => reject(err));
     });

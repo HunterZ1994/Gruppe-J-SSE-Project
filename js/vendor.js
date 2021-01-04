@@ -195,9 +195,8 @@ function updateArticle(userInfo, article, files) {
     });
 }
 
-function deleteArticle(userInfo, article) {
+function deleteArticle(userInfo, articleId) {
     return new Promise((resolve, reject) => {
-        const articleId = article.articleId;
         if (!articleId) {
             errorHanlder.createErrorResponse(userInfo, 400, "Bad Request, No Article Id")
             .then(err => {
@@ -206,22 +205,24 @@ function deleteArticle(userInfo, article) {
         }
     
         db_conector.deleteArticle(articleId)
-            .then(rows => {
+            .then(rows => {;
                 index.createIndex(userInfo).then(html => {
                     const message = "Löschen erfolgreich"
                     const root = htmlParser.parse(html);
                     root.querySelector('#head').appendChild(`<script> window.alert(${message}) </script>`);
                     resolve(root.toString());
                 }).catch(err => {
-                    errorHanlder.createErrorResponse(userInfo, 500, "Internal Server Error")
+                    console.log(err);
+                    errorHandler.createErrorResponse(err, userInfo, 500, "Internal Server Error")
                         .then(html => {
                             reject(html);
                         }); 
                 }); 
             })
             .catch(err => {
-                errorHanlder.createErrorResponse(userInfo, 500, "Internal Server Error")
+                errorHandler.createErrorResponse(err, userInfo, 500, "Internal Server Error")
                 .then(html => {
+                    console.log(err);
                     reject(html);
                 }); 
             });

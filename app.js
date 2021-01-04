@@ -172,11 +172,11 @@ app.post('/article/add', function (req, res) {
     });
 });
 
-app.delete('/article/delete', function (req, res) {
+app.get('/article/delete', function (req, res) {
     // TODO: Replace with real creadentials -> DB Checking, else ins. deser.
     const userId = 1;
     const isVendor = 'vendor' === 'vendor';
-    const articleId = req.params.articleId;
+    const articleId = req.query.articleId;
     
     if (!isVendor) {
         // TODO: replace userInfo
@@ -188,8 +188,11 @@ app.delete('/article/delete', function (req, res) {
     }
 
     // TODO: replace userInfo
-    vendor.deleteArticle(fakeUserInfo, article)
-        .then(html => res.send(html))
+    vendor.deleteArticle(fakeUserInfo, articleId)
+        .then(html => {
+            console.log(html);
+            res.send(html);
+        })
         .catch(err =>{
             res.status = err.code;
             res.send(err.html);
