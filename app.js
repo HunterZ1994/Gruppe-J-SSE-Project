@@ -51,14 +51,14 @@ app.post('/login', function (req, res) {
         if(Object.keys(result).length>1){
             const users = result[0];
             if (dbpwd.toUpperCase() === users.PwdHash.toUpperCase()) {
-                this.userInfo = { loggedIn: true, userID: users.UserId, role: users.Userrole }
+                this.userInfo = { loggedIn: true, userId: users.UserId, role: users.Userrole }
                 res.cookie('userInfo', this.userInfo).redirect('/')
             }else{
-                this.userInfo = { loggedIn: false, userID: users.UserId, role: users.Userrole }
+                this.userInfo = { loggedIn: false, userId: users.UserId, role: users.Userrole }
                 res.cookie('userInfo', this.userInfo).sendFile(htmlPath + '/signin_error.html');
             }
         }else{
-            this.userInfo = { loggedIn: false, userID: "", role: "" }
+            this.userInfo = { loggedIn: false, userId: "", role: "" }
             res.cookie('userInfo', this.userInfo).sendFile(htmlPath + '/signin_error.html');
         }
     });

@@ -45,10 +45,10 @@ function getArtcileByName(articleName='') {
     });
 }
 
-function getArticlesOfVendor(userId='') {
+function getArticlesOfVendor(userId = 0) {
     return new Promise((resolve, reject) => {
         pool.getConnection().then(con => {
-            const sql = 'select * from articles as art where art.Seller = ?'
+            const sql = 'SELECT * FROM articles  WHERE Seller = ?'
             con.query(sql, userId)
             .then(res => resolve(res))
             .catch(err => reject(err));
