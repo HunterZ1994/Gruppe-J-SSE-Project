@@ -43,7 +43,7 @@ function buildArticlePage(userInfo, article, comments) {
 
 function getCartButton(articleId) {
     return new Promise((resolve, reject) => {
-        resolve(`<button type="submit" method="post" action="cart/add?articleId=${articleId}">In den Einkaufswagen</button>`);
+        resolve(`<a href="cart/add?articleId=${articleId}"><button>In den Einkaufswagen</button> </a>`);
     });
 }
 
