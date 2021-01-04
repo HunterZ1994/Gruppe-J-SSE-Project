@@ -48,7 +48,7 @@ function getArtcileByName(articleName='') {
 function getArticlesOfVendor(userId='') {
     return new Promise((resolve, reject) => {
         pool.getConnection().then(con => {
-            const sql = 'select * from articles as art wehre art.seller = ?'
+            const sql = 'select * from articles as art where art.seller = ?'
             con.query(sql, userId)
             .then(res => resolve(res))
             .catch(err => reject(err));

@@ -77,6 +77,7 @@ function getCommentsHtml(comments) {
         getCommenTsAndUser(comments).then(users => {
             let res = '<hr/>\n<div>\n';
             for (const cm of comments) {
+                console.log(cm);
                 const user = users.find(u => u.UserId === comments.User)[0];
                 res += `<p style="border: 1px solid black;"> ${user.FirstName}: ${cm.ComText} </p><br/>\n`
                 resolve( res += '</div><br/>\n');
@@ -87,11 +88,11 @@ function getCommentsHtml(comments) {
 
 function addComment(comText, articleId, userInfo) {
     return new Promise((resolve, reject) => {
-        db_conector.addArticleComment(comText, articleId, userId)
+        db_conector.addArticleComment(comText, articleId, userInfo.userId)
         .then(rows => {
             createArticleView(userInfo, articleId)
             .then(html => {
-                console.log(html);
+                resolve(html);
             })
             .catch(err => console.log(err));
         })

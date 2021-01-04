@@ -278,8 +278,12 @@ app.post('/comment/add', (req, res) => {
     const userId = 3;
 
     articleView.addComment(comment.comText, comment.articleId, {...fakeUserInfo, userId: 1})
-    .then(html => res.send(html))
-    .catch(err => res.send(err));
+    .then(html => {
+        res.send(html);
+    })
+    .catch(err => {
+        console.log(err);
+    });
 });
 
 
