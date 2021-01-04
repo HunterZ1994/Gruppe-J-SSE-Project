@@ -20,6 +20,7 @@ const index = require('./js/index');
 const cart = require('./js/cart');
 
 // basic app setup
+const app = express();
 app.use(express.urlencoded());
 app.use(express.json());
 app.use(cookieParser());
@@ -30,7 +31,7 @@ app.use('/css', express.static(__dirname + '/css'));
 // TODO: replace hard-coded user info with cookie
 const fakeUserInfo = { loggedIn: false, role: 'customer' };
 const htmlPath = path.join(__dirname) + '/html';
-const app = express();
+
 
 app.get('/', function (req, res) {
     // TODO: replace hard-coded userInfo with info from cookie
