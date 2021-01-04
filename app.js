@@ -32,6 +32,7 @@ app.use('/css', express.static(__dirname + '/css'));
 const fakeUserInfo = { loggedIn: false, role: 'customer' };
 const htmlPath = path.join(__dirname) + '/html';
 
+//#region userAuthentication
 
 app.get('/', function (req, res) {
     // TODO: replace hard-coded userInfo with info from cookie
@@ -97,6 +98,10 @@ app.post('/register', function (req, res) {
    
 });
 
+//#endregion
+
+//#region articles
+
 app.get('/search', function (req, res) {
     let key = encodeURI(req.query.key)
     // TODO: replace hard-coded userInfo with info from cookie
@@ -104,6 +109,8 @@ app.get('/search', function (req, res) {
         res.send(result);
     })
 });
+
+//#endregion
 
 // #region admin
 
@@ -177,7 +184,6 @@ app.delete('/article/delete', function (req, res) {
             res.send(err.html);
         });
 });
-
 
 app.get('/article/edit', function (req, res) {
     // TODO: Replace with real creadentials -> DB Checking, else ins. deser.
