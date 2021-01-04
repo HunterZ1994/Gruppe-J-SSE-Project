@@ -36,7 +36,7 @@ const htmlPath = path.join(__dirname) + '/html';
 
 app.get('/', function (req, res) {
     // TODO: replace hard-coded userInfo with info from cookie
-    index.createIndex(fakeUserInfo).then(result => {
+    index.createIndex(!!req.cookies.userInfo ? req.cookies.userInfo : fakeUserInfo).then(result => {
         res.send(result);
     })
 });
