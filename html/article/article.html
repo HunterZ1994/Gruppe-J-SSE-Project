@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="de-DE">
+<head id="head">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HardwareBay</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+    <body>
+        { navigation }
+        <br/>
+        <br/>
+
+        <div class="article">
+            { article }
+        </div>
+
+        <br/>
+        <br/>
+
+        <div class="comments">
+            { comments }
+        </div>
+
+        <br/>
+        <br/>
+
+        <div class="new-comment">
+            <form method="post" action="/comment/add">
+                <input type="hidden" id="articleId" />
+                <label for="commText">Kommentar: </label>
+                <input type="textArea" name="commText" id="commText"/>
+                <button type="submit">Speichern</button>
+
+            </form>
+        </div>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+
+        <div class="cart-button" id="cartButton">
+            { button }
+        </div>
+
+    </body>
+</html>

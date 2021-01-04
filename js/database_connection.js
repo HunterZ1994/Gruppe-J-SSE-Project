@@ -116,7 +116,6 @@ function getCommentsOfUser(userId) {
     return new Promise((resolve, reject) => {
         pool.getConnection().then(con => {
             const sql = "SELECT * FROM comments WHERE user = ?";
-            const values = [];
             con.query(sql, userId).then(res => resolve(res)).catch(err => reject(err));
         }).catch(err => reject(err));
     });
@@ -139,6 +138,20 @@ function getAllUsers() {
             }).catch(err => {
                 reject(err);
         });
+    });
+}
+
+function getUserById(userId = ''){
+    return new Promise((resolve, reject) => {
+        pool.getConnection()
+        .then(con => {
+            const sql = 'SELECT * FROM users WHERE UserId = ?';
+            con.query(sql, userId)
+            .then(rows => {
+                resolve(rows);
+            }).catch(err => reject(err));
+        })
+        .catch(err => reject(err));
     });
 }
 
@@ -209,4 +222,8 @@ module.exports = {
     getCommentsOfArticle,
     addUser,
     checkIfEmailExists,
+    getAllUsers,
+    getUserById,
+    getUserByEmail
+
 }

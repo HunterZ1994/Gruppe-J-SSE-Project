@@ -1,12 +1,22 @@
 const tools = require('./tools');
+const index = require('./index');
 const htmlParser = require('node-html-parser');
 
-function createErrorResponse(userInfo, statusCode, message) {
+function createErrorResponse(userInfo, statusCode, message, redirectHtmlFileName) {
     return new Promise((resolve, reject) => {
-        tools.readHtmlAndAddNav(userInfo, '/error.html')
-        .them(html => {
+        const htmlPath = redirectHtml ? redirectHtmlFileName : 'error.html';
+        let promise = null;
+        switch (htmlPath) {
+            case 'index.html':
+                promise = index.createIndex(userInfo);
+                break; 
+            default: 
+                promise = tools.readHtmlAndAddNav(userInfo, htmlPath);
+        }
+        promise.them(html => {
             const root = htmlParser.parse(html);
-            root.querySelector('#errorMessage').set_content(`Error: ${statusCode} => ${message}`);
+            root.querySelector('#head').appendChild(`<script> window.alert(Error: ${statusCode} => ${message}) </script>`);
+            resolve({code: statusCode,  html: root.toString});
         })
         .catch(err => reject(err));
     });
