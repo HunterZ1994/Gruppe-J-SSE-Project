@@ -27,10 +27,9 @@ function buildArticlePage(userInfo, article, comments) {
                 getCommentsHtml(comments),
                 getCartButton(article.ArticleId)
             ]).then(results => {
-                console.log(results);
                 html = html.replace('{ article }', results[0]);
                 html = html.replace('{ comments }', results[1]);
-                htmt = html.replace('{ button }', results[3]);
+                html = html.replace('{ button }', results[2]);
                 const root = htmlParser.parse(html);
                 root.querySelector('#articleId').setAttribute('value', article.articleId);
                 html = root.toString();
