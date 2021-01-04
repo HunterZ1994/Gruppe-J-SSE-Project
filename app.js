@@ -13,7 +13,7 @@ const jimp = require('jimp');
 
 // own modules
 const db_conector = require("./js/database_connection");
-const articleForm = require('./js/articleForm');
+const vendor = require('./js/vendor');
 const errorHanlder = require('./js/errorHandler');
 const search_results = require('./js/search_results');
 const index = require('./js/index');
@@ -118,7 +118,8 @@ app.get('/adminPanel', function (req, res) {
 // #region vendor
 
 app.get('/article/add', function (req, res) {
-    articleForm.createArticleForm(fakeUserInfo).then(html => res.send(html));
+    // TODO: Replace userInfo
+    vendor.createArticleForm(fakeUserInfo).then(html => res.send(html));
 });
 
 app.post('/article/add', function (req, res) {
@@ -127,6 +128,7 @@ app.post('/article/add', function (req, res) {
     const isVerndor = 'vendor' == 'vendor'
 
     if (!isVerndor) {
+        // TODO: Replace fakeUserInfo
         errorHanlder.createErrorResponse(fakeUserInfo, 403, "Access Denied")
         .then(html => {
             res.status = 403;
@@ -136,44 +138,11 @@ app.post('/article/add', function (req, res) {
 
     const form = new formidable.IncomingForm();
     form.parse(req, function (err, fields, files) {
-        const article = fields;
-        const articleIsValid = article.articleName && article.descpt && article.price;
-
-        if (!articleIsValid) {
-            errorHanlder.createErrorResponse(fakeUserInfo, 400, "Bad Request")
-            .then(html => {
-                res.status = 400;
-                res.send(html);
-            });  
-        }
-
-        const imagePath = `./assets/images/${userid}/${article.articleName}`;
-        db_conector.addArticle({ ...fields, imagePath: imagePath + `/${files.imagePath.name}`}, userid)
-            .then(rows => {
-                // file upload and saving
-                const oldpath = files.imagePath.path;
-                const newpath = imagePath;
-                const rawData = fs.readFileSync(oldpath);
-                if (!fs.existsSync(imagePath)) {
-                    fs.mkdirSync(imagePath);
-                }
-                fs.writeFile(newpath, rawData, function (err) {
-                    const message = err ? 'Speichern des Bildes fehlgeschlagen' : 'Hinzufügen erfolgreich';
-                    // TODO replace fakeUserInfo
-                    index.createIndex(fakeUserInfo).then(html => {
-                        const root = htmlParser.parse(html);
-                        root.querySelector('#head').appendChild(`<script> window.alert(${message}) </script>`);
-                        res.send(root.toString());
-                    }).catch(err => console.log(err)); 
-                });
-            })
-            .catch(err => { 
-                errorHanlder.createErrorResponse(fakeUserInfo, 500, "Internal Server Error")
-                .then(html => {
-                    res.status = 500;
-                    res.send(html);
-                }); 
-            });
+        // TODO: Input sanitazation
+        // TODO: Replace fakeUserInfo
+        vendor.addArticle(fakeUserInfo, fields, files)
+            .then(html => res.send(html))
+            .catch(err => res.send(err));
     });
 });
 
@@ -184,6 +153,7 @@ app.delete('/article/delete', function (req, res) {
     const articleId = req.params.articleId;
     
     if (!isVendor) {
+        // TODO: replace userInfo
         errorHanlder.createErrorResponse(fakeUserInfo, 403, "Access Denied")
         .then(html => {
             res.status = 403;
@@ -191,32 +161,10 @@ app.delete('/article/delete', function (req, res) {
         }); 
     }
 
-    if (!articleId) {
-        errorHanlder.createErrorResponse(fakeUserInfo, 400, "Bad Request, No Article Id")
-        .then(html => {
-            res.status = 400;
-            res.send(html);
-        }); 
-    }
-
-    db_conector.deleteArticle(articleId)
-        .then(rows => {
-            index.createIndex(fakeUserInfo).then(html => {
-                const message = "Löschen erfolgreich"
-                const root = htmlParser.parse(html);
-                root.querySelector('#head').appendChild(`<script> window.alert(${message}) </script>`);
-                res.send(root.toString());
-            }).catch(err => {
-                console.log(err);
-            }); 
-        })
-        .catch(err => {
-            errorHanlder.createErrorResponse(fakeUserInfo, 400, "Internal Server Error")
-            .then(html => {
-                res.status = 500;
-                res.send(html);
-            }); 
-        });
+    // TODO: replace userInfo
+    vendor.deleteArticle(fakeUserInfo, article)
+        .then(html => res.send(html))
+        .catch(err => res.send(err));
 });
 
 
@@ -227,6 +175,7 @@ app.get('/article/edit', function (req, res) {
     const articleId = req.query.articleId;
 
     if (!isVendor) {
+        // TODO: Replace userInfo
         errorHanlder.createErrorResponse(fakeUserInfo, 403, "Access Denied")
         .then(html => {
             res.status = 403;
@@ -234,30 +183,10 @@ app.get('/article/edit', function (req, res) {
         });  
     }
 
-    if (!articleId) {
-        errorHanlder.createErrorResponse(fakeUserInfo, 400, "Bad Request")
-            .then(html => {
-                res.status = 400;
-                res.send(html);
-            });  
-    }
-
-    db_conector.getArtcileById(articleId)
-        .then(rows => {
-            const dbArticle = rows[0];
-            articleForm.createArticleForm(fakeUserInfo, dbArticle)
-                .then(html => {
-                    res.send(html);
-                })
-                .catch(err => console.log(err));
-        })
-        .catch(err => {
-            errorHanlder.createErrorResponse(fakeUserInfo, 500, "Internal Server Error")
-            .then(html => {
-                res.status = 500;
-                res.send(html);
-            });  
-        });
+    // TODO: Replace userInfo
+    vendor.createArticleForm(fakeUserInfo, articleId)
+    .then(html => res.send(html))
+    .catch(errHtml => res.send(errHtml));
 });
 
 app.post('/article/edit', function (req, res) {
@@ -266,6 +195,7 @@ app.post('/article/edit', function (req, res) {
     const isVendor = 'vendor' === 'vendor';
 
     if (!isVendor) {
+        // TODO: replace userInfo
         errorHanlder.createErrorResponse(fakeUserInfo, 403, "Access Denied")
         .then(html => {
             res.status = 403;
@@ -275,87 +205,9 @@ app.post('/article/edit', function (req, res) {
 
     const form = new formidable.IncomingForm();
     form.parse(req, function (err, fields, files) {
-        const article = fields;
-        const articleIsValid = article.articleId && article.articleName && article.descpt && article.price;
-
-        if (!articleIsValid) {
-            // TODO: Replace with real credentials
-            errorHanlder.createErrorResponse(fakeUserInfo, 400, "Bad Request")
-            .then(html => {
-                res.status = 400;
-                res.send(html);
-            });  
-        }
-
-        // reading article for comparsion
-        db_conector.getArtcileById(article.articleId)
-            .then(rows => {
-                const dbArticle = rows[0];
-                for (const key of Object.keys(article)) {
-                    // this should already avoid saving image if there is no image
-                    switch(key.toLowerCase()) {
-                        case 'imagepath': 
-                            const imageName = files.imagePath.name;
-                            const storedImage = jimp.read(dbArticle.imagePath);
-                            const uploadImage = jimp.read(fs.readFileSync(imageName));
-
-                            // check if hash of image changed 
-                            if (jimp.diff(storedImage, uploadImage) !== 0) {
-                                const newPath = `./assets/images/${userId}/${dbArticle.articleName}/${files.imagePath.name}`;
-
-                                // delete image from file System
-                                try {
-                                    fs.unlinkSync(dbArticle.imagePath);
-                                } catch(err) {
-                                    console.log(err);
-                                }
-
-                                // read image from client
-                                const rawData = fs.readFileSync(files.imagePath.name);
-
-                                // write image to file system
-                                fs.writeFile(newpath, rawData, function (err) {
-                                    if (err) {
-                                        // TODO: Replace with error handling
-                                        console.log(err);
-                                    }
-                                });
-
-                                // set new image for article
-                                dbArticle.imagePath = newPath;
-                            }
-                            break;
-
-                        default: 
-                            // update to new values, except articleId
-                            if (key.toLowerCaae() !== 'articleid') {
-                                dbArticle[key] = article[key];
-                            }
-                            break;
-                    }
-                }
-                db_conector.updateArticle(dbArticle)
-                    .then(rows => {
-                        const message = "Bearbeiten erfolgreich"
-                        index.createIndex(fakeUserInfo)
-                            .then(html => {
-                                const root = htmlParser.parse(html);
-                                root.querySelector('#head').appendChild(`<script> window.alert(${message}) </script>`);
-                                res.send(root.toString());
-                    }).catch(err => {
-                        console.log(err);
-                    }); 
-                }).catch(err => {
-                    console.log(err)
-                });
-            })
-            .catch(err => {
-                errorHanlder.createErrorResponse(fakeUserInfo, 500, "Internal Server Error")
-                .then(html => {
-                    res.status = 500;
-                    res.send(html);
-                });  
-            });
+        vendor.updateArticle(fakeUserInfo, fields, files)
+        .then(html => res.send(html))
+        .catch(html => res.send(html));
     });
 });
 
