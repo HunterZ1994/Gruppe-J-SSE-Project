@@ -212,8 +212,10 @@ app.get('/article/edit', function (req, res) {
     }
 
     // TODO: Replace userInfo
-    vendor.createArticleForm(fakeUserInfo, articleId)
-    .then(html => res.send(html))
+    vendor.createEditForm(fakeUserInfo, articleId)
+    .then(html => {
+        res.send(html);
+    })
     .catch(err =>{
         res.status = err.code;
         res.send(err.html);

@@ -22,7 +22,7 @@ function createArticleForm(userInfo, article) {
                 resolve(root.toString());
             })
             .catch(err => {
-                errorHandler.createErrorResponse(userInfo, 500, "Internal Server Error")
+                errorHandler.createErrorResponse(err, userInfo, 500, "Internal Server Error")
                 .then(html => reject(html));
             });
     });
@@ -85,20 +85,22 @@ function createEditForm(userInfo, articleId) {
         db_conector.getArtcileById(articleId)
             .then(rows => {
                 const dbArticle = rows[0];
-                vendor.createArticleForm(userInfo, dbArticle)
+                createArticleForm(userInfo, dbArticle)
                     .then(html => {
                         resolve(html);
                     })
                     .catch(err => {
-                        errorHanlder.createErrorResponse(userInfo, 500, "Internal Server Error")
+                        errorHanlder.createErrorResponse(err, userInfo, 500, "Internal Server Error")
                             .then(html => {
+                                console.log(html);
                                 reject(html);
                             });
                     });
             })
             .catch(err => {
-                errorHanlder.createErrorResponse(userInfo, 500, "Internal Server Error")
+                errorHandler.createErrorResponse(err, userInfo, 500, "Internal Server Error")
                 .then(html => {
+                    console.log(html);
                     reject(html);
                 });  
             });
@@ -110,7 +112,7 @@ function updateArticle(userInfo, article, files) {
         const articleIsValid = article.articleId && article.articleName && article.descpt && article.price;
 
         if (!articleIsValid) {
-            errorHanlder.createErrorResponse(userInfo, 400, "Bad Request")
+            errorHanlder.createErrorResponse("No articleId", userInfo, 400, "Bad Request")
             .then(html => {
                 reject(html);
             });  
@@ -145,8 +147,8 @@ function updateArticle(userInfo, article, files) {
                                 // write image to file system
                                 fs.writeFile(newpath, rawData, function (err) {
                                     if (err) {
-                                        errorHandler.createErrorResponse(userInfo, 500, "Internal Server Error")
-                                        .then(html => reject(err));
+                                        errorHandler.createErrorResponse(err, userInfo, 500, "Internal Server Error")
+                                        .then(html => reject(html));
                                     }
                                 });
 
