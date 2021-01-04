@@ -76,15 +76,15 @@ app.get('/register', function (req, res) {
 });
 
 app.post('/register', function (req, res) {
-    var user = req.body;
+    const user = req.body;
     user.pwHash = tools.createPasswordHash(user.password);
     db_conector.checkIfEmailExists(user).then(result =>{
-        if(Object.keys(result).length>1){
-            this.userInfo = { loggedIn: false, userID: users.UserId, role: users.Userrole }
+        if(Object.keys(result).length > 1){
+            this.userInfo = { loggedIn: false, userID: user.UserId, role: user.Userrole }
                 res.cookie('userInfo', this.userInfo).sendFile(htmlPath + '/signup_error.html');
         }else{
              db_conector.addUser(user).then(result =>{
-                 if(result.warningStatus == 0){
+                 if(result.warningStatus === 0){
                     this.userInfo = { loggedIn: true, userID: user.email, role: 'customer' }
                     res.cookie('userInfo', this.userInfo).redirect('/');
                 }else{
@@ -103,7 +103,7 @@ app.post('/register', function (req, res) {
 //#region articles
 
 app.get('/search', function (req, res) {
-    let key = encodeURI(req.query.key)
+    const key = encodeURI(req.query.key)
     // TODO: replace hard-coded userInfo with info from cookie
     search_results.createSearchResults(req.cookies.userInfo, key).then(result => {
         res.send(result);
