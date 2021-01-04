@@ -1,35 +1,36 @@
+// node modules
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const formidable = require('formidable');
-const index = require('./js/index');
-const cart = require('./js/cart');
-const search_results = require('./js/search_results');
-const db_conector = require("./js/database_connection");
 const cookieParser = require('cookie-parser');
 const { userInfo } = require('os');
 const tools = require("./js/tools");
 const { BADQUERY } = require('dns');
 const { reset } = require('nodemon');
-const articleForm = require('./js/articleForm');
-const errorHanlder = require('./js/errorHandler');
 const htmlParser = require('node-html-parser');
 const jimp = require('jimp');
 
-const htmlPath = path.join(__dirname) + '/html';
-const app = express();
+// own modules
+const db_conector = require("./js/database_connection");
+const articleForm = require('./js/articleForm');
+const errorHanlder = require('./js/errorHandler');
+const search_results = require('./js/search_results');
+const index = require('./js/index');
+const cart = require('./js/cart');
 
+// basic app setup
 app.use(express.urlencoded());
 app.use(express.json());
 app.use(cookieParser());
-
-// TODO: replace hard-coded user info with cookie
-const fakeUserInfo = { loggedIn: false, role: 'customer' };
-
-
 app.use(express.static('public'));
 app.use('/images', express.static(__dirname + '/assets/images'));
 app.use('/css', express.static(__dirname + '/css'));
+
+// TODO: replace hard-coded user info with cookie
+const fakeUserInfo = { loggedIn: false, role: 'customer' };
+const htmlPath = path.join(__dirname) + '/html';
+const app = express();
 
 app.get('/', function (req, res) {
     // TODO: replace hard-coded userInfo with info from cookie

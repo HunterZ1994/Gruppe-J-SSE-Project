@@ -7,6 +7,8 @@ const pool = mariadb.createPool({
     port: '3306',
 });
 
+//#region articles
+
 function getSearchedArticles(key = '') {
     return new Promise((resolve, reject) => {
         pool.getConnection().then(con => {
@@ -17,19 +19,6 @@ function getSearchedArticles(key = '') {
                     resolve(rows)
                 }).catch(err => console.log(err))
         }).catch(err => console.log(err))
-    })
-}
-
-function getUserByUName(username =''){
-    return new Promise((resolve, reject) => {
-        pool.getConnection().then(con => {
-            let sql = 'select * from users'
-            sql += (username === '') ? ' limit 10' : ' where Email like \'%' + username + '%\''
-            con.query({sql: sql})
-                .then(rows => {
-                    resolve(rows)
-                }).catch(err => reject(err))
-        }).catch(err => reject(err))
     })
 }
 
@@ -100,6 +89,10 @@ function deleteArticle(articleId) {
     });
 }
 
+//#endregion
+
+//#region comments
+
 function addArticleComment(comment, articleId, userId) {
     return new Promise((resolve, reject) => {
         pool.getConnection().then(con => {
@@ -129,6 +122,54 @@ function getCommentsOfUser(userId) {
     });
 }
 
+//#endregion
+
+// #region user
+
+function getAllUsers() {
+    return new Promise((resolve, reject) => {
+        pool.getConnection()
+            .then(con => {
+                const sql = 'SELECT * FROM users';
+                con.query(sql).then(rows => {
+                    resolve(rows);
+                }).catch(err => {
+                    reject(err);
+                });
+            }).catch(err => {
+                reject(err);
+        });
+    });
+}
+
+function getUserByEmail(userEmail ='') {
+    return new Promise((resolve, reject) => {
+        pool.getConnection()
+            .then(con => {
+                const sql = 'SELECT * FROM users WHERE user.Email = ?';
+                con.query(sql, username)
+                    .then(rows => resolve(rows))
+                    .catch(err => reject(err));
+            })
+            .catch(err => {
+                reject(err);
+            });
+    });
+}
+
+function getUserByUName(username =''){
+    return new Promise((resolve, reject) => {
+        pool.getConnection().then(con => {
+            let sql = 'select * from users'
+            sql += (username === '') ? ' limit 10' : ' where Email like \'%' + username + '%\''
+            con.query({sql: sql})
+                .then(rows => {
+                    resolve(rows)
+                }).catch(err => reject(err))
+        }).catch(err => reject(err))
+    })
+}
+
 function addUser(user){
     return new Promise((resolve, reject) =>{
         pool.getConnection().then(con => {
@@ -151,6 +192,8 @@ function checkIfEmailExists(user){
         }).catch(err => reject(err));
     }).catch(err => console.log(err));
 }
+
+//#endregion
 
 module.exports = {
     getSearchedArticles, 
