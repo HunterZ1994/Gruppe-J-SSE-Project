@@ -113,7 +113,8 @@ app.get('/search', function (req, res) {
 
 app.get('/article', function(req, res) {
     const articleId = req.query.articleId;
-    articleView.createArticleView(articleId).then(html => res.send(html)).catch(err => {
+    // TODO: Replace userInfo
+    articleView.createArticleView(fakeUserInfo, articleId).then(html => res.send(html)).catch(err => {
         res.status = err.code;
         res.send(err.html);
     });
