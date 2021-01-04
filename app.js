@@ -5,7 +5,6 @@ const fs = require('fs');
 const formidable = require('formidable');
 const cookieParser = require('cookie-parser');
 const { userInfo } = require('os');
-const tools = require("./js/tools");
 const { BADQUERY, resolve4 } = require('dns');
 const { reset } = require('nodemon');
 const htmlParser = require('node-html-parser');
@@ -18,6 +17,8 @@ const errorHanlder = require('./js/errorHandler');
 const search_results = require('./js/search_results');
 const index = require('./js/index');
 const cart = require('./js/cart');
+const articleView = require('./js/article');
+const tools = require("./js/tools");
 
 // basic app setup
 const app = express();
@@ -108,6 +109,14 @@ app.get('/search', function (req, res) {
     search_results.createSearchResults(req.cookies.userInfo, key).then(result => {
         res.send(result);
     })
+});
+
+app.get('/article', function(req, res) {
+    const articleId = req.query.articleId;
+    articleView.createArticleView(articleId).then(html => res.send(html)).catch(err => {
+        res.status = err.code;
+        res.send(err.html);
+    });
 });
 
 //#endregion
