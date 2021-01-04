@@ -1,32 +1,42 @@
 <!DOCTYPE html>
 <html lang="de-DE">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HardwareBay</title>
-    <link rel="stylesheet" href="css/style.css">
-</head>
-<form method="POST" action="add" class="column" enctype="multipart/form-data">
-    <div class="row" name>
-        <label for="articleName">Artikelbezeichnung</label>
-        <input name="articleName" type="text" required/>
-    </div>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>HardwareBay</title>
+        <link rel="stylesheet" href="css/style.css">
+    </head>
+    <body>
 
-    <div class="row" beschreibung>
-        <label for="descpt">Beschreibung</label>
-        <input name="descpt" type="text" required/>
-    </div>
+        { navigation }
 
-    <div class="row">
-        <label for="price">Preis</label>
-        <input name="price" type="number" required/>
-    </div>
+        <br/><br/><br/><br/>
 
-    <div class="row" image>
-        <label for="image">Beschreibung</label>
-        <input name="image" type="file" accept="image/png, image/jpeg"/>
-    </div>
-    
+        <form method="POST" action="add" class="column" enctype="multipart/form-data">
+            <input type="hidden" name="articleId" id="articleId"/>
+            <div class="row" name>
+                <label for="articleName">Artikelbezeichnung</label>
+                <input name="articleName" id="articleName" type="text" required/>
+            </div>
 
-    <button type="submit">Hinzufügen</button>
-</form>
+            <div class="row" beschreibung>
+                <label for="descpt">Beschreibung</label>
+                <input name="descpt" id="descpt" type="text" required/>
+            </div>
+
+            <div class="row">
+                <label for="price">Preis</label>
+                <input name="price" id="price" type="number" required/>
+            </div>
+
+            <div class="row" image>
+                <label for="image">Beschreibung</label>
+                <input name="image" type="file" id="imagePath" accept="image/png, image/jpeg"/>
+            </div>
+            
+
+            <button type="submit" id="submit">Hinzufügen</button>
+        </form>
+    </body>
+    </html>
+

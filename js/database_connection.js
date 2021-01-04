@@ -36,9 +36,8 @@ function getUserByUName(username =''){
 function getArtcileById(articleId='') {
     return new Promise((resolve, reject) => {
         pool.getConnection().then(con => {
-            let sql = 'select * from articles';
-            sql +=  "where ArticleId = " + "'" + articleId + "'";
-            con.query({sql}).then(rows => {
+            const sql = 'SELECT * FROM articles WHERE articleId = ?';
+            con.query(sql, articleId).then(rows => {
                 resolve(rows);
             }).catch(err => reject(err));
         }).catch(err => reject(err));
@@ -57,10 +56,21 @@ function getArtcileByName(articleName='') {
     });
 }
 
+function getArticlesOfVendor(userId='') {
+    return new Promise((resolve, reject) => {
+        pool.getConnection().then(con => {
+            const sql = 'select * from articles as art wehre art.seller = ?'
+            confirm.query(sql, userId)
+            .then(res => resolve(res))
+            .catch(err => reject(err));
+        }).catch(err => recect(err));
+    });
+}
+
 function addArticle(article, userId) {
     return new Promise((resolve, reject) => {
        pool.getConnection().then(con => {
-            let sql = 'insert into articles (ArticleName, Descpt, Price, ImagePath, Seller) VALUES (?, ?, ?, ?, ?)'
+            const sql = 'insert into articles (ArticleName, Descpt, Price, ImagePath, Seller) VALUES (?, ?, ?, ?, ?)'
             const values = [article.articleName, article.descpt, article.price, article.imagePath, userId];
            con.query(sql, values)
            .then(rows => {
@@ -68,6 +78,54 @@ function addArticle(article, userId) {
            })
            .catch(err => reject(err))
        }).catch(err => reject(err)); 
+    });
+}
+
+function updateArticle(articleUpdate) {
+    return new Promise((resolve, reject) => {
+        pool.getConnection().then(con => {
+            const sql = "UPDATE articles SET articleName = ?, descpt = ?, Price = ?, imagePath = ? WHERE articleId = ?"
+            const values = [article.articleName, article.descpt, article.price, article.imagePath];
+            con.query(sql, values).then(res => resolve(res)).catch(err => reject(err)); 
+        }).catch(err => reject(err));
+    });
+}
+
+function deleteArticle(articleId) {
+    return new Promise((resolve, reject) => {
+        pool.getConnection().then(con => {
+            const sql = "DELETE FROM articles WHERE articleId = ?";
+            con.sql(sql, articleId).then(res => resolve(res)).catch(err => reject(err));
+        }).catch(err => reject(err));
+    });
+}
+
+function addArticleComment(comment, articleId, userId) {
+    return new Promise((resolve, reject) => {
+        pool.getConnection().then(con => {
+            const sql = "INSERT INTO Comments (comText, articleId, userId) VALUES (?, ?, ?)"
+            const values = [comment.comText, articleId, userId];
+            con.query(sql, values).then(res => resolve(res)).catch(err => reject(err));
+        }).catch(err => reject(err));
+    });
+}
+
+function getCommentsOfArticle(articleId) {
+    return new Promise((resolve, reject) => {
+        pool.getConnection().then(con => {
+            const sql = "SELECT * FROM comments WHERE article = ?";
+            con.query(sql, articleId).then(res => resolve(res)).catch(err => reject(err));
+        }).catch(err => reject(err));
+    });
+}
+
+function getCommentsOfUser(userId) {
+    return new Promise((resolve, reject) => {
+        pool.getConnection().then(con => {
+            const sql = "SELECT * FROM comments WHERE user = ?";
+            const values = [];
+            con.query(sql, userId).then(res => resolve(res)).catch(err => reject(err));
+        }).catch(err => reject(err));
     });
 }
 
@@ -95,5 +153,17 @@ function checkIfEmailExists(user){
 }
 
 module.exports = {
-    getSearchedArticles, getUserByUName, getArtcileById, addArticle, getArtcileByName, addUser,checkIfEmailExists,
+    getSearchedArticles, 
+    getUserByUName, 
+    getArtcileById, 
+    addArticle, 
+    updateArticle,
+    deleteArticle,
+    getArtcileByName,
+    getArticlesOfVendor, 
+    addArticleComment,
+    getCommentsOfUser,
+    getCommentsOfArticle,
+    addUser,
+    checkIfEmailExists,
 }
