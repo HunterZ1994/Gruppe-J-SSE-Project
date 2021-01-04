@@ -15,7 +15,7 @@ function buildArticlesTable(articles, userInfo) {
         artTable += '   </tr>\n'
         for(let article of articles) {
             artTable += '   <tr>\n'
-            artTable += '       <td><a href="/product/' + article.ArticleId + '">' + article.ArticleName + '</a></td>\n'
+            artTable += '       <td><a href="/product?articleId=' + article.ArticleId + '">' + article.ArticleName + '</a></td>\n'
             artTable += '       <td>' + article.Descpt + '</td>\n'
             artTable += '       <td>' + article.Price + '$</td>\n'
             artTable += '       <td><img src="' + article.ImagePath

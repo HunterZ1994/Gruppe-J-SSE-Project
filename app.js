@@ -8,7 +8,6 @@ const { userInfo } = require('os');
 const { BADQUERY, resolve4 } = require('dns');
 const { reset } = require('nodemon');
 const htmlParser = require('node-html-parser');
-const jimp = require('jimp');
 
 // own modules
 const db_conector = require("./js/database_connection");
@@ -37,7 +36,7 @@ const htmlPath = path.join(__dirname) + '/html';
 
 app.get('/', function (req, res) {
     // TODO: replace hard-coded userInfo with info from cookie
-    index.createIndex(req.cookies.userInfo).then(result => {
+    index.createIndex(fakeUserInfo).then(result => {
         res.send(result);
     })
 });
@@ -69,7 +68,7 @@ app.get('/search', function (req, res) {
     })
 });
 
-app.get('/article', function(req, res) {
+app.get('/product', function(req, res) {
     const articleId = req.query.articleId;
     // TODO: Replace userInfo
     articleView.createArticleView(fakeUserInfo, articleId).then(html => res.send(html)).catch(err => {
@@ -220,7 +219,26 @@ app.delete('/cart', (req, res) => {
 
 //#endregion
 
+//#region checkout
+
+app.get('/checkout', (req, res) => {
+    // read user id
+    // clear cart 
+    // send response
+});
+
+//#endregion
+
 // #region comments
+
+app.post('/comment/add', (req, res) => {
+    const comment = req.body;
+    const userId = 3;
+
+    articleView.addComment(comment.comText, comment.articleId, {...fakeUserInfo, userId: 1})
+    .then(html => res.send(html))
+    .catch(err => res.send(err));
+});
 
 
 // #endregion

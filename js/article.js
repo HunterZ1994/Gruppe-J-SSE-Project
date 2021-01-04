@@ -31,7 +31,7 @@ function buildArticlePage(userInfo, article, comments) {
                 html = html.replace('{ comments }', results[1]);
                 html = html.replace('{ button }', results[2]);
                 const root = htmlParser.parse(html);
-                root.querySelector('#articleId').setAttribute('value', article.articleId);
+                root.querySelector('#articleId').setAttribute('value', article.ArticleId);
                 html = root.toString();
                 resolve(html);
             }).catch(err => console.log(err));
@@ -85,7 +85,24 @@ function getCommentsHtml(comments) {
     });
 }
 
+function addComment(comText, articleId, userInfo) {
+    return new Promise((resolve, reject) => {
+        db_conector.addArticleComment(comText, articleId, userId)
+        .then(rows => {
+            createArticleView(userInfo, articleId)
+            .then(html => {
+                console.log(html);
+            })
+            .catch(err => console.log(err));
+        })
+        .catch(err => {
+            reject(err);
+        });
+    });
+}
+
 
 module.exports = {
-    createArticleView
+    createArticleView,
+    addComment
 }

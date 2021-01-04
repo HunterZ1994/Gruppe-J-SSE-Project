@@ -3,6 +3,7 @@ const db_conector = require('./database_connection');
 const index = require('./index');
 const errorHandler = require('./errorHandler');
 const htmlParser = require('node-html-parser');
+const jimp = require('jimp');
 
 function createArticleForm(userInfo, article) {
     return new Promise((resolve, reject) => {
