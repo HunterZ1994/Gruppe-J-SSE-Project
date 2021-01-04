@@ -146,10 +146,10 @@ app.post('/article/add', function (req, res) {
         }
 
         const imagePath = `./assets/images/${userid}/${article.articleName}`;
-        db_conector.addArticle({ ...fields, imagePath: imagePath + `/${files.image.name}`}, userid)
+        db_conector.addArticle({ ...fields, imagePath: imagePath + `/${files.imagePath.name}`}, userid)
             .then(rows => {
                 // file upload and saving
-                const oldpath = files.image.path;
+                const oldpath = files.imagePath.path;
                 const newpath = imagePath;
                 const rawData = fs.readFileSync(oldpath);
                 if (!fs.existsSync(imagePath)) {
@@ -293,13 +293,13 @@ app.post('/article/edit', function (req, res) {
                     // this should already avoid saving image if there is no image
                     switch(key.toLowerCase()) {
                         case 'imagepath': 
-                            const imageName = files.image.name;
+                            const imageName = files.imagePath.name;
                             const storedImage = jimp.read(dbArticle.imagePath);
                             const uploadImage = jimp.read(fs.readFileSync(imageName));
 
                             // check if hash of image changed 
                             if (jimp.diff(storedImage, uploadImage) !== 0) {
-                                const newPath = `./assets/images/${userId}/${dbArticle.articleName}/${files.image.name}`;
+                                const newPath = `./assets/images/${userId}/${dbArticle.articleName}/${files.imagePath.name}`;
 
                                 // delete image from file System
                                 try {
@@ -309,7 +309,7 @@ app.post('/article/edit', function (req, res) {
                                 }
 
                                 // read image from client
-                                const rawData = fs.readFileSync(files.image.name);
+                                const rawData = fs.readFileSync(files.imagePath.name);
 
                                 // write image to file system
                                 fs.writeFile(newpath, rawData, function (err) {
