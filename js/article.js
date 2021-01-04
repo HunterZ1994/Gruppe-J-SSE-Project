@@ -79,9 +79,9 @@ function getCommentsHtml(comments) {
             for (const cm of comments) {
                 console.log(cm);
                 const user = users.find(u => u.UserId === comments.User)[0];
-                res += `<p style="border: 1px solid black;"> ${user.FirstName}: ${cm.ComText} </p><br/>\n`
-                resolve( res += '</div><br/>\n');
+                res += `<p> ${user.FirstName}: </p> <p style="border: 1px solid black;"> ${cm.ComText} </p>\n`
             }
+            resolve( res += '</div><br/>\n');
         }).catch(err => console.log(err));
     });
 }
