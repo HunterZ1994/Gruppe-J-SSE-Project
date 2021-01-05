@@ -8,8 +8,8 @@ const createNavigationHTML = (userInfo) => {
 
         if (userInfo.role === 'admin') {
             nav += '    <a href="/adminPanel" style="float: left">Admin</a>\n'
-        } else if (userInfo.role === 'vendor') {
-            nav += '    <a href="/myArticles" style="float: left">My Articles</a>\n'
+        // } else if (userInfo.role === 'vendor') {
+        //     nav += '    <a href="/myArticles" style="float: left">My Articles</a>\n'
         } else if (userInfo.role === 'customer') {
             nav += '    <a href="/cart" style="float: left">Cart</a>\n'
         }

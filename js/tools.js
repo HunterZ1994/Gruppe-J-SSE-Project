@@ -21,7 +21,7 @@ function buildArticlesTable(articles, userInfo) {
             artTable += '       <td><img src="' + article.ImagePath
                 + '" style="max-height: 150px; max-width: 150px;"></td>\n'
 
-            if (userInfo.role === 'vendor') {
+            if (!!userInfo && userInfo.role === 'vendor') {
                 artTable += `<td> <a href='article/edit?articleId=${article.ArticleId}'> Bearbeiten </a> </td>\n`; 
                 artTable += `<td> <a href='article/delete?articleId=${article.ArticleId}'> Löschen </a> </td>\n`; 
             }
@@ -29,7 +29,7 @@ function buildArticlesTable(articles, userInfo) {
             artTable += '   </tr>\n'
         }
         
-        if (userInfo.role === 'vendor') {
+        if (!!userInfo && userInfo.role === 'vendor') {
             artTable += '<tr>\n';
             artTable += '<td> <a href="article/add"> Hinzufügen </a> </td>';
             artTable += '</tr>\n'
@@ -39,7 +39,7 @@ function buildArticlesTable(articles, userInfo) {
         artTable += '</table>'
     }
     else {
-        if (userInfo.role === 'vendor') {
+        if (!!userInfo && userInfo.role === 'vendor') {
             artTable = 'Sie haben noch keine Artikel zum Verkauf angeboten.'
         } else {
             artTable = 'No products matching search criteria'

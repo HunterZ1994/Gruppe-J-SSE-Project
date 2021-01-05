@@ -14,11 +14,11 @@ function getSearchedArticles(key = '') {
         pool.getConnection().then(con => {
             let sql = 'select * from articles'
             sql += (key === '') ? ' limit 10' : ' where ArticleName like ?'
-            con.query(sql, `'%${key}%'`)
+            con.query(sql, `%${key}%`)
                 .then(rows => {
                     resolve(rows)
-                }).catch(err => console.log(err))
-        }).catch(err => console.log(err))
+                }).catch(err => reject(err))
+        }).catch(err => reject(err))
     })
 }
 
