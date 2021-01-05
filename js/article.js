@@ -11,9 +11,13 @@ function createArticleView(userInfo, articleId) {
         ]).then(results => {  
             buildArticlePage(userInfo, results[0][0], results[1])
             .then(html => resolve(html))
-            .catch(err => reject(err));
+            .catch(err => {
+                console.log(err);
+                reject(err);
+            });
         }).catch(err => {
             console.log(err);
+            reject(err);
         });
     });
 }
@@ -34,9 +38,15 @@ function buildArticlePage(userInfo, article, comments) {
                 root.querySelector('#articleId').setAttribute('value', article.ArticleId);
                 html = root.toString();
                 resolve(html);
-            }).catch(err => console.log(err));
+            }).catch(err => {
+                console.log(err);
+                reject(err);
+            });
         })
-        .catch(err => console.log(err));
+        .catch(err => {
+            console.log(err);
+            reject(err);
+        });
     });
 }
 
@@ -68,7 +78,10 @@ function getCommenTsAndUser(comments) {
 
         Promise.all(promises).then(results => {
             resolve(results);
-        }).catch(err => reject(err));
+        }).catch(err => {
+            console.log(err);
+            reject(err);
+        });
     })
 }
 
@@ -77,12 +90,14 @@ function getCommentsHtml(comments) {
         getCommenTsAndUser(comments).then(users => {
             let res = '<hr/>\n<div>\n';
             for (const cm of comments) {
-                console.log(cm);
                 const user = users.find(u => u.UserId === comments.User)[0];
                 res += `<p> ${user.FirstName}: </p> <p style="border: 1px solid black;"> ${cm.ComText} </p>\n`
             }
             resolve( res += '</div><br/>\n');
-        }).catch(err => console.log(err));
+        }).catch(err => {
+            console.log(err);
+            reject(err);
+        });
     });
 }
 
@@ -94,9 +109,13 @@ function addComment(comText, articleId, userInfo) {
             .then(html => {
                 resolve(html);
             })
-            .catch(err => console.log(err));
+            .catch(err => {
+                console.log(err);
+                reject(err);
+            });
         })
         .catch(err => {
+            console.log(err);
             reject(err);
         });
     });
