@@ -28,7 +28,7 @@ body {
 }
 
 .topnav a:hover {
-    background-color: #ddd;
+    background-color: rgba(185, 215, 211, 0.80);
     color: black;
 }
 
