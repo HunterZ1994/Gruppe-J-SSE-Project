@@ -23,7 +23,7 @@ function createArticleForm(userInfo, article) {
             })
             .catch(err => {
                 errorHandler.createErrorResponse(err, userInfo, 500, "Internal Server Error")
-                .then(html => reject(html));
+                    .then(html => reject(html));
             });
     });
 }
@@ -34,13 +34,13 @@ function addArticle(userInfo, article, files) {
 
         if (!articleIsValid) {
             errorHanlder.createErrorResponse(userInfo, 400, "Bad Request")
-            .then(html => {
-                reject(html);
-            });  
+                .then(html => {
+                    reject(html);
+                });
         }
 
         const imagePath = `./assets/images/${userid}/${article.articleName}`;
-        db_conector.addArticle({ ...fields, imagePath: imagePath + `/${files.imagePath.name}`}, userInfo.userid)
+        db_conector.addArticle({...fields, imagePath: imagePath + `/${files.imagePath.name}`}, userInfo.userid)
             .then(rows => {
                 // file upload and saving
                 const oldpath = files.imagePath.path;
@@ -60,14 +60,14 @@ function addArticle(userInfo, article, files) {
                             .then(html => {
                                 reject(html);
                             });
-                    }); 
+                    });
                 });
             })
-            .catch(err => { 
+            .catch(err => {
                 errorHanlder.createErrorResponse(userInfo, 500, "Internal Server Error")
-                .then(html => {
-                    reject(html);
-                }); 
+                    .then(html => {
+                        reject(html);
+                    });
             });
     });
 
@@ -79,9 +79,9 @@ function createEditForm(userInfo, articleId) {
             errorHanlder.createErrorResponse(userInfo, 400, "Bad Request")
                 .then(html => {
                     reject(html)
-                });  
+                });
         }
-    
+
         db_conector.getArtcileById(articleId)
             .then(rows => {
                 const dbArticle = rows[0];
@@ -99,10 +99,10 @@ function createEditForm(userInfo, articleId) {
             })
             .catch(err => {
                 errorHandler.createErrorResponse(err, userInfo, 500, "Internal Server Error")
-                .then(html => {
-                    console.log(html);
-                    reject(html);
-                });  
+                    .then(html => {
+                        console.log(html);
+                        reject(html);
+                    });
             });
     });
 }
@@ -113,9 +113,9 @@ function updateArticle(userInfo, article, files) {
 
         if (!articleIsValid) {
             errorHanlder.createErrorResponse("No articleId", userInfo, 400, "Bad Request")
-            .then(html => {
-                reject(html);
-            });  
+                .then(html => {
+                    reject(html);
+                });
         }
 
         // reading article for comparsion
@@ -124,8 +124,8 @@ function updateArticle(userInfo, article, files) {
                 const dbArticle = rows[0];
                 for (const key of Object.keys(article)) {
                     // this should already avoid saving image if there is no image
-                    switch(key.toLowerCase()) {
-                        case 'imagepath': 
+                    switch (key.toLowerCase()) {
+                        case 'imagepath':
                             const imageName = files.imagePath.name;
                             const storedImage = jimp.read(dbArticle.imagePath);
                             const uploadImage = jimp.read(fs.readFileSync(imageName));
@@ -137,7 +137,7 @@ function updateArticle(userInfo, article, files) {
                                 // delete image from file System
                                 try {
                                     fs.unlinkSync(dbArticle.imagePath);
-                                } catch(err) {
+                                } catch (err) {
                                     console.log(err);
                                 }
 
@@ -148,7 +148,7 @@ function updateArticle(userInfo, article, files) {
                                 fs.writeFile(newpath, rawData, function (err) {
                                     if (err) {
                                         errorHandler.createErrorResponse(err, userInfo, 500, "Internal Server Error")
-                                        .then(html => reject(html));
+                                            .then(html => reject(html));
                                     }
                                 });
 
@@ -157,7 +157,7 @@ function updateArticle(userInfo, article, files) {
                             }
                             break;
 
-                        default: 
+                        default:
                             // update to new values, except articleId
                             if (key.toLowerCaae() !== 'articleid') {
                                 dbArticle[key] = article[key];
@@ -173,24 +173,24 @@ function updateArticle(userInfo, article, files) {
                                 const root = htmlParser.parse(html);
                                 root.querySelector('#head').appendChild(`<script> window.alert(${message}) </script>`);
                                 resolve(root.toString());
+                            }).catch(err => {
+                            cerrorHanlder.createErrorResponse(userInfo, 500, "Internal Server Error")
+                                .then(html => {
+                                    reject(html);
+                                });
+                        });
                     }).catch(err => {
-                        cerrorHanlder.createErrorResponse(userInfo, 500, "Internal Server Error")
+                    errorHanlder.createErrorResponse(userInfo, 500, "Internal Server Error")
                         .then(html => {
                             reject(html);
-                        });  
-                    }); 
-                }).catch(err => {
-                    errorHanlder.createErrorResponse(userInfo, 500, "Internal Server Error")
-                    .then(html => {
-                        reject(html);
-                    });  
+                        });
                 });
             })
             .catch(err => {
                 errorHanlder.createErrorResponse(userInfo, 500, "Internal Server Error")
-                .then(html => {
-                    reject(html);
-                });  
+                    .then(html => {
+                        reject(html);
+                    });
             });
     });
 }
@@ -199,13 +199,14 @@ function deleteArticle(userInfo, articleId) {
     return new Promise((resolve, reject) => {
         if (!articleId) {
             errorHanlder.createErrorResponse(userInfo, 400, "Bad Request, No Article Id")
-            .then(err => {
-                reject(err);
-            }); 
+                .then(err => {
+                    reject(err);
+                });
         }
-    
+
         db_conector.deleteArticle(articleId)
-            .then(rows => {;
+            .then(rows => {
+
                 index.createIndex(userInfo).then(html => {
                     const message = "Löschen erfolgreich"
                     const root = htmlParser.parse(html);
@@ -216,15 +217,15 @@ function deleteArticle(userInfo, articleId) {
                     errorHandler.createErrorResponse(err, userInfo, 500, "Internal Server Error")
                         .then(html => {
                             reject(html);
-                        }); 
-                }); 
+                        });
+                });
             })
             .catch(err => {
                 errorHandler.createErrorResponse(err, userInfo, 500, "Internal Server Error")
-                .then(html => {
-                    console.log(err);
-                    reject(html);
-                }); 
+                    .then(html => {
+                        console.log(err);
+                        reject(html);
+                    });
             });
     });
 }

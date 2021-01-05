@@ -80,7 +80,7 @@ app.get('/register', function (req, res) {
 app.post('/register', function (req, res) {
     const user = req.body;
     user.pwHash = tools.createPasswordHash(user.password);
-    db_connector.checkIfEmailExists(user).then(result =>{
+    db_connector.checkIfEmailExists(user).then(result => {
         if (Object.keys(result).length > 1){
             this.userInfo = { loggedIn: false, userID: user.UserId, role: user.Userrole }
                 res.cookie('userInfo', this.userInfo).sendFile(htmlPath + '/signup_error.html');

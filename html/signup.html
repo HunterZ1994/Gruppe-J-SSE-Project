@@ -12,15 +12,15 @@
     </style>
     <script>
         function checkPassword(){
-            var password = document.getElementById("password").value;
-            var password2 = document.getElementById("password_second").value;
-            if(password == password2 && password != ""){
-                var element = document.getElementById("passwordCorrect");
+            const password = document.getElementById("password").value;
+            const password2 = document.getElementById("password_second").value;
+            if (password === password2 && password !== "") {
+                const element = document.getElementById("passwordCorrect");
                 element.innerHTML = "Passwörter stimmen überein!";
                 element.style.color = 'green';
                 document.getElementById("submit").removeAttribute("disabled")
-            }else{
-                var element = document.getElementById("passwordCorrect");
+            } else {
+                const element = document.getElementById("passwordCorrect");
                 element.innerHTML = "Passwörter stimmen nicht überein!";
                 element.style.color = 'red';
                 document.getElementById("submit").setAttribute("disabled", true)
@@ -50,7 +50,7 @@
 
         <div class="row bottom-space">
             <label for="houseNr">Haus Nr</label>
-            <input type="text" name="houseNr" id="houseNr">
+            <input type="number" name="houseNr" id="houseNr">
         </div>
         
         <div class="row bottom-space">
