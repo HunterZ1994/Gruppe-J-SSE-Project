@@ -58,6 +58,7 @@ function addArticle(userInfo, article, files) {
                     }).catch(err => {
                         errorHanlder.createErrorResponse(userInfo, 500, "Internal Server Error")
                             .then(html => {
+                                console.log(err);
                                 reject(html);
                             });
                     });
@@ -65,9 +66,10 @@ function addArticle(userInfo, article, files) {
             })
             .catch(err => {
                 errorHanlder.createErrorResponse(userInfo, 500, "Internal Server Error")
-                    .then(html => {
-                        reject(html);
-                    });
+                .then(html => {
+                    console.log(err);
+                    reject(html);
+                }); 
             });
     });
 
@@ -174,19 +176,27 @@ function updateArticle(userInfo, article, files) {
                                 root.querySelector('#head').appendChild(`<script> window.alert(${message}) </script>`);
                                 resolve(root.toString());
                             }).catch(err => {
-                            cerrorHanlder.createErrorResponse(userInfo, 500, "Internal Server Error")
+                                errorHanlder.createErrorResponse(userInfo, 500, "Internal Server Error")
                                 .then(html => {
                                     reject(html);
                                 });
                         });
                     }).catch(err => {
-                    errorHanlder.createErrorResponse(userInfo, 500, "Internal Server Error")
+                        console.log(err);
+                        cerrorHanlder.createErrorResponse(userInfo, 500, "Internal Server Error")
                         .then(html => {
                             reject(html);
-                        });
-                });
+                        });  
+                    }); 
+                }).catch(err => {
+                    console.log(err);
+                    errorHanlder.createErrorResponse(userInfo, 500, "Internal Server Error")
+                    .then(html => {
+                        reject(html);
+                    });  
             })
             .catch(err => {
+                console.log(err);
                 errorHanlder.createErrorResponse(userInfo, 500, "Internal Server Error")
                     .then(html => {
                         reject(html);
