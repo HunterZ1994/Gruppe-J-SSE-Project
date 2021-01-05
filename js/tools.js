@@ -16,10 +16,10 @@ function buildArticlesTable(articles, userInfo) {
 
         for(const article of articles) {
             artTable += '   <tr>\n'
-            artTable += '       <td><a href="/product?articleId=' + article.ArticleId + '">' + article.ArticleName + '</a></td>\n'
-            artTable += '       <td>' + article.Descpt + '</td>\n'
-            artTable += '       <td>' + article.Price + '$</td>\n'
-            artTable += '       <td><img src="' + article.ImagePath
+            artTable += '       <td class="item-name"><a href="/product?articleId=' + article.ArticleId + '">' + article.ArticleName + '</a></td>\n'
+            artTable += '       <td class="item-descr">' + article.Descpt + '</td>\n'
+            artTable += '       <td class="item-price">' + article.Price + '$</td>\n'
+            artTable += '       <td class="item-image"><img src="' + article.ImagePath
                 + '" style="max-height: 150px; max-width: 150px;"></td>\n'
 
             if (!!userInfo && userInfo.role === 'vendor') {

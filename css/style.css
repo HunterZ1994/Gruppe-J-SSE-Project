@@ -1,3 +1,7 @@
+body {
+    font-family: "Courier New", sans-serif;
+}
+
 .row {
     display: flex;
     flex-flow: row;
@@ -8,10 +12,77 @@
     flex-flow: column;
 }
 
-.item-table-component, .item-table-component th, td {
-    border: 1px solid black;
+.topnav {
+    background-color: rgba(185, 215, 211, 0.54);
+    overflow: hidden;
 }
 
-nav * {
-    padding: 5px;
+.topnav a {
+    float: left;
+    display: block;
+    color: black;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+}
+
+.topnav a:hover {
+    background-color: #ddd;
+    color: black;
+}
+
+.search-bar {
+    float: left;
+    padding-left: 16px;
+}
+
+.topnav input[type=text] {
+    float: left;
+    padding: 6px;
+    border: none;
+    margin-top: 8px;
+    margin-right: 16px;
+    font-size: 17px;
+}
+
+.topnav input[type=submit] {
+    display: none;
+}
+
+.item-table-component, .item-table-component th, td {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+.item-table-component td {
+    padding: 1em;
+    min-width: 100px;
+    max-width: 500px;
+}
+
+.item-table-component th {
+    text-align: left;
+    padding: 3px 3px 3px 5px;
+    border: 1px solid #f2f2f2;
+}
+
+.item-table-component tr:nth-child(even) {
+    background-color: #f2f2f2
+}
+
+.item-price {
+    text-align: center;
+}
+
+.item-image {
+    text-align: center;
+}
+
+.item-name {
+    text-align: left;
+}
+
+.item-descr {
+    text-align: left;
 }
