@@ -18,6 +18,7 @@ const index = require('./js/index');
 const cart = require('./js/cart');
 const articleView = require('./js/article');
 const tools = require("./js/tools");
+const interceptor = require('./js/interceptor');
 
 // basic app setup
 const app = express();
@@ -31,6 +32,9 @@ app.use('/css', express.static(__dirname + '/css'));
 // TODO: replace hard-coded user info with cookie
 const fakeUserInfo = { loggedIn: false, role: 'customer' };
 const htmlPath = path.join(__dirname) + '/html';
+
+app.use(interceptor.decodeRequestCookie);
+app.use(interceptor.logResponse);
 
 //#region userAuthentication
 
@@ -48,18 +52,30 @@ app.get('/login', function (req, res) {
 app.post('/login', function (req, res) {
     const dbpwd = tools.createPasswordHash(req.body.password);
     db_connector.getUserByUName(req.body.email).then(result => {
+        let path = '';
+        let userInfo;
         if (Object.keys(result).length > 1) {
             const users = result[0];
             if (dbpwd.toUpperCase() === users.PwdHash.toUpperCase()) {
                 this.userInfo = { loggedIn: true, userId: users.UserId, role: users.Userrole }
-                res.cookie('userInfo', this.userInfo).redirect('/')
+                userInfo = { loggedIn: true, userId: users.UserId, role: users.Userrole };
+                path = '/';
             } else{
                 this.userInfo = { loggedIn: false, userId: users.UserId, role: users.Userrole }
-                res.cookie('userInfo', this.userInfo).sendFile(htmlPath + '/signin_error.html');
+                userInfo = { loggedIn: false, userId: users.UserId, role: users.Userrole }
+                path = '/signin_error.html';
             }
         } else {
             this.userInfo = { loggedIn: false, userId: "", role: "" }
-            res.cookie('userInfo', this.userInfo).sendFile(htmlPath + '/signin_error.html');
+            userInfo = { loggedIn: false, userId: "", role: "" };
+            path = '/signin_error.html';
+        }
+        const encoded = interceptor.encodeCookie('userInfo', userInfo);
+        res.cookie(encoded.name, encoded.cookie);
+        if (path === '/') {
+            res.redirect(path);
+        } else {
+            res.sendFile(htmlPath + path);
         }
     });
 });
