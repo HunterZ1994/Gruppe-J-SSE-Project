@@ -22,7 +22,7 @@ function getSearchedArticles(key = '') {
     })
 }
 
-function getArtcileById(articleId='') {
+function getArticleById(articleId='') {
     return new Promise((resolve, reject) => {
         pool.getConnection().then(con => {
             const sql = 'SELECT * FROM articles WHERE articleId = ?';
@@ -33,10 +33,10 @@ function getArtcileById(articleId='') {
     });
 }
 
-function getArtcileByName(articleName='') {
+function getArticleByName(articleName='') {
     return new Promise((resolve, reject) => {
         pool.getConnection().then(con => {
-            const sql = 'select * from articles where articlename LIKE %?%';
+            const sql = 'select * from articles where ArticleName LIKE %?%';
             con.query(sql, articleName)
             .then(rows => {
                 resolve(rows);
@@ -211,11 +211,11 @@ function checkIfEmailExists(user){
 module.exports = {
     getSearchedArticles, 
     getUserByUName, 
-    getArtcileById, 
+    getArtcileById: getArticleById,
     addArticle, 
     updateArticle,
     deleteArticle,
-    getArtcileByName,
+    getArtcileByName: getArticleByName,
     getArticlesOfVendor, 
     addArticleComment,
     getCommentsOfUser,
