@@ -219,9 +219,7 @@ function deleteArticle(userInfo, articleId) {
 
                 index.createIndex(userInfo).then(html => {
                     const message = "Löschen erfolgreich"
-                    const root = htmlParser.parse(html);
-                    root.querySelector('#head').appendChild(`<script> window.alert(${message}) </script>`);
-                    resolve(root.toString());
+                    resolve(html.replace('{ script }', `<script>alert("${message}") </script>`));
                 }).catch(err => {
                     console.log(err);
                     errorHandler.createErrorResponse(err, userInfo, 500, "Internal Server Error")

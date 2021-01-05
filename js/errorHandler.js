@@ -15,9 +15,7 @@ function createErrorResponse(error, userInfo, statusCode, message, redirectHtmlF
                 promise = tools.readHtmlAndAddNav(userInfo, htmlPath);
         }
         promise.then(html => {
-            const root = htmlParser.parse(html);
-            root.querySelector('#head').appendChild(`<script> window.alert(Error: ${statusCode} => ${message}) </script>`);
-            resolve({code: statusCode,  html: root.toString()});
+            resolve({code: statusCode,  html: html.replace('{ script }', `<script> window.alert(Error: ${statusCode} => ${message}) </script>`)});
         })
         .catch(err => reject(err));
     });

@@ -28,12 +28,11 @@ app.use(cookieParser());
 app.use(express.static('public'));
 app.use('/images', express.static(__dirname + '/assets/images'));
 app.use('/css', express.static(__dirname + '/css'));
+app.use(interceptor.decodeRequestCookie);
 
 // TODO: replace hard-coded user info with cookie
 const fakeUserInfo = { loggedIn: false, role: 'customer' };
 const htmlPath = path.join(__dirname) + '/html';
-
-app.use(interceptor.decodeRequestCookie);
 
 //#region userAuthentication
 
@@ -209,7 +208,6 @@ app.get('/article/delete', function (req, res) {
     // TODO: replace userInfo
     vendor.deleteArticle(!!req.cookies.userInfo ? req.cookies.userInfo : fakeUserInfo, articleId)
         .then(html => {
-            console.log(html);
             res.send(html);
         })
         .catch(err => {

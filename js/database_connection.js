@@ -5,6 +5,7 @@ const pool = mariadb.createPool({
     password: '123',
     database: 'hardwarebay',
     port: '3306',
+    multipleStatements: true
 });
 
 //#region articles
@@ -111,8 +112,8 @@ function updateArticle(article) {
 function deleteArticle(articleId) {
     return new Promise((resolve, reject) => {
         pool.getConnection().then(con => {
-            const sql = "DELETE FROM articles WHERE ArticleId = ?";
-            con.query(sql, articleId).then(res => {
+            const sql = "DELETE FROM holds WHERE Article = ?; DELETE FROM comments WHERE Article = ?; DELETE FROM articles WHERE ArticleId = ?";
+            con.query(sql, [articleId, articleId, articleId]).then(res => {
                 resolve(res)
                 con.end()
             }).catch(err => {
