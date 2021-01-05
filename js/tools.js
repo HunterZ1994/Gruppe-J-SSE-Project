@@ -13,7 +13,8 @@ function buildArticlesTable(articles, userInfo) {
         artTable += '       <th>Price</th>\n'
         artTable += '       <th>Image</th>\n'
         artTable += '   </tr>\n'
-        for(let article of articles) {
+
+        for(const article of articles) {
             artTable += '   <tr>\n'
             artTable += '       <td><a href="/product?articleId=' + article.ArticleId + '">' + article.ArticleName + '</a></td>\n'
             artTable += '       <td>' + article.Descpt + '</td>\n'
