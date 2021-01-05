@@ -34,7 +34,6 @@ const fakeUserInfo = { loggedIn: false, role: 'customer' };
 const htmlPath = path.join(__dirname) + '/html';
 
 app.use(interceptor.decodeRequestCookie);
-app.use(interceptor.logResponse);
 
 //#region userAuthentication
 
