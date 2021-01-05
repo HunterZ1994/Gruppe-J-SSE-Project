@@ -17,7 +17,11 @@ function getSearchedArticles(key = '') {
             con.query(sql, `%${key}%`)
                 .then(rows => {
                     resolve(rows)
-                }).catch(err => reject(err))
+                    con.end()
+                }).catch(err => {
+                    reject(err)
+                    con.end()
+                })
         }).catch(err => reject(err))
     })
 }
@@ -28,7 +32,11 @@ function getArticleById(articleId='') {
             const sql = 'SELECT * FROM articles WHERE articleId = ?';
             con.query(sql, articleId).then(rows => {
                 resolve(rows);
-            }).catch(err => reject(err));
+                con.end()
+            }).catch(err => {
+                reject(err)
+                con.end()
+            });
         }).catch(err => reject(err));
     });
 }
@@ -40,7 +48,11 @@ function getArticleByName(articleName='') {
             con.query(sql, articleName)
             .then(rows => {
                 resolve(rows);
-            }).catch(err => reject(err));
+                con.end()
+            }).catch(err => {
+                reject(err)
+                con.end()
+            });
         }).catch(err => reject(err));
     });
 }
@@ -50,8 +62,14 @@ function getArticlesOfVendor(userId = 0) {
         pool.getConnection().then(con => {
             const sql = 'SELECT * FROM articles  WHERE Seller = ?'
             con.query(sql, userId)
-            .then(res => resolve(res))
-            .catch(err => reject(err));
+            .then(res => {
+                resolve(res);
+                con.end()
+            })
+            .catch(err => {
+                reject(err)
+                con.end()
+            });
         }).catch(err => reject(err));
     });
 }
@@ -64,8 +82,12 @@ function addArticle(article, userId) {
            con.query(sql, values)
            .then(rows => {
                resolve(rows);
+               con.end()
            })
-           .catch(err => reject(err))
+           .catch(err => {
+               reject(err)
+               con.end()
+           })
        }).catch(err => reject(err)); 
     });
 }
@@ -75,7 +97,13 @@ function updateArticle(article) {
         pool.getConnection().then(con => {
             const sql = "UPDATE articles SET articleName = ?, descpt = ?, Price = ?, imagePath = ? WHERE articleId = ?"
             const values = [article.ArticleName, article.Descpt, article.Price, article.ImagePath, article.ArticleId];
-            con.query(sql, values).then(res => resolve(res)).catch(err => reject(err)); 
+            con.query(sql, values).then(res => {
+                resolve(res)
+                con.end()
+            }).catch(err => {
+                reject(err)
+                con.end()
+            });
         }).catch(err => reject(err));
     });
 }
@@ -84,7 +112,13 @@ function deleteArticle(articleId) {
     return new Promise((resolve, reject) => {
         pool.getConnection().then(con => {
             const sql = "DELETE FROM articles WHERE ArticleId = ?";
-            con.query(sql, articleId).then(res => resolve(res)).catch(err => reject(err));
+            con.query(sql, articleId).then(res => {
+                resolve(res)
+                con.end()
+            }).catch(err => {
+                reject(err)
+                con.end()
+            });
         }).catch(err => reject(err));
     });
 }
@@ -98,7 +132,13 @@ function addArticleComment(comment, articleId, userId) {
         pool.getConnection().then(con => {
             const sql = "INSERT INTO Comments (ComText, Article, User) VALUES (?, ?, ?)"
             const values = [comment, articleId, userId];
-            con.query(sql, values).then(res => resolve(res)).catch(err => reject(err));
+            con.query(sql, values).then(res => {
+                resolve(res)
+                con.end()
+            }).catch(err => {
+                reject(err)
+                con.end()
+            });
         }).catch(err => reject(err));
     });
 }
@@ -107,7 +147,13 @@ function getCommentsOfArticle(articleId) {
     return new Promise((resolve, reject) => {
         pool.getConnection().then(con => {
             const sql = "SELECT * FROM comments WHERE article = ?";
-            con.query(sql, articleId).then(res => resolve(res)).catch(err => reject(err));
+            con.query(sql, articleId).then(res => {
+                resolve(res)
+                con.end()
+            }).catch(err => {
+                reject(err)
+                con.end()
+            });
         }).catch(err => reject(err));
     });
 }
@@ -116,7 +162,13 @@ function getCommentsOfUser(userId) {
     return new Promise((resolve, reject) => {
         pool.getConnection().then(con => {
             const sql = "SELECT * FROM comments WHERE user = ?";
-            con.query(sql, userId).then(res => resolve(res)).catch(err => reject(err));
+            con.query(sql, userId).then(res => {
+                resolve(res)
+                con.end()
+            }).catch(err => {
+                reject(err)
+                con.end()
+            });
         }).catch(err => reject(err));
     });
 }
@@ -131,9 +183,11 @@ function getAllUsers() {
             .then(con => {
                 const sql = 'SELECT * FROM users';
                 con.query(sql).then(rows => {
-                    resolve(rows);
+                    resolve(rows)
+                    con.end()
                 }).catch(err => {
-                    reject(err);
+                    reject(err)
+                    con.end()
                 });
             }).catch(err => {
                 reject(err);
@@ -149,7 +203,10 @@ function getUserById(userId = ''){
             con.query(sql, userId)
             .then(rows => {
                 resolve(rows);
-            }).catch(err => reject(err));
+            }).catch(err => {
+                reject(err)
+                con.end()
+            });
         })
         .catch(err => reject(err));
     });
@@ -161,8 +218,14 @@ function getUserByEmail(userEmail ='') {
             .then(con => {
                 const sql = 'SELECT * FROM users WHERE user.Email = ?';
                 con.query(sql, userEmail)
-                    .then(rows => resolve(rows))
-                    .catch(err => reject(err));
+                    .then(rows => {
+                        resolve(rows)
+                        con.end()
+                    })
+                    .catch(err => {
+                        reject(err)
+                        con.end()
+                    });
             })
             .catch(err => {
                 reject(err);
@@ -170,7 +233,7 @@ function getUserByEmail(userEmail ='') {
     });
 }
 
-function getUserByUName(username =''){
+function getUserByUName(username ='') {
     return new Promise((resolve, reject) => {
         pool.getConnection().then(con => {
             let sql = 'select * from users'
@@ -178,30 +241,41 @@ function getUserByUName(username =''){
             con.query({sql: sql})
                 .then(rows => {
                     resolve(rows)
-                }).catch(err => reject(err))
+                    con.end()
+                }).catch(err => {
+                reject(err)
+                con.end()
+            })
         }).catch(err => reject(err))
     })
 }
 
-function addUser(user){
+function addUser(user) {
     return new Promise((resolve, reject) =>{
         pool.getConnection().then(con => {
             let sql = 'INSERT INTO users (Email , FirstName, SureName, Street , HouseNr, PostCode, City, Userrole, PwdHash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
             const values = [user.email, user.firstName, user.sureName, user.street, user.houseNr, user.postalCode, user.city, 'customer', user.pwHash];
             con.query(sql, values, (err, data) =>{}).then(rows => {
                 resolve(rows);
-            }).catch(err => reject(err))
+            }).catch(err => {
+                reject(err)
+                con.end()
+            })
         }).catch(err => reject(err))
     });
 } 
 
-function checkIfEmailExists(user){
+function checkIfEmailExists(user) {
     return new Promise((resolve, reject) =>{
         pool.getConnection().then(con =>{
             let sql = 'select * from users where Email = ?';
-            con.query(sql, user.email).then(rows =>{
-                resolve(rows);
-            }).catch(err => reject(err));
+            con.query(sql, user.email).then(rows => {
+                resolve(rows)
+                con.end()
+            }).catch(err => {
+                reject(err)
+                con.end()
+            });
         }).catch(err => reject(err));
     }).catch(err => console.log(err));
 }
@@ -225,5 +299,4 @@ module.exports = {
     getAllUsers,
     getUserById,
     getUserByEmail
-
 }
