@@ -19,7 +19,7 @@ const cart = require('./js/cart');
 const articleView = require('./js/article');
 const tools = require("./js/tools");
 const interceptor = require('./js/interceptor');
-const { RSA_NO_PADDING } = require('constants');
+const session = require('express-session');
 
 // basic app setup
 const app = express();
@@ -31,15 +31,49 @@ app.use('/images', express.static(__dirname + '/assets/images'));
 app.use('/css', express.static(__dirname + '/css'));
 app.use(interceptor.decodeRequestCookie);
 
+// Sesion parameters
+
+const TWO_HOURS = 1000 * 60 * 60 * 2;
+
+const {
+    PORT = 8080,
+    NODE_ENV = 'developmnet',
+
+    SESS_NAME = 'ssid',
+    SESS_SECRET = 'ssh!quiet,it\'asecret',
+    SESS_LIFETIME = TWO_HOURS
+} = process.env;
+
+const IN_PROD = NODE_ENV === 'production';
+
+// build coockie
+
+app.use(session({
+    name: SESS_NAME,
+    resave : false,
+    saveUninitialized: false,
+    secret : SESS_SECRET,
+    cookie: {
+        maxAge: SESS_LIFETIME,
+        sameSite: true,
+        secure: IN_PROD,
+    },
+    'QkFCQUFCQUFCQUFBQkFBQkFBQUJBQkFBQUFCQkFCQUFCQUJBQkJCQQ==': ''
+}))
+
 // TODO: replace hard-coded user info with cookie
-const fakeUserInfo = { loggedIn: false, role: 'customer' };
+const fakeUserInfo = { userID: '1230000', userRole: 'guest' };
 const htmlPath = path.join(__dirname) + '/html';
 
 //#region userAuthentication
 
 app.get('/', function (req, res) {
+    // console.log(req.session);
+    // if(!req.session.cookie.userID || req.session.cookie.userID === ''){
+    //     req.session.cookie.userID = 'guest';
+    // }
     // TODO: replace hard-coded userInfo with info from cookie
-    index.createIndex(!!req.cookies.userInfo ? req.cookies.userInfo : fakeUserInfo).then(result => {
+    index.createIndex(!!req.session.cookie ? req.session.cookie : fakeUserInfo).then(result => {
         res.send(result);
     })
 });
@@ -49,28 +83,33 @@ app.get('/login', function (req, res) {
 });
 
 app.post('/login', function (req, res) {
+    console.log(req.session);
     const dbpwd = tools.createPasswordHash(req.body.password);
     db_connector.getUserByUName(req.body.email).then(result => {
         let path = '';
-        let userInfo;
+        let userInfo = {};
         if (Object.keys(result).length > 1) {
             const users = result[0];
             if (dbpwd.toUpperCase() === users.PwdHash.toUpperCase()) {
-                this.userInfo = { loggedIn: true, userId: users.UserId, role: users.Userrole }
-                userInfo = { loggedIn: true, userId: users.UserId, role: users.Userrole };
+                userInfo = { loggedIn: true, userId: users.UserId, role: users.Userrole }
                 path = '/';
+                //TODO set error paths back to error.
             } else{
                 this.userInfo = { loggedIn: false, userId: users.UserId, role: users.Userrole }
                 userInfo = { loggedIn: false, userId: users.UserId, role: users.Userrole }
-                path = '/signin_error.html';
+                path = '/';
             }
         } else {
             this.userInfo = { loggedIn: false, userId: "", role: "" }
             userInfo = { loggedIn: false, userId: "", role: "" };
-            path = '/signin_error.html';
+            path = '/';
         }
         const encoded = interceptor.encodeCookie('userInfo', userInfo);
-        res.cookie(encoded.name, encoded.cookie);
+        req.session[encoded.name] = encoded.cookie;
+        // req.session. = encoded.cookie;
+        req.session.save();
+        // console.log(req.session.cookie);
+        // res.cookie(encoded.name, encoded.cookie);
         if (path === '/') {
             res.redirect(path);
         } else {
@@ -123,7 +162,7 @@ app.post('/register', function (req, res) {
 app.get('/search', function (req, res) {
     const key = encodeURI(req.query.key)
     // TODO: replace hard-coded userInfo with info from cookie
-    search_results.createSearchResults(!!req.cookies.userInfo ? req.cookies.userInfo
+    search_results.createSearchResults(!!req.session.cookies.userInfo ? req.session.cookies.userInfo
         : fakeUserInfo, key).then(result => {
         res.send(result);
     })
@@ -132,7 +171,7 @@ app.get('/search', function (req, res) {
 app.get('/product', function(req, res) {
     const articleId = req.query.articleId;
     // TODO: Replace userInfo
-    articleView.createArticleView(!!req.cookies.userInfo ? req.cookies.userInfo :
+    articleView.createArticleView(!!req.session.cookies.userInfo ? req.session.cookies.userInfo :
         fakeUserInfo, articleId).then(html => res.send(html)).catch(err => {
         res.status = err.code;
         res.send(err.html);
@@ -155,7 +194,7 @@ app.get('/adminPanel', function (req, res) {
 
 app.get('/article/add', function (req, res) {
     // TODO: Replace userInfo
-    vendor.createArticleForm(!!req.cookies.userInfo ? req.cookies.userInfo : fakeUserInfo)
+    vendor.createArticleForm(!!req.session.cookies.userInfo ? req.session.cookies.userInfo : fakeUserInfo)
     .then(html => res.send(html))
     .catch(err => {
         res.status = err.code;
@@ -170,7 +209,7 @@ app.post('/article/add', function (req, res) {
 
     if (!isVendor) {
         // TODO: Replace fakeUserInfo
-        errorHandler.createErrorResponse(!!req.cookies.userInfo ? req.cookies.userInfo : fakeUserInfo,
+        errorHandler.createErrorResponse(!!req.session.cookies.userInfo ? req.session.cookies.userInfo : fakeUserInfo,
             403, "Access Denied")
         .then(err => {
             res.status = err.status;
@@ -182,7 +221,7 @@ app.post('/article/add', function (req, res) {
     form.parse(req, function (err, fields, files) {
         // TODO: Input sanitization
         // TODO: Replace fakeUserInfo
-        vendor.addArticle(!!req.cookies.userInfo ? req.cookies.userInfo : fakeUserInfo, fields, files)
+        vendor.addArticle(!!req.session.cookies.userInfo ? req.session.cookies.userInfo : fakeUserInfo, fields, files)
             .then(html => res.send(html))
             .catch(err => {
                 res.status = err.code;
@@ -208,7 +247,7 @@ app.get('/article/delete', function (req, res) {
     }
 
     // TODO: replace userInfo
-    vendor.deleteArticle(!!req.cookies.userInfo ? req.cookies.userInfo : fakeUserInfo, articleId)
+    vendor.deleteArticle(!!req.session.cookies.userInfo ? req.session.cookies.userInfo : fakeUserInfo, articleId)
         .then(html => {
             res.send(html);
         })
@@ -226,7 +265,7 @@ app.get('/article/edit', function (req, res) {
 
     if (!isVendor) {
         // TODO: Replace userInfo
-        errorHandler.createErrorResponse(!!req.cookies.userInfo ? req.cookies.userInfo : fakeUserInfo,
+        errorHandler.createErrorResponse(!!req.session.cookies.userInfo ? req.session.cookies.userInfo : fakeUserInfo,
             403, "Access Denied")
         .then(err => {
             res.status = err.code;
@@ -235,7 +274,7 @@ app.get('/article/edit', function (req, res) {
     }
 
     // TODO: Replace userInfo
-    vendor.createEditForm(!!req.cookies.userInfo ? req.cookies.userInfo : fakeUserInfo, articleId)
+    vendor.createEditForm(!!req.session.cookies.userInfo ? req.session.cookies.userInfo : fakeUserInfo, articleId)
     .then(html => {
         res.send(html);
     })
@@ -252,7 +291,7 @@ app.post('/article/edit', function (req, res) {
 
     if (!isVendor) {
         // TODO: replace userInfo
-        errorHandler.createErrorResponse(!!req.cookies.userInfo ? req.cookies.userInfo : fakeUserInfo,
+        errorHandler.createErrorResponse(!!req.session.cookies.userInfo ? req.session.cookies.userInfo : fakeUserInfo,
             403, "Access Denied")
         .then(err => {
             res.status = err.code;
@@ -262,7 +301,7 @@ app.post('/article/edit', function (req, res) {
 
     const form = new formidable.IncomingForm();
     form.parse(req, function (err, fields, files) {
-        vendor.updateArticle(!!req.cookies.userInfo ? req.cookies.userInfo : fakeUserInfo, fields, files)
+        vendor.updateArticle(!!req.session.cookies.userInfo ? req.session.cookies.userInfo : fakeUserInfo, fields, files)
         .then(html => res.send(html))
         .catch(err => {
             res.status = err.code;
@@ -277,7 +316,7 @@ app.post('/article/edit', function (req, res) {
 
 app.get('/cart', (req, res) => {
     // TODO: replace hard-coded userInfo with info from cookie
-    cart.createCart(!!req.cookies.userInfo ? req.cookies.userInfo : fakeUserInfo).then(result => {
+    cart.createCart(!!req.session.cookies.userInfo ? req.session.cookies.userInfo : fakeUserInfo).then(result => {
         res.send(result);
     })
 });
@@ -316,8 +355,8 @@ app.post('/comment/add', (req, res) => {
     const comment = req.body;
     const userId = 3;
 
-    articleView.addComment(comment.comText, comment.articleId, {...!!req.cookies.userInfo ?
-            req.cookies.userInfo : fakeUserInfo, userId: 1})
+    articleView.addComment(comment.comText, comment.articleId, {...!!req.session.cookies.userInfo ?
+            req.session.cookies.userInfo : fakeUserInfo, userId: 1})
     .then(html => {
         res.send(html);
     })
