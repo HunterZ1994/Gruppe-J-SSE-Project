@@ -84,7 +84,8 @@ app.get('/logout', function (req, res) {
     userInfo.loggedIn = false;
     userInfo.role = 'customer';
     delete userInfo.userID;
-    res.cookie('userInfo', userInfo).redirect('/');
+    const enc = interceptor.encodeCookie('userInfo', userInfo);
+    res.cookie(enc.name, enc.cookie).redirect('/');
 });
 
 app.get('/register', function (req, res) {
