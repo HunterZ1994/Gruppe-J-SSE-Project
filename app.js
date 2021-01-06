@@ -61,7 +61,7 @@ app.use(session({
 }))
 
 // TODO: replace hard-coded user info with cookie
-const fakeUserInfo = { userID: '0000000000', role: 'guest', loggedIn: true };
+const fakeUserInfo = { userID: '0000000000', role: 'guest', loggedIn: false };
 const htmlPath = path.join(__dirname) + '/html';
 
 //#region userAuthentication
@@ -72,7 +72,7 @@ app.get('/', function (req, res) {
     if (userCookie) {
         userInfo = tools.decodeCookie(userCookie);
     }
-    index.createIndex(!!req.session ? userInfo : fakeUserInfo).then(result => {
+    index.createIndex(userInfo ? userInfo : fakeUserInfo).then(result => {
         res.send(result);
     })
 });
@@ -95,12 +95,12 @@ app.post('/login', function (req, res, next) {
             } else{
                 this.userInfo = { loggedIn: false, userId: users.UserId, role: users.Userrole }
                 userInfo = { loggedIn: false, userId: users.UserId, role: users.Userrole }
-                path = '/';
+                path = '/signin_error.html';
             }
         } else {
             this.userInfo = { loggedIn: false, userId: "", role: "" }
             userInfo = { loggedIn: false, userId: "", role: "" };
-            path = '/';
+            path = '/signin_error.html';
         }
         const encoded = interceptor.encodeCookie('userInfo', userInfo);
         req.session[encoded.name] = encoded.cookie;
@@ -117,13 +117,8 @@ app.post('/login', function (req, res, next) {
 });
 
 app.get('/logout', function (req, res) {
-    // TODO: logout
-    const userInfo = req.cookies.userInfo;
-    userInfo.loggedIn = false;
-    userInfo.role = 'customer';
-    delete userInfo.userID;
-    const enc = interceptor.encodeCookie('userInfo', userInfo);
-    res.cookie(enc.name, enc.cookie).redirect('/');
+    req.session.destroy();
+    res.redirect('/');
 });
 
 app.get('/register', function (req, res) {
