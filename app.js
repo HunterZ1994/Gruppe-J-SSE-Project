@@ -58,11 +58,11 @@ app.use(session({
         sameSite: true,
         secure: IN_PROD,
     },
-    'QkFCQUFCQUFCQUFBQkFBQkFBQUJBQkFBQUFCQkFCQUFCQUJBQkJCQQ==': ''
+    'QkFCQUFCQUFCQUFBQkFBQkFBQUJBQkFBQUFCQkFCQUFCQUJBQkJCQQ==': '123'
 }))
 
 // TODO: replace hard-coded user info with cookie
-const fakeUserInfo = { userID: '1230000', userRole: 'guest' };
+const fakeUserInfo = { userID: '0000000000', userRole: 'guest' };
 const htmlPath = path.join(__dirname) + '/html';
 
 //#region userAuthentication
@@ -73,7 +73,7 @@ app.get('/', function (req, res) {
     //     req.session.cookie.userID = 'guest';
     // }
     // TODO: replace hard-coded userInfo with info from cookie
-    index.createIndex(!!req.session.cookie ? req.session.cookie : fakeUserInfo).then(result => {
+    index.createIndex(!!req.session ? req.session : fakeUserInfo).then(result => {
         res.send(result);
     })
 });
@@ -83,7 +83,6 @@ app.get('/login', function (req, res) {
 });
 
 app.post('/login', function (req, res) {
-    console.log(req.session);
     const dbpwd = tools.createPasswordHash(req.body.password);
     db_connector.getUserByUName(req.body.email).then(result => {
         let path = '';
