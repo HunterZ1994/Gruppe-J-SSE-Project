@@ -4,7 +4,7 @@ const db_connector = require('./database_connection');
 const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 
-async function decodeRequestCookie(req, res, next) {
+function decodeRequestCookie(req, res, next) {
     let cookieName = Buffer.from(bacon.encode('userInfo', {alphabet})).toString('base64');
     cookieName = cookieName.substring(0, cookieName.length - 2);
     if (req.cookies[cookieName]) {
@@ -26,15 +26,8 @@ async function decodeRequestCookie(req, res, next) {
             const orValue = typeof userBacon[key] === 'string' ? bacon.decode(userBacon[key], {alphabet}).toLowerCase() : userBacon[key];
             userInfo[orKey] = orValue;
         }
-        
-        const dbUserInfo = await db_connector.getUserById(userInfo.userId);
 
-        if (userInfo.role !== dbUserInfo[0].Userrole) {
-            console.log('##### Boooom someone tried to hack me! #########');
-            userInfo.role = dbUserInfo.Role;
-        }
-
-        req.cookies  = {userInfo};
+        req.cookies = {userInfo};
     }
     next();
 

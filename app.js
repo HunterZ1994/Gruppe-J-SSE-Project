@@ -119,9 +119,12 @@ app.post('/login', function (req, res) {
 
 app.get('/logout', function (req, res) {
     // TODO: logout
-    req.session.userID = '';
-    req.session.role = '';
-    res.redirect('/');
+    const userInfo = req.cookies.userInfo;
+    userInfo.loggedIn = false;
+    userInfo.role = 'customer';
+    delete userInfo.userID;
+    const enc = interceptor.encodeCookie('userInfo', userInfo);
+    res.cookie(enc.name, enc.cookie).redirect('/');
 });
 
 app.get('/register', function (req, res) {
