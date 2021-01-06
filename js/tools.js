@@ -104,7 +104,7 @@ function checkSeesion(session) {
     const userCookie = session[getEncodedName()];
     if (userCookie) {
         userInfo = decodeCookie(userCookie);
-        userInfo.loggedIn = moment.invalid(session._expires) || moment().isBefore(session._expires);
+        userInfo.loggedIn = moment.invalid(session._expires) && moment().isBefore(session._expires);
     }
 
     return userInfo ? userInfo : defaultInfo;
@@ -119,7 +119,5 @@ module.exports = {
     buildArticlesTable,
     readHtmlAndAddNav,
     createPasswordHash,
-    decodeCookie,
-    getEncodedName,
     checkSeesion
 }
