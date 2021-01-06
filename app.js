@@ -68,7 +68,7 @@ const htmlPath = path.join(__dirname) + '/html';
 //#region userAuthentication
 
 app.get('/', function (req, res) {
-    const userInfo = tools.checkSeesion(req.session);
+    const userInfo = tools.checkSession(req.session);
     index.createIndex(userInfo).then(result => {
         res.send(result);
     })
@@ -149,18 +149,14 @@ app.post('/register', function (req, res) {
 
 app.get('/search', function (req, res) {
     const key = encodeURI(req.query.key)
-    // TODO: replace hard-coded userInfo with info from cookie
-    search_results.createSearchResults(!!req.session.cookies.userInfo ? req.session.cookies.userInfo
-        : fakeUserInfo, key).then(result => {
+    search_results.createSearchResults(tools.checkSession(req.session), key).then(result => {
         res.send(result);
     })
 });
 
 app.get('/product', function(req, res) {
     const articleId = req.query.articleId;
-    // TODO: Replace userInfo
-    articleView.createArticleView(!!req.session.cookies.userInfo ? req.session.cookies.userInfo :
-        fakeUserInfo, articleId).then(html => res.send(html)).catch(err => {
+    articleView.createArticleView(tools.checkSession(req.session), articleId).then(html => res.send(html)).catch(err => {
         res.status = err.code;
         res.send(err.html);
     });
@@ -181,8 +177,7 @@ app.get('/adminPanel', function (req, res) {
 // #region vendor
 
 app.get('/article/add', function (req, res) {
-    // TODO: Replace userInfo
-    vendor.createArticleForm(!!req.session.cookies.userInfo ? req.session.cookies.userInfo : fakeUserInfo)
+    vendor.createArticleForm(tools.checkSession(req.session))
     .then(html => res.send(html))
     .catch(err => {
         res.status = err.code;
@@ -191,14 +186,11 @@ app.get('/article/add', function (req, res) {
 });
 
 app.post('/article/add', function (req, res) {
-    // TODO: Replace with real credentials -> DB Checking, else ins. deser.
-    const userId = 1;
-    const isVendor = 'vendor' === 'vendor'
+    const userInfo = tools.checkSession(req.session);
+    const isVendor = userInfo.role === 'vendor'
 
     if (!isVendor) {
-        // TODO: Replace fakeUserInfo
-        errorHandler.createErrorResponse(!!req.session.cookies.userInfo ? req.session.cookies.userInfo : fakeUserInfo,
-            403, "Access Denied")
+        errorHandler.createErrorResponse(userInfo, 403, "Access Denied")
         .then(err => {
             res.status = err.status;
             res.send(err.html);
@@ -207,9 +199,7 @@ app.post('/article/add', function (req, res) {
 
     const form = new formidable.IncomingForm();
     form.parse(req, function (err, fields, files) {
-        // TODO: Input sanitization
-        // TODO: Replace fakeUserInfo
-        vendor.addArticle(!!req.session.cookies.userInfo ? req.session.cookies.userInfo : fakeUserInfo, fields, files)
+        vendor.addArticle(userInfo, fields, files)
             .then(html => res.send(html))
             .catch(err => {
                 res.status = err.code;
@@ -219,23 +209,19 @@ app.post('/article/add', function (req, res) {
 });
 
 app.get('/article/delete', function (req, res) {
-    // TODO: Replace with real credentials -> DB Checking, else ins. deser.
-    const userId = 1;
-    const isVendor = 'vendor' === 'vendor';
+    const userInfo = tools.checkSession(req.session);
+    const isVendor = userInfo.role === 'vendor';
     const articleId = req.query.articleId;
     
     if (!isVendor) {
-        // TODO: replace userInfo
-        errorHandler.createErrorResponse(!!req.cookies.userInfo ? req.cookies.userInfo : fakeUserInfo,
-            403, "Access Denied")
+        errorHandler.createErrorResponse(userInfo, 403, "Access Denied")
         .then(err => {
             res.status = err.code;
             res.send(err.html);
         });
     }
 
-    // TODO: replace userInfo
-    vendor.deleteArticle(!!req.session.cookies.userInfo ? req.session.cookies.userInfo : fakeUserInfo, articleId)
+    vendor.deleteArticle(userInfo, articleId)
         .then(html => {
             res.send(html);
         })
@@ -246,15 +232,13 @@ app.get('/article/delete', function (req, res) {
 });
 
 app.get('/article/edit', function (req, res) {
-    // TODO: Replace with real credentials -> DB Checking, else ins. deser.
-    const userId = 1;
-    const isVendor = 'vendor' === 'vendor';
+    const userInfo = tools.checkSession(req.session);
+    const isVendor = userInfo.role === 'vendor';
     const articleId = req.query.articleId;
 
     if (!isVendor) {
         // TODO: Replace userInfo
-        errorHandler.createErrorResponse(!!req.session.cookies.userInfo ? req.session.cookies.userInfo : fakeUserInfo,
-            403, "Access Denied")
+        errorHandler.createErrorResponse(userInfo, 403, "Access Denied")
         .then(err => {
             res.status = err.code;
             res.send(err.html);
@@ -262,7 +246,7 @@ app.get('/article/edit', function (req, res) {
     }
 
     // TODO: Replace userInfo
-    vendor.createEditForm(!!req.session.cookies.userInfo ? req.session.cookies.userInfo : fakeUserInfo, articleId)
+    vendor.createEditForm(userInfo, articleId)
     .then(html => {
         res.send(html);
     })
@@ -273,14 +257,12 @@ app.get('/article/edit', function (req, res) {
 });
 
 app.post('/article/edit', function (req, res) {
-    // TODO: Replace with real credentials -> DB Checking, else ins. deser.
-    const userId = 1;
-    const isVendor = 'vendor' === 'vendor';
+    const userInfo = tools.checkSession(req.session);
+    const isVendor = userInfo.role === 'vendor';
 
     if (!isVendor) {
         // TODO: replace userInfo
-        errorHandler.createErrorResponse(!!req.session.cookies.userInfo ? req.session.cookies.userInfo : fakeUserInfo,
-            403, "Access Denied")
+        errorHandler.createErrorResponse(userInfo, 403, "Access Denied")
         .then(err => {
             res.status = err.code;
             res.send(err.html);
@@ -289,7 +271,7 @@ app.post('/article/edit', function (req, res) {
 
     const form = new formidable.IncomingForm();
     form.parse(req, function (err, fields, files) {
-        vendor.updateArticle(!!req.session.cookies.userInfo ? req.session.cookies.userInfo : fakeUserInfo, fields, files)
+        vendor.updateArticle(userInfo, fields, files)
         .then(html => res.send(html))
         .catch(err => {
             res.status = err.code;
@@ -303,22 +285,19 @@ app.post('/article/edit', function (req, res) {
 //#region cart
 
 app.get('/cart', (req, res) => {
-    // TODO: replace hard-coded userInfo with info from cookie
-    cart.createCart(!!req.session.cookies.userInfo ? req.session.cookies.userInfo : fakeUserInfo).then(result => {
+    cart.createCart(tools.checkSession(req.session)).then(result => {
         res.send(result);
     })
 });
 
 app.get('/cart/add', (req, res) => {
-    const userInfo = req.cookies.userInfo;
     const articleId = req.query.articleId;
-    cart.addToCart(userInfo, articleId).then(bool => res.redirect('/')).catch(err => res.redirect('/cart'));
+    cart.addToCart(tools.checkSession(req.session), articleId).then(bool => res.redirect('/')).catch(err => res.redirect('/cart'));
 });
 
 app.get('/cart/delete', (req, res) => {
     const articleId = req.query.articleId;
-    const userInfo = req.cookies.userInfo;
-    cart.deleteFromCart(userInfo, articleId).then(rows => {
+    cart.deleteFromCart(tools.checkSession(req.session), articleId).then(rows => {
         res.redirect('/cart')
     }).catch(err => {
         res.redirect('/cart')
@@ -341,10 +320,7 @@ app.get('/checkout', (req, res) => {
 
 app.post('/comment/add', (req, res) => {
     const comment = req.body;
-    const userId = 3;
-
-    articleView.addComment(comment.comText, comment.articleId, {...!!req.session.cookies.userInfo ?
-            req.session.cookies.userInfo : fakeUserInfo, userId: 1})
+    articleView.addComment(comment.comText, comment.articleId, tools.checkSession(req.session))
     .then(html => {
         res.send(html);
     })

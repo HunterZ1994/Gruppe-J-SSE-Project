@@ -111,14 +111,14 @@ function encodeCookie(cookieName='cookie', cookie) {
     return {name: Buffer.from(bacon.encode(cookieName, {alphabet})).toString('base64'), cookie: Buffer.from(JSON.stringify(encoded)).toString('base64')};
 }
 
-function checkSeesion(session) {
+function checkSession(session) {
     const defaultInfo = { userID: '0000000000', role: 'guest', loggedIn: false };
 
     let userInfo;
     const userCookie = session[getEncodedName()];
     if (userCookie) {
         userInfo = decodeCookie(userCookie);
-        userInfo.loggedIn = moment.invalid(session._expires) && moment().isBefore(session._expires);
+        userInfo.loggedIn = !moment(session.cookie._expires).isBefore(moment());
     }
 
     return userInfo ? userInfo : defaultInfo;
@@ -133,6 +133,6 @@ module.exports = {
     buildArticlesTable,
     readHtmlAndAddNav,
     createPasswordHash,
-    checkSeesion,
+    checkSession,
     encodeCookie
 }
