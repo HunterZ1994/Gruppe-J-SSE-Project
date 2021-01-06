@@ -281,6 +281,21 @@ function checkIfEmailExists(user) {
     }).catch(err => console.log(err));
 }
 
+function isValidUserID(user){
+    return new Promise((resolve, reject) =>{
+        pool.getConnection().then(con =>{
+            let sql = 'select * from users where UserId = ?';
+            con.query(sql, user.userID).then(rows => {
+                resolve(rows)
+                con.end()
+            }).catch(err => {
+                reject(err)
+                con.end()
+            });
+        }).catch(err => reject(err));
+    }).catch(err => console.log(err));
+}
+
 //#endregion
 
 module.exports = {
@@ -299,5 +314,6 @@ module.exports = {
     checkIfEmailExists,
     getAllUsers,
     getUserById,
-    getUserByEmail
+    getUserByEmail,
+    isValidUserID,
 }
