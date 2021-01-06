@@ -146,13 +146,15 @@ app.post('/register', function (req, res) {
 });
 
 app.get('/forgotPassword', function (req, res) {
-    forgot_password.createForgotPwInput({ loggedIn: false, role: 'customer' }).then(result => {
+    forgot_password.createForgotPwInput(tools.checkSession(req.session)).then(result => {
         res.send(result)
     })
 });
 
 app.post('/forgotPassword', function (req, res) {
-    forgot_password.createForgotPassword({ loggedIn: false, role: 'customer', email: req.body.email }).then(result => {
+    const user = tools.checkSession(req.session);
+    user.email = req.body.email;
+    forgot_password.createForgotPassword(user).then(result => {
         res.send(result)
     })
 });

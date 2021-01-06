@@ -248,9 +248,9 @@ function getUserByUName(username ='') {
 function addUser(user) {
     return new Promise((resolve, reject) =>{
         pool.getConnection().then(con => {
-            let sql = 'INSERT INTO users (Email , FirstName, SureName, Street , HouseNr, PostCode, City, Userrole, PwdHash, , ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+            let sql = 'INSERT INTO users (Email , FirstName, SureName, Street , HouseNr, PostCode, City, Userrole, PwdHash, SecQuestion, SecAnswer) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
             const values = [user.email, user.firstName, user.sureName, user.street, user.houseNr, user.postalCode, user.city, 'customer', user.pwHash, user.security_question, user.secAnswerHash];
-            con.query(sql, values, (err, data) =>{}).then(rows => {
+            con.query(sql, values).then(rows => {
                 resolve(rows);
             }).catch(err => {
                 reject(err)
