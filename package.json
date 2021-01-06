@@ -11,6 +11,7 @@
     "formidable": "^1.2.2",
     "jimp": "^0.16.1",
     "mariadb": "^2.5.2",
+    "moment": "^2.29.1",
     "node-html-parser": "^2.0.1"
   },
   "devDependencies": {

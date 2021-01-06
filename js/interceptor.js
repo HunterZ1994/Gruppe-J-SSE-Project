@@ -1,6 +1,6 @@
 const bacon = require('bacon-cipher');
 const db_connector = require('./database_connection');
-
+const tools = require('./tools');
 const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 
@@ -33,21 +33,6 @@ function decodeRequestCookie(req, res, next) {
 
 }
 
-function encodeCookie(cookieName='cookie', cookie) {
-    let encoded = {};
-
-    for (const key of Object.keys(cookie)) {
-        if (typeof cookie[key] === 'string') {
-            encoded[bacon.encode(key, {alphabet})] = bacon.encode(cookie[key], {alphabet});
-        } else {
-            encoded[bacon.encode(key, {alphabet})] = cookie[key];
-        }
-    }
-
-    return {name: Buffer.from(bacon.encode(cookieName, {alphabet})).toString('base64'), cookie: Buffer.from(JSON.stringify(encoded)).toString('base64')};
-}
-
 module.exports = {
     decodeRequestCookie,
-    encodeCookie
 }
