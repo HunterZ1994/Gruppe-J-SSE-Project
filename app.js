@@ -29,7 +29,6 @@ app.use(cookieParser());
 app.use(express.static('public'));
 app.use('/images', express.static(__dirname + '/assets/images'));
 app.use('/css', express.static(__dirname + '/css'));
-app.use(interceptor.decodeRequestCookie);
 
 // Sesion parameters
 
@@ -62,18 +61,18 @@ app.use(session({
 }))
 
 // TODO: replace hard-coded user info with cookie
-const fakeUserInfo = { userID: '0000000000', userRole: 'guest' };
+const fakeUserInfo = { userID: '0000000000', role: 'guest', loggedIn: true };
 const htmlPath = path.join(__dirname) + '/html';
 
 //#region userAuthentication
 
 app.get('/', function (req, res) {
-    // console.log(req.session);
-    // if(!req.session.cookie.userID || req.session.cookie.userID === ''){
-    //     req.session.cookie.userID = 'guest';
-    // }
-    // TODO: replace hard-coded userInfo with info from cookie
-    index.createIndex(!!req.session ? req.session : fakeUserInfo).then(result => {
+    let userInfo;
+    const userCookie = req.session[tools.getEncodedName()];
+    if (userCookie) {
+        userInfo = tools.decodeCookie(userCookie);
+    }
+    index.createIndex(!!req.session ? userInfo : fakeUserInfo).then(result => {
         res.send(result);
     })
 });
@@ -82,7 +81,7 @@ app.get('/login', function (req, res) {
     res.sendFile(htmlPath + '/signIn.html');
 });
 
-app.post('/login', function (req, res) {
+app.post('/login', function (req, res, next) {
     const dbpwd = tools.createPasswordHash(req.body.password);
     db_connector.getUserByUName(req.body.email).then(result => {
         let path = '';

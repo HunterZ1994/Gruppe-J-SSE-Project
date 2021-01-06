@@ -1,6 +1,10 @@
 const navigation = require('./navigation')
 const fs = require('fs')
 const crypto = require('crypto');
+const bacon = require('bacon-cipher');
+const db_connector = require('./database_connection');
+
+const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 function buildArticlesTable(articles, userInfo) {
     let artTable = ''
@@ -69,9 +73,38 @@ function createPasswordHash(value) {
     return crypto.createHash('sha256').update(value).digest('hex');
 }
 
+function decodeCookie(cookieValue) {
+    const userBacon = JSON.parse(Buffer.from(cookieValue, 'base64').toString('ascii'));
+        
+    let userInfo = {};
+
+    for (const key of Object.keys(userBacon)) {
+        let orKey = bacon.decode(key, {alphabet}).toLowerCase();
+        switch (orKey) {
+            case 'userid': 
+                orKey = 'userId'
+                break;
+            case 'loggedin': 
+                orKey = 'loggedIn';
+                break;
+        }
+        const orValue = typeof userBacon[key] === 'string' ? bacon.decode(userBacon[key], {alphabet}).toLowerCase() : userBacon[key];
+        userInfo[orKey] = orValue;
+    }
+
+    return userInfo;
+
+}
+
+
+function getEncodedName() {
+    return Buffer.from(bacon.encode('userInfo', {alphabet})).toString('base64')
+}
 
 module.exports = {
     buildArticlesTable,
     readHtmlAndAddNav,
     createPasswordHash,
+    decodeCookie,
+    getEncodedName
 }
