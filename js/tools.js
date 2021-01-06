@@ -3,6 +3,7 @@ const fs = require('fs')
 const crypto = require('crypto');
 const bacon = require('bacon-cipher');
 const db_connector = require('./database_connection');
+const moment = require('moment');
 
 const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
@@ -96,6 +97,19 @@ function decodeCookie(cookieValue) {
 
 }
 
+function checkSeesion(session) {
+    const defaultInfo = { userID: '0000000000', role: 'guest', loggedIn: false };
+
+    let userInfo;
+    const userCookie = session[getEncodedName()];
+    if (userCookie) {
+        userInfo = decodeCookie(userCookie);
+        userInfo.loggedIn = moment.invalid(session._expires) || moment().isBefore(session._expires);
+    }
+
+    return userInfo ? userInfo : defaultInfo;
+}
+
 
 function getEncodedName() {
     return Buffer.from(bacon.encode('userInfo', {alphabet})).toString('base64')
@@ -106,5 +120,6 @@ module.exports = {
     readHtmlAndAddNav,
     createPasswordHash,
     decodeCookie,
-    getEncodedName
+    getEncodedName,
+    checkSeesion
 }

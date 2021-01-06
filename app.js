@@ -67,12 +67,8 @@ const htmlPath = path.join(__dirname) + '/html';
 //#region userAuthentication
 
 app.get('/', function (req, res) {
-    let userInfo;
-    const userCookie = req.session[tools.getEncodedName()];
-    if (userCookie) {
-        userInfo = tools.decodeCookie(userCookie);
-    }
-    index.createIndex(userInfo ? userInfo : fakeUserInfo).then(result => {
+    const userInfo = tools.checkSeesion(req.session);
+    index.createIndex(userInfo).then(result => {
         res.send(result);
     })
 });
