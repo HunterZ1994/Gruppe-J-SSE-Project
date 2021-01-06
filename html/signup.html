@@ -36,42 +36,42 @@
         
         <div class="row bottom-space">
             <label for="firstName">Vorname</label>
-            <input type="text" name="firstName" id="firstName">
+            <input type="text" name="firstName" id="firstName" required>
         </div>
         
         <div class="row bottom-space">
             <label for="sureName">Nachname</label>
-            <input type="text" name="sureName" id="sureName">
+            <input type="text" name="sureName" id="sureName" required>
         </div>
 
         <div class="row bottom-space">
             <label for="street">Straße</label>
-            <input type="text" name="street" id="street">
+            <input type="text" name="street" id="street" required>
         </div>
 
         <div class="row bottom-space">
             <label for="houseNr">Haus Nr</label>
-            <input type="number" name="houseNr" id="houseNr">
+            <input type="number" name="houseNr" id="houseNr" required>
         </div>
         
         <div class="row bottom-space">
             <label for="postalCode">PLZ</label>
-            <input type="number" name="postalCode" id="postalCode">
+            <input type="number" name="postalCode" id="postalCode" required>
         </div>
         
         <div class="row bottom-space">
             <label for="city">Stadt</label>
-            <input type="text" name="city" id="city">
+            <input type="text" name="city" id="city" required>
         </div>       
 
         <div class="row bottom-space">
             <label for="email">E-Mail Adresse</label>
-            <input type="email" name="email" id="email">
+            <input type="email" name="email" id="email" required>
         </div>
 
         <div class="row bottom-space">
             <label for="password">Passwort</label>
-            <input type="password" name="password" id="password" oninput="checkPassword()">
+            <input type="password" name="password" id="password" oninput="checkPassword()" required>
         </div>
 
         <div class="row bottom-space">
@@ -80,7 +80,7 @@
             <lable for="password_second" id="passwordCorrect" style="color: red;">Passwörter stimmen nicht überein!</lable>
         </div>
         
-        <button type="submit" disabled="true" id="submit">Registrieren</button>
+        <button type="submit" disabled="true" id="submit" style="width: 30%;">Registrieren</button>
         <a href="/login">Login</a>
     </form>
 
