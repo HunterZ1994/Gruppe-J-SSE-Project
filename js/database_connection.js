@@ -247,8 +247,8 @@ function getUserByUName(username ='') {
 function addUser(user) {
     return new Promise((resolve, reject) =>{
         pool.getConnection().then(con => {
-            let sql = 'INSERT INTO users (Email , FirstName, SureName, Street , HouseNr, PostCode, City, Userrole, PwdHash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
-            const values = [user.email, user.firstName, user.sureName, user.street, user.houseNr, user.postalCode, user.city, 'customer', user.pwHash];
+            let sql = 'INSERT INTO users (Email , FirstName, SureName, Street , HouseNr, PostCode, City, Userrole, PwdHash, , ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+            const values = [user.email, user.firstName, user.sureName, user.street, user.houseNr, user.postalCode, user.city, 'customer', user.pwHash, user.security_question, user.secAnswerHash];
             con.query(sql, values, (err, data) =>{}).then(rows => {
                 resolve(rows);
             }).catch(err => {
@@ -289,6 +289,53 @@ function isValidUserID(user){
     });
 }
 
+function getSecQuestionByEmail(email = '') {
+    return new Promise((resolve, reject) => {
+        pool.getConnection().then(con => {
+            let sql = 'select SecQuestion from users where Email like ?'
+            con.query(sql, email)
+                .then(rows => {
+                    resolve(rows)
+                    con.end()
+                }).catch(err => {
+                reject(err)
+                con.end()
+            })
+        }).catch(err => reject(err))
+    })
+}
+
+function checkSecurityAnswer(email, answer) {
+    return new Promise((resolve, reject) => {
+        pool.getConnection().then(con => {
+            let sql = 'select count(UserId) as found from users where Email = ? and SecAnswer = ?';
+            con.query(sql, [email, answer]).then(rows => {
+                resolve(rows)
+                con.end()
+            }).catch(err => {
+                reject(err)
+                con.end()
+            });
+        }).catch(err => reject(err))
+    })
+}
+
+function changePassword(email, password) {
+    return new Promise((resolve, reject) => {
+        pool.getConnection().then(con => {
+            let sql = 'update users set PwdHash = ? WHERE Email = ?'
+            con.query(sql, [password, email])
+                .then(rows => {
+                    resolve()
+                    con.end()
+                }).catch(err => {
+                reject(err)
+                con.end()
+            })
+        }).catch(err => reject(err))
+    })
+}
+
 //#endregion
 
 module.exports = {
@@ -309,4 +356,8 @@ module.exports = {
     getUserById,
     getUserByEmail,
     isValidUserID,
+    getSeqQuestionByEmail: getSecQuestionByEmail,
+    checkSecurityAnswer,
+    changePassword,
+
 }

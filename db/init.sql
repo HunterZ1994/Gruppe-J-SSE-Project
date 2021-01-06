@@ -13,6 +13,8 @@ create TABLE Users (
     PostCode int,
     Userrole varchar(10) NOT NULL,
     PwdHash varchar(255) NOT NULL,
+    SecQuestion varchar(255) NOT NULL,
+    SecAnswer varchar(255) NOT NULL,
     Blocked boolean,
 
     CHECK (Userrole IN("customer", "admin", "vendor")),
@@ -61,16 +63,16 @@ create TABLE Comments (
 );
 
 -- creating admin user with password admin
-INSERT INTO Users (Email, FirstName, SureName, Userrole, PwdHash) 
-VALUES ('admin@hardwareBay.de', 'Peter', 'Wiener', "admin", '8C6976E5B5410415BDE908BD4DEE15DFB167A9C873FC4BB8A81F6F2AB448A918');
+INSERT INTO Users (Email, FirstName, SureName, Userrole, PwdHash, SecQuestion, SecAnswer)
+VALUES ('admin@hardwareBay.de', 'Peter', 'Wiener', "admin", '8C6976E5B5410415BDE908BD4DEE15DFB167A9C873FC4BB8A81F6F2AB448A918', "change me", "64ba009cceac4ab8b3c877ae1b6b010e8fc5a15ab567238e3a6107cd4dfe147d");
 
 -- test vendor pwd = amazon
-INSERT INTO Users (Email, FirstName, SureName, Userrole, PwdHash)  
-    VALUES ("bezos@hardwareBay.de", "Jeff", "Bezos", "vendor", "CBC62794911FF31B2864ECD3DBBBEE7EBCB7EA41C5A42E2CBA377F3CFDB42811");
+INSERT INTO Users (Email, FirstName, SureName, Userrole, PwdHash, SecQuestion, SecAnswer)
+    VALUES ("bezos@hardwareBay.de", "Jeff", "Bezos", "vendor", "CBC62794911FF31B2864ECD3DBBBEE7EBCB7EA41C5A42E2CBA377F3CFDB42811", "change me", "64ba009cceac4ab8b3c877ae1b6b010e8fc5a15ab567238e3a6107cd4dfe147d");
 
 -- test usert pwd = wiener
-INSERT INTO Users (Email, FirstName, SureName, Street, HouseNr, City, PostCode, Userrole, PwdHash) 
-    VALUES ("wiener@hardwareBay.de", "Peter", "Wiener", "Wienerstreet", 10, "Wienertown", 1234, "customer", "29FEB5D3B68F493955A9C688197C580C99CD2EC416221D3537CE00C48C5765F2");
+INSERT INTO Users (Email, FirstName, SureName, Street, HouseNr, City, PostCode, Userrole, PwdHash, SecQuestion, SecAnswer)
+    VALUES ("wiener@hardwareBay.de", "Peter", "Wiener", "Wienerstreet", 10, "Wienertown", 1234, "customer", "29FEB5D3B68F493955A9C688197C580C99CD2EC416221D3537CE00C48C5765F2", "change me", "64ba009cceac4ab8b3c877ae1b6b010e8fc5a15ab567238e3a6107cd4dfe147d");
 
 INSERT INTO Articles (ArticleName, Descpt, Price, ImagePath, Seller) 
 VALUES ("Pfannenwender", "Hydrodynamischer Pfannenwender mit Turbo", 100, "/images/hydrodyn_pfannenwender.jpg", 2),

@@ -79,6 +79,16 @@
             <input type="password" name="password_second" id="password_second" oninput="checkPassword()">
             <lable for="password_second" id="passwordCorrect" style="color: red;">Passwörter stimmen nicht überein!</lable>
         </div>
+
+        <div class="row bottom-space">
+            <label for="security_question">Sicherheitsfrage</label>
+            <input type="text" name="security_question" id="security_question">
+        </div>
+
+        <div class="row bottom-space">
+            <label for="security_answer">Antwort</label>
+            <input type="text" name="security_answer" id="security_answer">
+        </div>
         
         <button type="submit" disabled="true" id="submit">Registrieren</button>
         <a href="/login">Login</a>

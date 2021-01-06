@@ -15,6 +15,7 @@ const vendor = require('./js/vendor');
 const errorHandler = require('./js/errorHandler');
 const search_results = require('./js/search_results');
 const index = require('./js/index');
+const forgot_password = require('./js/forgot_password');
 const cart = require('./js/cart');
 const articleView = require('./js/article');
 const tools = require("./js/tools");
@@ -134,6 +135,7 @@ app.get('/register', function (req, res) {
 app.post('/register', function (req, res) {
     const user = req.body;
     user.pwHash = tools.createPasswordHash(user.password);
+    user.secAnswerHash = tools.createPasswordHash(user.security_answer)
     db_connector.checkIfEmailExists(user).then(result => {
         if (Object.keys(result).length > 1){
             this.userInfo = { loggedIn: false, userID: user.UserId, role: user.Userrole }
@@ -152,6 +154,31 @@ app.post('/register', function (req, res) {
         console.log(err);
     })
    
+});
+
+app.get('/forgotPassword', function (req, res) {
+    forgot_password.createForgotPwInput({ loggedIn: false, role: 'customer' }).then(result => {
+        res.send(result)
+    })
+});
+
+app.post('/forgotPassword', function (req, res) {
+    forgot_password.createForgotPassword({ loggedIn: false, role: 'customer', email: req.body.email }).then(result => {
+        res.send(result)
+    })
+});
+
+app.post('/changePassword', function (req, res) {
+    const user = req.body
+    user.security_answer = tools.createPasswordHash(user.security_answer)
+    user.new_password = tools.createPasswordHash(user.new_password)
+    forgot_password.changePassword(user).then(success => {
+        if (success) {
+            res.redirect('/login')
+        } else {
+            res.send('<h1>Falsche Antwort</h1>Gehen Sie im Browser zurück')
+        }
+    })
 });
 
 //#endregion
