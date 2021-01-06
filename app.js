@@ -287,7 +287,7 @@ app.post('/article/edit', function (req, res) {
 app.get('/cart', (req, res) => {
     cart.createCart(tools.checkSession(req.session)).then(result => {
         res.send(result);
-    })
+    }).catch(err => res.redirect('/'));
 });
 
 app.get('/cart/add', (req, res) => {

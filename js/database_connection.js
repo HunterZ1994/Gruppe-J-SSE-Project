@@ -307,10 +307,12 @@ function getCartByUserId(userId='') {
             conn.query(sql, userId)
             .then(rows => {
                 resolve(rows);
+                conn.end();
             })
             .catch(err => {
                 console.log(err);
-                reject(err)
+                reject(err);
+                conn.end();
             });
         })
         .catch(err => {
@@ -328,10 +330,12 @@ function getCartArticles(cartId='') {
             conn.query(sql, cartId)
             .then(rows => {
                 resolve(rows);
+                conn.end();
             })
             .catch(err => {
                 console.log(err);
                 reject(err);
+                conn.end();
             });
         })
         .catch(err => {
@@ -349,10 +353,12 @@ function createCart(userId='') {
             conn.query(sql, userId)
             .then(rows => {
                 resolve(rows)
+                conn.end();
             })
             .catch(err => {
                 console.log(err);
                 reject(err);
+                conn.end();
             });
         }).catch(err => {
                 console.log(err);
@@ -369,10 +375,12 @@ function addArticleToCart(cartId = '', articleId = '', amount='') {
             conn.query(sql, [cartId, articleId, amount])
             .then(rows => {
                 resolve(rows)
+                conn.end();
             })
             .catch(err => {
                 console.log(err);
                 reject(err);
+                conn.end()
             });
         }).catch(err => {
                 console.log(err);
@@ -388,9 +396,11 @@ function deletreArticleFromCart(cartId, articleId) {
             const sql = "DELETE FROM holds WHERE Cart = ? AND Article = ?;"
             conn.query(sql, [cartId, articleId])
             .then(rows => {
+                conn.end();
                 resolve(rows)
             })
             .catch(err => {
+                conn.end();
                 console.log(err);
                 reject(err);
             });
