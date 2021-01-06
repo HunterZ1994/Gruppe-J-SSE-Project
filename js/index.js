@@ -7,7 +7,7 @@ const createIndex = (userInfo) => {
     return new Promise((resolve, reject) => {
         Promise.all([tools.readHtmlAndAddNav(userInfo, 'index.html'), dbAccess]).then(results => {
             const articles = tools.buildArticlesTable(results[1], userInfo)
-            resolve(results[0].replace('{ articles }', articles))
+            resolve(results[0].replace('{ articles }', articles).replace('{ script }', ''))
         })
     })
 }

@@ -122,7 +122,7 @@ app.get('/logout', function (req, res) {
     const userInfo = req.cookies.userInfo;
     userInfo.loggedIn = false;
     userInfo.role = 'customer';
-    delete userInfo.userID;
+    delete userInfo.userId;
     const enc = interceptor.encodeCookie('userInfo', userInfo);
     res.cookie(enc.name, enc.cookie).redirect('/');
 });

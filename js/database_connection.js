@@ -84,8 +84,7 @@ function addArticle(article, userId) {
            .then(rows => {
                resolve(rows);
                con.end()
-           })
-           .catch(err => {
+           }).catch(err => {
                reject(err)
                con.end()
            })
@@ -190,9 +189,7 @@ function getAllUsers() {
                     reject(err)
                     con.end()
                 });
-            }).catch(err => {
-                reject(err);
-        });
+            }).catch(err => reject(err));
     });
 }
 
@@ -208,8 +205,7 @@ function getUserById(userId = ''){
                 reject(err)
                 con.end()
             });
-        })
-        .catch(err => reject(err));
+        }).catch(err => reject(err));
     });
 }
 
@@ -227,10 +223,7 @@ function getUserByEmail(userEmail ='') {
                         reject(err)
                         con.end()
                     });
-            })
-            .catch(err => {
-                reject(err);
-            });
+            }).catch(err => reject(err));
     });
 }
 
@@ -293,7 +286,7 @@ function isValidUserID(user){
                 con.end()
             });
         }).catch(err => reject(err));
-    }).catch(err => console.log(err));
+    });
 }
 
 //#endregion
