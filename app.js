@@ -68,8 +68,6 @@ const htmlPath = path.join(__dirname) + '/html';
 //#region userAuthentication
 
 app.get('/', function (req, res) {
-    console.log(req.session);
-    console.log(req.session.cookie);
     // console.log(req.session);
     // if(!req.session.cookie.userID || req.session.cookie.userID === ''){
     //     req.session.cookie.userID = 'guest';
