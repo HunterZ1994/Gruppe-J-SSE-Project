@@ -1,55 +1,83 @@
-const navigation = require('./navigation')
+const { resolve4 } = require('dns');
 const fs = require('fs')
 const db_conector = require('./database_connection');
+const tools = require('./tools');
 
-const createCart = (userInfo) => {
+function createCart(userInfo) {
     return new Promise((resolve, reject) => {
-        let nav = navigation.createNavigationHTML(userInfo)
-
-        Promise.all([readCart(nav), db_conector.getArticleWithID()]).then(results => {
-            const articles = buildArticles(results[1])
-            resolve(results[0].replace('{ articles }', articles))
-        })
-    })
+        Promise.all([
+           tools.readHtmlAndAddNav(userInfo, 'cart.html'),
+           db_conector.getCartByUserId(userInfo.userId)
+        ]).then(results => {
+            db_conector.getCartArticles(results[1][0].CartId)
+            .then(articles => {
+                const table = tools.buildArticlesTable(articles);
+                resolve(results[0].replace('{ articles }', table));
+            }).catch(err => {
+                console.log(err);
+                reject(err);
+            });
+        }).catch(err => {
+            console.log(err);
+            reject(err);
+        }) ;
+    });
 }
 
-function readCart(nav) {
+
+function addToCart(userInfo, articleId) {
     return new Promise((resolve, reject) => {
-        fs.readFile(__dirname + '/../html/cart.html', 'utf8', function (err, html) {
-            if (err) {
-                throw err
+        const userId = userInfo.userId
+        db_conector.getCartByUserId(userId)
+        .then(res => {
+            if (!res[0]) {
+                db_conector.createCart(userId)
+                .then(res => {
+                    db_conector.addArticleToCart(res.insertId, articleId, 1)
+                    .then(resolve(true))
+                    .catch(err => {
+                        console.log(err);
+                        reject(err);
+                    });
+                })
+                .catch();
+            } else {
+                db_conector.addArticleToCart(res[0].CartId, articleId, 1)
+                .then(resolve(true))
+                .catch(err => {
+                    console.log(err);
+                    resolve(false);
+                });
             }
-            resolve(html.replace('{ navigation }', nav))
+        }).catch(err =>{ 
+            console.log(err)
+            resolve(false);
+        });
+    });
+}
+
+function deleteFromCart(userInfo, articleId ) {
+    return new Promise((resolve, reject) => {
+        db_conector.getCartByUserId(userInfo.userId)
+        .then(rows =>{
+            const cartId = rows[0].CartId;
+            db_conector.deletreArticleFromCart(cartId, articleId)
+            .then(res => resolve(res))
+            .catch(err => {
+                console.log(err);
+                reject(err);
+            });
         })
-    })
-}
-
-function buildArticles(articles) {
-    let artTable = '<table>\n'
-    artTable += '   <tr>\n'
-    artTable += '       <th>Name</th>\n'
-    artTable += '       <th>Description</th>\n'
-    artTable += '       <th>Price</th>\n'
-    artTable += '       <th>Image</th>\n'
-    artTable += '   </tr>\n'
-    for(let article of articles) {
-        artTable += '   <tr>\n'
-        artTable += '       <td><a href="/product/' + article.ArticleId + '">' + article.ArticleName + '</a></td>\n'
-        artTable += '       <td>' + article.Descpt + '</td>\n'
-        artTable += '       <td>' + article.Amount + '$</td>\n'
-        artTable += '       <td><img src="' + article.ImagePath
-            + '" style="max-height: 150px; max-width: 150px;"></td>\n'
-        artTable += '   </tr>\n'
-    }
-    artTable += '</table>'
-    return artTable
-}
-
-function goToCheckout(){
-    console.log("Going to checkout!")
-}
+        .catch(err => {
+            console.log(err);
+            reject(err);
+        });
+    });
+} 
 
 
 module.exports = {
     createCart,
+    addToCart,
+    deleteFromCart
 }

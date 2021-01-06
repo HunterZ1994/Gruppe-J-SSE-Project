@@ -1,3 +1,4 @@
+const { query } = require('express');
 const mariadb = require('mariadb');
 const pool = mariadb.createPool({
     host: 'localhost',
@@ -283,6 +284,108 @@ function checkIfEmailExists(user) {
 
 //#endregion
 
+function getCartByUserId(userId='') {
+    return new Promise((resolve, reject) => {
+        pool.getConnection()
+        .then(conn => {
+            const sql = 'SELECT * FROM carts WHERE User = ?';
+            conn.query(sql, userId)
+            .then(rows => {
+                resolve(rows);
+            })
+            .catch(err => {
+                console.log(err);
+                reject(err)
+            });
+        })
+        .catch(err => {
+            console.log(err);
+            reject(err);
+        });
+    });
+}
+
+function getCartArticles(cartId='') {
+    return new Promise((resolve, reject) => {
+        pool.getConnection()
+        .then(conn => {
+            const sql = "SELECT * FROM holds INNER JOIN articles ON articles.ArticleId = holds.Article WHERE cart = ?"
+            conn.query(sql, cartId)
+            .then(rows => {
+                resolve(rows);
+            })
+            .catch(err => {
+                console.log(err);
+                reject(err);
+            });
+        })
+        .catch(err => {
+             console.log(err);
+             reject(err);
+        });
+    });
+}
+
+function createCart(userId='') {
+    return new Promise((resolve, reject) => {
+        pool.getConnection()
+        .then(conn => {
+            const sql = 'INSERT INTO carts (User) VALUES (?)'
+            conn.query(sql, userId)
+            .then(rows => {
+                resolve(rows)
+            })
+            .catch(err => {
+                console.log(err);
+                reject(err);
+            });
+        }).catch(err => {
+                console.log(err);
+                reject(err);
+        });
+    });
+}
+
+function addArticleToCart(cartId = '', articleId = '', amount='') {
+    return new Promise((resolve, reject) => {
+        pool.getConnection()
+        .then(conn => {
+            const sql = 'INSERT INTO holds (Cart, Article, ArticleAmount) VALUES (?, ?, ?)'
+            conn.query(sql, [cartId, articleId, amount])
+            .then(rows => {
+                resolve(rows)
+            })
+            .catch(err => {
+                console.log(err);
+                reject(err);
+            });
+        }).catch(err => {
+                console.log(err);
+                reject(err);
+        });
+    });
+}
+
+function deletreArticleFromCart(cartId, articleId) {
+    return new Promise((resolve, reject) => { 
+        pool.getConnection()
+        .then(conn => {
+            const sql = "DELETE FROM holds WHERE Cart = ? AND Article = ?;"
+            conn.query(sql, [cartId, articleId])
+            .then(rows => {
+                resolve(rows)
+            })
+            .catch(err => {
+                console.log(err);
+                reject(err);
+            });
+        }).catch(err => {
+                console.log(err);
+                reject(err);
+        });
+    });
+}
+
 module.exports = {
     getSearchedArticles, 
     getUserByUName, 
@@ -299,5 +402,10 @@ module.exports = {
     checkIfEmailExists,
     getAllUsers,
     getUserById,
-    getUserByEmail
+    getUserByEmail,
+    getCartByUserId,
+    getCartArticles,
+    createCart,
+    addArticleToCart,
+    deletreArticleFromCart
 }
