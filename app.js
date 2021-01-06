@@ -320,9 +320,20 @@ app.get('/cart', (req, res) => {
     })
 });
 
-app.delete('/cart', (req, res) => {
-    console.log(req.query.id);
-    res.send('You\'ve deleted an item from your cart')
+app.get('/cart/add', (req, res) => {
+    const userInfo = req.cookies.userInfo;
+    const articleId = req.query.articleId;
+    cart.addToCart(userInfo, articleId).then(bool => res.redirect('/')).catch(err => res.redirect('/cart'));
+});
+
+app.get('/cart/delete', (req, res) => {
+    const articleId = req.query.articleId;
+    const userInfo = req.cookies.userInfo;
+    cart.deleteFromCart(userInfo, articleId).then(rows => {
+        res.redirect('/cart')
+    }).catch(err => {
+        res.redirect('/cart')
+    });
 });
 
 //#endregion

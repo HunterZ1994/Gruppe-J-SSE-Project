@@ -27,6 +27,10 @@ function buildArticlesTable(articles, userInfo) {
                 artTable += `<td> <a href='article/delete?articleId=${article.ArticleId}'> Löschen </a> </td>\n`; 
             }
 
+            if (article && article.Cart ) {
+                artTable +=  `<td> <a href="cart/delete?articleId=${article.ArticleId}&cartId=${article.Cart}"> Aus Warenkorb entfernen </a></td>"`;
+            }
+
             artTable += '   </tr>\n'
         }
         
