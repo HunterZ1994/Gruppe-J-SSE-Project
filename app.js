@@ -57,26 +57,25 @@ app.use(session({
         maxAge: SESS_LIFETIME,
         sameSite: true,
         secure: IN_PROD,
-        userInfo: {
-            userID: '00000000000000',
-            userRole: 'guest'
-        }
-    }
+    },
+    'QkFCQUFCQUFCQUFBQkFBQkFBQUJBQkFBQUFCQkFCQUFCQUJBQkJCQQ==': ''
 }))
 
 // TODO: replace hard-coded user info with cookie
-const fakeUserInfo = { userID: '00000000000000', userRole: 'guest' };
+const fakeUserInfo = { userID: '1230000', userRole: 'guest' };
 const htmlPath = path.join(__dirname) + '/html';
 
 //#region userAuthentication
 
 app.get('/', function (req, res) {
     console.log(req.session);
+    console.log(req.session.cookie);
+    // console.log(req.session);
     // if(!req.session.cookie.userID || req.session.cookie.userID === ''){
     //     req.session.cookie.userID = 'guest';
     // }
     // TODO: replace hard-coded userInfo with info from cookie
-    index.createIndex(!!req.session.cookie.userInfo ? req.session.cookie.userInfo : fakeUserInfo).then(result => {
+    index.createIndex(!!req.session.cookie ? req.session.cookie : fakeUserInfo).then(result => {
         res.send(result);
     })
 });
@@ -86,6 +85,7 @@ app.get('/login', function (req, res) {
 });
 
 app.post('/login', function (req, res) {
+    console.log(req.session);
     const dbpwd = tools.createPasswordHash(req.body.password);
     db_connector.getUserByUName(req.body.email).then(result => {
         let path = '';
@@ -95,20 +95,23 @@ app.post('/login', function (req, res) {
             if (dbpwd.toUpperCase() === users.PwdHash.toUpperCase()) {
                 userInfo = { loggedIn: true, userId: users.UserId, role: users.Userrole }
                 path = '/';
+                //TODO set error paths back to error.
             } else{
                 this.userInfo = { loggedIn: false, userId: users.UserId, role: users.Userrole }
                 userInfo = { loggedIn: false, userId: users.UserId, role: users.Userrole }
-                path = '/signin_error.html';
+                path = '/';
             }
         } else {
             this.userInfo = { loggedIn: false, userId: "", role: "" }
             userInfo = { loggedIn: false, userId: "", role: "" };
-            path = '/signin_error.html';
+            path = '/';
         }
         const encoded = interceptor.encodeCookie('userInfo', userInfo);
-        console.log(encoded);
-        // console.log(interceptor.decodeRequestCookie(encoded));
-        res.cookie(encoded.name, encoded.cookie);
+        req.session[encoded.name] = encoded.cookie;
+        // req.session. = encoded.cookie;
+        req.session.save();
+        // console.log(req.session.cookie);
+        // res.cookie(encoded.name, encoded.cookie);
         if (path === '/') {
             res.redirect(path);
         } else {

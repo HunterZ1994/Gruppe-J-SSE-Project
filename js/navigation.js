@@ -1,5 +1,5 @@
 const createNavigationHTML = (userInfo) => {
-    console.log(userInfo);
+    // console.log(userInfo);
     let nav = ''
     nav += '<div class="topnav">\n'
     nav += '    <a href="/">Main Page</a>\n'
