@@ -29,6 +29,7 @@ app.use(cookieParser());
 app.use(express.static('public'));
 app.use('/images', express.static(__dirname + '/assets/images'));
 app.use('/css', express.static(__dirname + '/css'));
+app.use(interceptor.decodeRequestCookie);
 
 // Sesion parameters
 
@@ -84,7 +85,7 @@ app.post('/login', function (req, res, next) {
         let userInfo = {};
         if (Object.keys(result).length > 1) {
             const users = result[0];
-            if (dbpwd.toUpperCase() === users.PwdHash.toUpperCase()) {
+            if (dbpwd.toUpperCase() === users.PwdHash.toUpperCase() && !users.Blocked) {
                 userInfo = { loggedIn: true, userId: users.UserId, role: users.Userrole }
                 path = '/';
                 //TODO set error paths back to error.
@@ -98,12 +99,10 @@ app.post('/login', function (req, res, next) {
             userInfo = { loggedIn: false, userId: "", role: "" };
             path = '/signin_error.html';
         }
-        const encoded = interceptor.encodeCookie('userInfo', userInfo);
+        const encoded = tools.encodeCookie('userInfo', userInfo);
         req.session[encoded.name] = encoded.cookie;
-        // req.session. = encoded.cookie;
         req.session.save();
-        // console.log(req.session.cookie);
-        // res.cookie(encoded.name, encoded.cookie);
+        res.cookie(encoded.name, encoded.cookie);
         if (path === '/') {
             res.redirect(path);
         } else {

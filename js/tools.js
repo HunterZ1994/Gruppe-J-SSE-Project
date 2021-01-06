@@ -97,6 +97,20 @@ function decodeCookie(cookieValue) {
 
 }
 
+function encodeCookie(cookieName='cookie', cookie) {
+    let encoded = {};
+
+    for (const key of Object.keys(cookie)) {
+        if (typeof cookie[key] === 'string') {
+            encoded[bacon.encode(key, {alphabet})] = bacon.encode(cookie[key], {alphabet});
+        } else {
+            encoded[bacon.encode(key, {alphabet})] = cookie[key];
+        }
+    }
+
+    return {name: Buffer.from(bacon.encode(cookieName, {alphabet})).toString('base64'), cookie: Buffer.from(JSON.stringify(encoded)).toString('base64')};
+}
+
 function checkSeesion(session) {
     const defaultInfo = { userID: '0000000000', role: 'guest', loggedIn: false };
 
@@ -119,5 +133,6 @@ module.exports = {
     buildArticlesTable,
     readHtmlAndAddNav,
     createPasswordHash,
-    checkSeesion
+    checkSeesion,
+    encodeCookie
 }
