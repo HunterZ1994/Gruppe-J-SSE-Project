@@ -1,18 +1,20 @@
-const { resolve4 } = require('dns');
-const fs = require('fs')
-const db_conector = require('./database_connection');
+const db_connector = require('./database_connection');
 const tools = require('./tools');
 
 function createCart(userInfo) {
     return new Promise((resolve, reject) => {
         Promise.all([
            tools.readHtmlAndAddNav(userInfo, 'cart.html'),
-           db_conector.getCartByUserId(userInfo.userId)
+           db_connector.getCartByUserId(userInfo.userId)
         ]).then(results => {
-            db_conector.getCartArticles(results[1][0].CartId)
+            db_connector.getCartArticles(results[1][0].CartId)
             .then(articles => {
                 const table = tools.buildArticlesTable(articles);
-                resolve(results[0].replace('{ articles }', table));
+                const buyButton = articles.length > 0 ?
+                    '<Button id=\'checkout_button\' value="Go to checkout" onclick="window.location.href = \'checkout\'">Kaufen</Button>' :
+                    '';
+                resolve(results[0].replace('{ articles }', table).replace('{ buy_button }', buyButton)
+                    .replace('No products matching search criteria', 'Your cart is currently empty'));
             }).catch(err => {
                 console.log(err);
                 reject(err);
@@ -28,13 +30,13 @@ function createCart(userInfo) {
 function addToCart(userInfo, articleId) {
     return new Promise((resolve, reject) => {
         const userId = userInfo.userId
-        db_conector.getCartByUserId(userId)
+        db_connector.getCartByUserId(userId)
         .then(res => {
             if (!res[0]) {
-                db_conector.createCart(userId)
+                db_connector.createCart(userId)
                 .then(res => {
-                    db_conector.addArticleToCart(res.insertId, articleId, 1)
-                    .then(resolve(true))
+                    db_connector.addArticleToCart(res.insertId, articleId, 1)
+                    .then(() => resolve(true))
                     .catch(err => {
                         console.log(err);
                         reject(err);
@@ -42,8 +44,8 @@ function addToCart(userInfo, articleId) {
                 })
                 .catch();
             } else {
-                db_conector.addArticleToCart(res[0].CartId, articleId, 1)
-                .then(resolve(true))
+                db_connector.addArticleToCart(res[0].CartId, articleId, 1)
+                .then(() => resolve(true))
                 .catch(err => {
                     console.log(err);
                     resolve(false);
@@ -58,10 +60,10 @@ function addToCart(userInfo, articleId) {
 
 function deleteFromCart(userInfo, articleId ) {
     return new Promise((resolve, reject) => {
-        db_conector.getCartByUserId(userInfo.userId)
+        db_connector.getCartByUserId(userInfo.userId)
         .then(rows =>{
             const cartId = rows[0].CartId;
-            db_conector.deletreArticleFromCart(cartId, articleId)
+            db_connector.deletreArticleFromCart(cartId, articleId)
             .then(res => resolve(res))
             .catch(err => {
                 console.log(err);

@@ -1,13 +1,9 @@
 // node modules
 const express = require('express');
 const path = require('path');
-const fs = require('fs');
 const formidable = require('formidable');
 const cookieParser = require('cookie-parser');
-const { userInfo } = require('os');
-const { BADQUERY, resolve4 } = require('dns');
-const { reset } = require('nodemon');
-const htmlParser = require('node-html-parser');
+const { BADQUERY } = require('dns');
 
 // own modules
 const db_connector = require("./js/database_connection");
@@ -89,7 +85,7 @@ app.post('/login', function (req, res, next) {
             if (dbpwd.toUpperCase() === users.PwdHash.toUpperCase() && !users.Blocked) {
                 userInfo = { loggedIn: true, userId: users.UserId, role: users.Userrole }
                 path = '/';
-                //TODO set error paths back to error.
+                // TODO set error paths back to error.
             } else{
                 this.userInfo = { loggedIn: false, userId: users.UserId, role: users.Userrole }
                 userInfo = { loggedIn: false, userId: users.UserId, role: users.Userrole }
@@ -127,13 +123,15 @@ app.post('/register', function (req, res) {
     user.secAnswerHash = tools.createPasswordHash(user.security_answer)
     db_connector.checkIfEmailExists(user).then(result => {
         if (Object.keys(result).length > 1){
-            this.userInfo = { loggedIn: false, userID: user.UserId, role: user.Userrole }
-                res.cookie('userInfo', this.userInfo).sendFile(htmlPath + '/signup_error.html');
+            const userInfo = { loggedIn: false, userID: user.UserId, role: user.Userrole }
+                res.cookie('userInfo', userInfo).sendFile(htmlPath + '/signup_error.html');
         } else {
              db_connector.addUser(user).then(result => {
                  if (result.warningStatus === 0) {
-                    this.userInfo = { loggedIn: true, userID: user.email, role: 'customer' }
-                    res.cookie('userInfo', this.userInfo).redirect('/');
+                     console.log(result)
+                     db_connector.createCart(result.insertId)
+                    const userInfo = { loggedIn: true, userID: user.email, role: 'customer' }
+                    res.cookie('userInfo', userInfo).redirect('/');
                 } else {
                     res.sendStatus(BADQUERY);
                  }
@@ -146,30 +144,45 @@ app.post('/register', function (req, res) {
 });
 
 app.get('/forgotPassword', function (req, res) {
-    forgot_password.createForgotPwInput(tools.checkSession(req.session)).then(result => {
-        res.send(result)
-    })
+    const session = tools.checkSession(req.session);
+    if (!session.loggedIn) {
+        forgot_password.createForgotPwInput(session).then(result => {
+            res.send(result);
+        })
+    } else {
+        res.redirect('/');
+    }
 });
 
 app.post('/forgotPassword', function (req, res) {
     const user = tools.checkSession(req.session);
-    user.email = req.body.email;
-    forgot_password.createForgotPassword(user).then(result => {
-        res.send(result)
-    })
+    if (!session.loggedIn) {
+        user.email = req.body.email;
+        forgot_password.createForgotPassword(user).then(result => {
+            res.send(result)
+        })
+    } else {
+        res.redirect('/');
+    }
+
 });
 
 app.post('/changePassword', function (req, res) {
-    const user = req.body
-    user.security_answer = tools.createPasswordHash(user.security_answer)
-    user.new_password = tools.createPasswordHash(user.new_password)
-    forgot_password.changePassword(user).then(success => {
-        if (success) {
-            res.redirect('/login')
-        } else {
-            res.send('<h1>Falsche Antwort</h1>Gehen Sie im Browser zurück')
-        }
-    })
+    const session = tools.checkSession(req.session);
+    if (!session.loggedIn) {
+        const user = req.body
+        user.security_answer = tools.createPasswordHash(user.security_answer)
+        user.new_password = tools.createPasswordHash(user.new_password)
+        forgot_password.changePassword(user).then(success => {
+            if (success) {
+                res.redirect('/login')
+            } else {
+                res.send('<h1>Falsche Antwort</h1>Gehen Sie im Browser zurück')
+            }
+        })
+    } else {
+        res.redirect('/');
+    }
 });
 
 //#endregion
@@ -206,12 +219,18 @@ app.get('/adminPanel', function (req, res) {
 // #region vendor
 
 app.get('/article/add', function (req, res) {
-    vendor.createArticleForm(tools.checkSession(req.session))
-    .then(html => res.send(html))
-    .catch(err => {
-        res.status = err.code;
-        res.send(err.html);
-    });
+    const session = tools.checkSession(req.session);
+
+    if (session.role === 'vendor') {
+        vendor.createArticleForm(session)
+            .then(html => res.send(html))
+            .catch(err => {
+                res.status = err.code;
+                res.send(err.html);
+            });
+    } else {
+        res.redirect('/')
+    }
 });
 
 app.post('/article/add', function (req, res) {
@@ -224,17 +243,17 @@ app.post('/article/add', function (req, res) {
             res.status = err.status;
             res.send(err.html);
         }); 
+    } else {
+        const form = new formidable.IncomingForm();
+        form.parse(req, function (err, fields, files) {
+            vendor.addArticle(userInfo, fields, files)
+                .then(html => res.send(html))
+                .catch(err => {
+                    res.status = err.code;
+                    res.send(err.html);
+                });
+        });
     }
-
-    const form = new formidable.IncomingForm();
-    form.parse(req, function (err, fields, files) {
-        vendor.addArticle(userInfo, fields, files)
-            .then(html => res.send(html))
-            .catch(err => {
-                res.status = err.code;
-                res.send(err.html);
-            });
-    });
 });
 
 app.get('/article/delete', function (req, res) {
@@ -248,16 +267,16 @@ app.get('/article/delete', function (req, res) {
             res.status = err.code;
             res.send(err.html);
         });
+    } else {
+        vendor.deleteArticle(userInfo, articleId)
+            .then(html => {
+                res.send(html);
+            })
+            .catch(err => {
+                res.status = err.code;
+                res.send(err.html);
+            });
     }
-
-    vendor.deleteArticle(userInfo, articleId)
-        .then(html => {
-            res.send(html);
-        })
-        .catch(err => {
-            res.status = err.code;
-            res.send(err.html);
-        });
 });
 
 app.get('/article/edit', function (req, res) {
@@ -272,17 +291,17 @@ app.get('/article/edit', function (req, res) {
             res.status = err.code;
             res.send(err.html);
         }); 
+    } else {
+        // TODO: Replace userInfo
+        vendor.createEditForm(userInfo, articleId)
+            .then(html => {
+                res.send(html);
+            })
+            .catch(err => {
+                res.status = err.code;
+                res.send(err.html);
+            });
     }
-
-    // TODO: Replace userInfo
-    vendor.createEditForm(userInfo, articleId)
-    .then(html => {
-        res.send(html);
-    })
-    .catch(err => {
-        res.status = err.code;
-        res.send(err.html);
-    });
 });
 
 app.post('/article/edit', function (req, res) {
@@ -296,17 +315,17 @@ app.post('/article/edit', function (req, res) {
             res.status = err.code;
             res.send(err.html);
         });  
-    }
-
-    const form = new formidable.IncomingForm();
-    form.parse(req, function (err, fields, files) {
-        vendor.updateArticle(userInfo, fields, files)
-        .then(html => res.send(html))
-        .catch(err => {
-            res.status = err.code;
-            res.send(err.html);
+    } else {
+        const form = new formidable.IncomingForm();
+        form.parse(req, function (err, fields, files) {
+            vendor.updateArticle(userInfo, fields, files)
+                .then(html => res.send(html))
+                .catch(err => {
+                    res.status = err.code;
+                    res.send(err.html);
+                });
         });
-    });
+    }
 });
 
 // #endregion
@@ -314,23 +333,51 @@ app.post('/article/edit', function (req, res) {
 //#region cart
 
 app.get('/cart', (req, res) => {
-    cart.createCart(tools.checkSession(req.session)).then(result => {
-        res.send(result);
-    }).catch(err => res.redirect('/'));
+    const session = tools.checkSession(req.session);
+
+    if (session.role === 'customer') {
+        cart.createCart(session).then(result => {
+            res.send(result);
+        }).catch(err => {
+            console.log(err);
+            res.redirect('/');
+        });
+    } else {
+        res.redirect('/')
+    }
 });
 
 app.get('/cart/add', (req, res) => {
-    const articleId = req.query.articleId;
-    cart.addToCart(tools.checkSession(req.session), articleId).then(bool => res.redirect('/')).catch(err => res.redirect('/cart'));
+    const session = tools.checkSession(req.session);
+
+    if (session.role === 'customer') {
+        const articleId = req.query.articleId;
+        cart.addToCart(session, articleId)
+            .then(() => res.redirect('/cart'))
+            .catch(err => {
+                console.log(err);
+                res.redirect('/');
+            });
+    } else {
+        res.redirect('/')
+    }
+
 });
 
 app.get('/cart/delete', (req, res) => {
-    const articleId = req.query.articleId;
-    cart.deleteFromCart(tools.checkSession(req.session), articleId).then(rows => {
-        res.redirect('/cart')
-    }).catch(err => {
-        res.redirect('/cart')
-    });
+    const session = tools.checkSession(req.session);
+
+    if (session.role === 'customer') {
+        const articleId = req.query.articleId;
+        cart.deleteFromCart(session, articleId).then(rows => {
+            res.redirect('/cart')
+        }).catch(err => {
+            console.log(err);
+            res.redirect('/cart');
+        });
+    } else {
+        res.redirect('/')
+    }
 });
 
 //#endregion
@@ -348,14 +395,20 @@ app.get('/checkout', (req, res) => {
 // #region comments
 
 app.post('/comment/add', (req, res) => {
-    const comment = req.body;
-    articleView.addComment(comment.comText, comment.articleId, tools.checkSession(req.session))
-    .then(html => {
-        res.send(html);
-    })
-    .catch(err => {
-        console.log(err);
-    });
+    const session = tools.checkSession(req.session);
+
+    if (session.loggedIn) {
+        const comment = req.body;
+        articleView.addComment(comment.comText, comment.articleId, session)
+            .then(html => {
+                res.send(html);
+            })
+            .catch(err => {
+                console.log(err);
+            });
+    } else {
+        res.redirect('/')
+    }
 });
 
 

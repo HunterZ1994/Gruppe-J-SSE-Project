@@ -2,7 +2,6 @@ const navigation = require('./navigation')
 const fs = require('fs')
 const crypto = require('crypto');
 const bacon = require('bacon-cipher');
-const db_connector = require('./database_connection');
 const moment = require('moment');
 
 const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -33,7 +32,7 @@ function buildArticlesTable(articles, userInfo) {
             }
 
             if (article && article.Cart ) {
-                artTable +=  `<td> <a href="cart/delete?articleId=${article.ArticleId}&cartId=${article.Cart}"> Aus Warenkorb entfernen </a></td>"`;
+                artTable +=  `<td> <a href="cart/delete?articleId=${article.ArticleId}&cartId=${article.Cart}"> Aus Warenkorb entfernen </a></td>`;
             }
 
             artTable += '   </tr>\n'
@@ -49,7 +48,7 @@ function buildArticlesTable(articles, userInfo) {
         artTable += '</table>'
     }
     else {
-        if (!!userInfo && userInfo.role === 'vendor') {
+        if (!!userInfo && userInfo?.role === 'vendor') {
             artTable = 'Sie haben noch keine Artikel zum Verkauf angeboten.'
         } else {
             artTable = 'No products matching search criteria'
