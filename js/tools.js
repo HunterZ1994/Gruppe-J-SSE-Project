@@ -58,6 +58,34 @@ function buildArticlesTable(articles, userInfo) {
     return artTable
 }
 
+function buildUserTable(users) {
+    let userTable = ''
+
+    if (users.length > 0) {
+        userTable += '<table class="item-table-component">\n'
+        userTable += '   <tr>\n'
+        userTable += '       <th>Name</th>\n'
+        userTable += '       <th>FirstName      '
+        userTable += '       <th>E-Mail</th>\n'
+        userTable += '   </tr>\n'
+
+        for(const user of users) {
+            userTable += '   <tr>\n'
+            userTable += '        <td class="user-name">' + user.SureName + '</td>\n'
+            userTable += '       <td class="user-firstname">' + user.FirstName + '</td>\n'
+            userTable += '       <td class="user-email">' + user.Email + '</td>\n'
+
+            if (!(user.Userrole === 'admin')) {
+                userTable += `<td> <a href='article/lock?userId=${user.userId}'> Sperren </a> </td>\n`; 
+                artTable += `<td> <a href='article/delete?userId=${user.userId}'> Löschen </a> </td>\n`; 
+            }
+
+            userTable += '   </tr>\n'
+        }
+	
+	return userTable
+}
+
 function readHtmlAndAddNavAndHead(userInfo, filename) {
     return new Promise((resolve, reject) => {
         fs.readFile(__dirname + '/../html/' + filename, 'utf8', function (err, html) {
