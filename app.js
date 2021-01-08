@@ -17,6 +17,7 @@ const articleView = require('./js/article');
 const tools = require("./js/tools");
 const interceptor = require('./js/interceptor');
 const session = require('express-session');
+const admin = require('./js/admin_panel')
 
 // basic app setup
 const app = express();
@@ -209,6 +210,18 @@ app.get('/product', function(req, res) {
 app.get('/adminPanel', function (req, res) {
     // TODO: check for role
     // TODO: return admin page
+    const session = tools.checkSession(req.session);
+
+    if (session.role === 'admin') {
+        admin.createAdminPanel()
+            .then(html => res.send(html))
+            .catch(err => {
+                res.status = err.code;
+                res.send(err.html);
+            });
+    } else {
+        res.redirect('/')
+    }
     throw Error('Method adminPanel not implemented')
 });
 
