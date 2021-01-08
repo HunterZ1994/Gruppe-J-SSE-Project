@@ -3,6 +3,10 @@ const express = require('express');
 const path = require('path');
 const formidable = require('formidable');
 const cookieParser = require('cookie-parser');
+const helmet = require('helmet');
+const csrf = require('csurf');
+const rateLimit = require('express-rate-limit');
+const htmlParser = require('node-html-parser');
 const { BADQUERY } = require('dns');
 
 // own modules
@@ -21,13 +25,31 @@ const admin = require('./js/admin_panel')
 
 // basic app setup
 const app = express();
-app.use(express.urlencoded());
+app.use(express.urlencoded({extended: false}));
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.static('public'));
 app.use('/images', express.static(__dirname + '/assets/images'));
 app.use('/css', express.static(__dirname + '/css'));
 app.use(interceptor.decodeRequestCookie);
+app.use(rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // only 100 requests per client per windowMS
+    delayMs: 0 // disable delay -> user hasfull speed until limit
+}));
+
+// Setting helmet Options 
+app.use(helmet.dnsPrefetchControl());
+app.use(helmet.expectCt());
+app.use(helmet.frameguard());
+app.use(helmet.hidePoweredBy());
+app.use(helmet.hsts());
+app.use(helmet.ieNoOpen());
+app.use(helmet.noSniff());
+app.use(helmet.permittedCrossDomainPolicies());
+app.use(helmet.referrerPolicy());
+app.use(helmet.xssFilter());
+app.use(csrf({cookie: true}));
 
 // Sesion parameters
 
@@ -75,7 +97,18 @@ app.use(function(req, res, next){
         res.setHeader(securityHeaders.contentSecurityPolicy.name, securityHeaders.contentSecurityPolicy.value);
     }
     next();
-})
+});
+
+app.use(function(req, res, next) {
+    const oldSend = res.send;
+
+    res.send = function(data) {
+        const m  = data.replace('{ csrf }', `<input type="hidden' name="_csrf" value=${req.csrfToken()}`);
+        console.log(m);
+        oldSend.apply(res, arguments);
+    }   
+});
+
 
 
 const htmlPath = path.join(__dirname) + '/html';
