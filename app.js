@@ -58,8 +58,6 @@ app.use(session({
     'QkFCQUFCQUFCQUFBQkFBQkFBQUJBQkFBQUFCQkFCQUFCQUJBQkJCQQ==': '123'
 }))
 
-// TODO: replace hard-coded user info with cookie
-const fakeUserInfo = { userID: '0000000000', role: 'guest', loggedIn: false };
 const htmlPath = path.join(__dirname) + '/html';
 
 //#region userAuthentication
