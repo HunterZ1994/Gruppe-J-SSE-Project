@@ -3,6 +3,7 @@ const fs = require('fs')
 const crypto = require('crypto');
 const bacon = require('bacon-cipher');
 const moment = require('moment');
+const { resolve } = require('path');
 
 const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
@@ -104,6 +105,14 @@ function readHtmlAndAddNavAndHead(userInfo, filename) {
     })
 }
 
+function injectScript(userInfo, filenmae, script){
+    return new Promise((resolve, reject) => {
+       readHtmlAndAddNavAndHead(userInfo, filenmae).then(result =>{
+           resolve(result[0].replace('{script}', script));
+       }).catch(err => reject(err));
+    })
+}
+
 function createPasswordHash(value) {
     return crypto.createHash('sha256').update(value).digest('hex');
 }
@@ -170,4 +179,5 @@ module.exports = {
     checkSession,
     encodeCookie,
     buildUserTable,
+    injectScript,
 }

@@ -90,7 +90,7 @@ app.post('/login', function (req, res, next) {
             } else{
                 this.userInfo = { loggedIn: false, userId: users.UserId, role: users.Userrole }
                 userInfo = { loggedIn: false, userId: users.UserId, role: users.Userrole }
-                path = '/signin_error.html';
+                path = '/signin';
             }
         } else {
             this.userInfo = { loggedIn: false, userId: "", role: "" }
@@ -104,7 +104,11 @@ app.post('/login', function (req, res, next) {
         if (path === '/') {
             res.redirect(path);
         } else {
-            res.sendFile(htmlPath + path);
+            tools.injectScript(tools.checkSession(req.session), htmlPath + "/signin.html", 
+                "<script>window.alert('Username or password wrong! Please try agaim. );</script>"
+            ).then(result =>{
+                res.send(result);
+            })
         }
     });
 });
