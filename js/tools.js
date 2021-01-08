@@ -76,7 +76,7 @@ function buildUserTable(users) {
             userTable += '       <td class="user-email">' + user.Email + '</td>\n'
 
             if (!(user.Userrole === 'admin' || user.Userrole === 'vendor')) {
-                userTable += `<td> <a href='adminPanel/lock?userId=${user.userId}'> Sperren </a> </td>\n`;
+                userTable += `<td> <a href='adminPanel/block?userId=${user.userId}'> Sperren </a> </td>\n`;
                 userTable += `<td> <a href='adminPanel/delete?userId=${user.userId}'> Löschen </a> </td>\n`;
             }
 

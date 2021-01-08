@@ -196,11 +196,26 @@ function getAllUsers() {
     });
 }
 
+function blockUser(userId) {
+    return new Promise((resolve, reject) => {
+        pool.getConnection().then(con => {
+            const sql = "INSERT INTO user (Blocked) VALUES (?) WHERE UserId = ?"
+            con.query(sql, userId).then(res => {
+                resolve(res)
+                con.end()
+            }).catch(err => {
+                reject(err)
+                con.end()
+            });
+        }).catch(err => reject(err));
+    });
+}
+
 function deleteUser(userId) {
     return new Promise((resolve, reject) => {
         pool.getConnection().then(con => {
             const sql = "DELETE FROM users WHERE UserId = ?";
-            con.query(sql, [articleId, userId]).then(res => {
+            con.query(sql, userId).then(res => {
                 resolve(res)
                 con.end()
             }).catch(err => {
@@ -508,6 +523,7 @@ module.exports = {
     getUserById,
     getUserByEmail,
     deleteUser,
+    blockUser,
     getCartByUserId,
     getCartArticles,
     createCart,
