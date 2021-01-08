@@ -60,17 +60,19 @@ function buildArticlesTable(articles, userInfo) {
 
 function readHtmlAndAddNavAndHead(userInfo, filename) {
     return new Promise((resolve, reject) => {
-        fs.readFile(__dirname + '/../html/' + filename, 'utf8', function (err, html) {
-            if (err) {
-                throw err
-            }
-            resolve(html.replace('{ navigation }', navigation.createNavigationHTML(userInfo))
-                .replace('{ head }', '<meta charset="UTF-8">\n' +
-                    '    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n' +
-                    '    <title>HardwareBay</title>\n' +
-                    '    <link rel="stylesheet" href="css/style.css">\n' +
-                    '    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">'))
-        })
+        try {
+            fs.readFile(__dirname + '/../html/' + filename, 'utf8', function (err, html) {
+                resolve(html.replace('{ navigation }', navigation.createNavigationHTML(userInfo))
+                    .replace('{ head }', '<meta charset="UTF-8">\n' +
+                        '    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n' +
+                        '    <title>HardwareBay</title>\n' +
+                        '    <link rel="stylesheet" href="css/style.css">\n' +
+                        '    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">'))
+            })
+        } catch (err) {
+            console.log(err);
+            reject(err);
+        }
     })
 }
 

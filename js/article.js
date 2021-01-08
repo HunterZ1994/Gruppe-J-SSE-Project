@@ -23,7 +23,7 @@ function createArticleView(userInfo, articleId) {
 
 function buildArticlePage(userInfo, article, comments) {
     return new Promise((resolve, reject) => {
-        tools.readHtmlAndAddNav(userInfo, '/article/article.html')
+        tools.readHtmlAndAddNav(userInfo, '/article.html')
         .then(html => {
             Promise.all([
                 getArticleHtml(article),
