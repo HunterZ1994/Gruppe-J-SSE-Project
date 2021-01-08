@@ -89,7 +89,10 @@ function addArticle(article, userId) {
                reject(err)
                con.end()
            })
-       }).catch(err => reject(err)); 
+       }).catch(err => {
+           console.log(err);
+           reject(err);
+       }); 
     });
 }
 

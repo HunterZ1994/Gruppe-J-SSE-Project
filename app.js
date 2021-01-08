@@ -236,23 +236,20 @@ app.get('/article/add', function (req, res) {
 app.post('/article/add', function (req, res) {
     const userInfo = tools.checkSession(req.session);
     const isVendor = userInfo.role === 'vendor'
-
-    if (!isVendor) {
-        errorHandler.createErrorResponse(userInfo, 403, "Access Denied")
-        .then(err => {
-            res.status = err.status;
-            res.send(err.html);
-        }); 
-    } else {
+    if (isVendor) {
         const form = new formidable.IncomingForm();
         form.parse(req, function (err, fields, files) {
             vendor.addArticle(userInfo, fields, files)
-                .then(html => res.send(html))
+                .then(html => res.redirect('/'))
                 .catch(err => {
-                    res.status = err.code;
-                    res.send(err.html);
+                    res.redirect('/article/add')
                 });
         });
+    } else {
+        errorHandler.createErrorResponse(null, userInfo, 403, "Access Denied")
+        .then(err => {
+            res.redirect('/article/add')
+        }); 
     }
 });
 
@@ -385,9 +382,10 @@ app.get('/cart/delete', (req, res) => {
 app.get('/checkout/:json', (req, res) => {
     const userInfo = tools.checkSession(req.session);
     const cartJSON = JSON.parse(req.params.json);
-    console.log(cartJSON);
-    if (userInfo, cartJSON) {
+    if (userInfo) {
         cart.checkOut(userInfo, cartJSON).then(html => res.send(html)).catch(err => res.redirect('/cart'));
+    } else {
+        res.redirect('/cart');
     }
 });
 
@@ -397,9 +395,8 @@ app.get('/checkout/:json', (req, res) => {
 
 app.post('/comment/add', (req, res) => {
     const session = tools.checkSession(req.session);
-
+    const comment = req.body;
     if (session.loggedIn) {
-        const comment = req.body;
         articleView.addComment(comment.comText, comment.articleId, session)
             .then(html => {
                 res.send(html);
@@ -408,7 +405,7 @@ app.post('/comment/add', (req, res) => {
                 console.log(err);
             });
     } else {
-        res.redirect('/')
+        res.redirect('/product?articleId=' + comment.articleId)
     }
 });
 

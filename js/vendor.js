@@ -4,6 +4,7 @@ const index = require('./index');
 const errorHandler = require('./errorHandler');
 const htmlParser = require('node-html-parser');
 const jimp = require('jimp');
+const fs = require('fs');
 
 function createArticleForm(userInfo, article) {
     return new Promise((resolve, reject) => {
@@ -30,49 +31,41 @@ function createArticleForm(userInfo, article) {
 
 function addArticle(userInfo, article, files) {
     return new Promise((resolve, reject) => {
-        const articleIsValid = article.articleName && article.descpt && article.price;
-
-        if (!articleIsValid) {
-            errorHanlder.createErrorResponse(userInfo, 400, "Bad Request")
-                .then(html => {
-                    reject(html);
+        const articleIsValid = !!(article.articleName && article.descpt && article.price);
+        if (articleIsValid) {
+            const folderPath = `/images/${userInfo.userId}/${article.articleName.replace(' ', '')}`;
+            const imageName = files.imagePath.name;
+            const imagePath = `${folderPath}/${imageName}`;
+            const dbArticle = {...article, imagePath};
+            db_conector.addArticle(dbArticle, userInfo.userId)
+                .then(rows => {
+                    // file upload and saving
+                    if (files.imagePath.size > 0) {
+                        const clientFilePath = files.imagePath.path;
+                        const rawData = fs.readFileSync(clientFilePath);
+                        const absoluteDirectory = `${__dirname}/../assets${folderPath}`;
+                        if (!fs.existsSync(absoluteDirectory)) {
+                            try {
+                                fs.mkdirSync(absoluteDirectory, {recursive: true});
+                            } catch (err) {
+                                console.log('Error while creating directory: ', {err});
+                            }
+                        }
+                        const absoluteImage = `${absoluteDirectory}/${imageName}`;
+                        fs.writeFile(absoluteImage, rawData, function (err) {
+                            console.log(err);
+                        });
+                        resolve(true);
+                    }
+                })
+                .catch(err => {
+                    console.log({err});
+                    reject(false);
                 });
+        } else {
+            reject(false);
         }
-
-        const imagePath = `./assets/images/${userid}/${article.articleName}`;
-        db_conector.addArticle({...fields, imagePath: imagePath + `/${files.imagePath.name}`}, userInfo.userid)
-            .then(rows => {
-                // file upload and saving
-                const oldpath = files.imagePath.path;
-                const newpath = imagePath;
-                const rawData = fs.readFileSync(oldpath);
-                if (!fs.existsSync(imagePath)) {
-                    fs.mkdirSync(imagePath);
-                }
-                fs.writeFile(newpath, rawData, function (err) {
-                    const message = err ? 'Speichern des Bildes fehlgeschlagen' : 'Hinzufügen erfolgreich';
-                    index.createIndex(userInfo).then(html => {
-                        const root = htmlParser.parse(html);
-                        root.querySelector('#head').appendChild(`<script> window.alert(${message}) </script>`);
-                        resolve(root.toString());
-                    }).catch(err => {
-                        errorHanlder.createErrorResponse(userInfo, 500, "Internal Server Error")
-                            .then(html => {
-                                console.log(err);
-                                reject(html);
-                            });
-                    });
-                });
-            })
-            .catch(err => {
-                errorHanlder.createErrorResponse(userInfo, 500, "Internal Server Error")
-                .then(html => {
-                    console.log(err);
-                    reject(html);
-                }); 
-            });
     });
-
 }
 
 function createEditForm(userInfo, articleId) {
