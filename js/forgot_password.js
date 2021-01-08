@@ -14,11 +14,11 @@ const createForgotPassword = (userInfo, script='') => {
     return new Promise((resolve, reject) => {
         Promise.all([tools.readHtmlAndAddNav(userInfo, 'forgot_password.html'), secQuestion])
             .then(results => {
-                if (!!(results[1][0].SecQuestion)) {
+                if (!!results[1][0] && !!results[1][0].SecQuestion) {
                     resolve(results[0].replace('{ question }', results[1][0].SecQuestion).replace('{ script }', '')
                         .replace('{ email }', userInfo.email));
                 } else {
-                    createForgotPwInput(userInfo, '<script>window.alert(\'Email nicht gefunden\')</script>').then(page => {
+                    createForgotPwInput(userInfo, '<script type="application/javascript;charset=utf-8" src="/js/forgot_password.js"></script>').then(page => {
                         resolve(page);
                     })
                 }
