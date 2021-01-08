@@ -27,7 +27,8 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.static('public'));
 app.use('/images', express.static(__dirname + '/assets/images'));
-app.use('/css', express.static(__dirname + '/css'));
+app.use('/css', express.static(__dirname + '/assets/css'));
+app.use('/js', express.static(__dirname + '/assets/js'));
 app.use(interceptor.decodeRequestCookie);
 
 // Sesion parameters
@@ -181,6 +182,8 @@ app.post('/forgotPassword', [check('email').escape().isEmail()], function (req, 
             res.send(result)
         })
     } else {
+        if (!errors.isEmpty())
+            console.log(errors)
         res.redirect('/');
     }
 });

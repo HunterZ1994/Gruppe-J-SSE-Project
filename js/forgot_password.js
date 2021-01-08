@@ -18,7 +18,7 @@ const createForgotPassword = (userInfo, script='') => {
                     resolve(results[0].replace('{ question }', results[1][0].SecQuestion).replace('{ script }', '')
                         .replace('{ email }', userInfo.email));
                 } else {
-                    createForgotPwInput(userInfo, '<script>window.alert(\'Email nicht gefunden\')</script>').then(page => {
+                    createForgotPwInput(userInfo, '<script type="application/javascript;charset=utf-8" src="/js/forgot_password.js"></script>').then(page => {
                         resolve(page);
                     })
                 }

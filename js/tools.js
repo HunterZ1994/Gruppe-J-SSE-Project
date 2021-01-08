@@ -94,7 +94,7 @@ function readHtmlAndAddNavAndHead(userInfo, filename) {
                     .replace('{ head }', '<meta charset="UTF-8">\n' +
                         '    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n' +
                         '    <title>HardwareBay</title>\n' +
-                        '    <link rel="stylesheet" href="css/style.css">\n' +
+                        '    <link rel="stylesheet" type="text/css;charset=utf-8" href="/../css/style.css">\n' +
                         '    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">'))
             })
         } catch (err) {
