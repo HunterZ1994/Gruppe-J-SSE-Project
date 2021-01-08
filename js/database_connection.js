@@ -200,7 +200,7 @@ function deleteUser(userId) {
     return new Promise((resolve, reject) => {
         pool.getConnection().then(con => {
             const sql = "DELETE FROM users WHERE UserId = ?";
-            con.query(sql, [articleId, userId).then(res => {
+            con.query(sql, [articleId, userId]).then(res => {
                 resolve(res)
                 con.end()
             }).catch(err => {
