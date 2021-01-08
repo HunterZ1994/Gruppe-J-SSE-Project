@@ -29,12 +29,6 @@ app.use('/images', express.static(__dirname + '/assets/images'));
 app.use('/css', express.static(__dirname + '/css'));
 app.use(interceptor.decodeRequestCookie);
 
-app.use(function(req, res, next){
-    console.log(res);
-    res.setHeader("Content-Security-Policy", "script-src 'self' https://apis.google.com");
-    next();
-})
-
 // Sesion parameters
 
 const TWO_HOURS = 1000 * 60 * 60 * 2;
@@ -59,13 +53,29 @@ app.use(session({
     secret : SESS_SECRET,
     cookie: {
         maxAge: SESS_LIFETIME,
-        sameSite: true,
         secure: IN_PROD,
         sameSite: 'strict',
         httpOnly: true,
     },
     'QkFCQUFCQUFCQUFBQkFBQkFBQUJBQkFBQUFCQkFCQUFCQUJBQkJCQQ==': '123'
 }))
+
+const securityHeaders = {
+    contentSecurityPolicy: {
+        name: 'Content-Security-Policy',
+        value: "script-src 'self' https://apis.google.com"
+    }
+};
+
+app.use(function(req, res, next){
+    if (req.path.toLowerCase().includes('product')) {
+        res.removeHeader(securityHeaders.contentSecurityPolicy.name);
+    } else {
+        res.setHeader(securityHeaders.contentSecurityPolicy.name, securityHeaders.contentSecurityPolicy.value);
+    }
+    next();
+})
+
 
 const htmlPath = path.join(__dirname) + '/html';
 
@@ -464,10 +474,11 @@ app.post('/comment/add', (req, res) => {
     if (session.loggedIn) {
         articleView.addComment(comment.comText, comment.articleId, session)
             .then(html => {
-                res.send(html);
+                res.redirect('/product?articleId=' + comment.articleId)
             })
             .catch(err => {
                 console.log(err);
+                res.redirect('/product?articleId=' + comment.articleId)
             });
     } else {
         res.redirect('/product?articleId=' + comment.articleId)
