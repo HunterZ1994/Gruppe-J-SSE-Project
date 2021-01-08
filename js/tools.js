@@ -48,7 +48,7 @@ function buildArticlesTable(articles, userInfo) {
         artTable += '</table>'
     }
     else {
-        if (!!userInfo && userInfo?.role === 'vendor') {
+        if (!!userInfo && userInfo.role === 'vendor') {
             artTable = 'Sie haben noch keine Artikel zum Verkauf angeboten.'
         } else {
             artTable = 'No products matching search criteria'

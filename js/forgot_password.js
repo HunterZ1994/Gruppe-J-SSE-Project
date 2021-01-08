@@ -14,7 +14,7 @@ const createForgotPassword = (userInfo, script='') => {
     return new Promise((resolve, reject) => {
         Promise.all([tools.readHtmlAndAddNav(userInfo, 'forgot_password.html'), secQuestion])
             .then(results => {
-                if (!!(results[1][0]?.SecQuestion)) {
+                if (!!(results[1][0].SecQuestion)) {
                     resolve(results[0].replace('{ question }', results[1][0].SecQuestion).replace('{ script }', '')
                         .replace('{ email }', userInfo.email));
                 } else {
@@ -30,7 +30,7 @@ const changePassword = (userInfo) => {
     const checkAnswer = db_connection.checkSecurityAnswer(userInfo.email, userInfo.security_answer);
     return new Promise((resolve, reject) => {
         checkAnswer.then(result => {
-            if (result[0]?.found > 0 ) {
+            if (result[0].found > 0 ) {
                 db_connection.changePassword(userInfo.email, userInfo.new_password).then(() => resolve(true))
             } else {
                 resolve(false)
