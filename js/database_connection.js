@@ -99,7 +99,7 @@ function updateArticle(article) {
     return new Promise((resolve, reject) => {
         pool.getConnection().then(con => {
             const sql = "UPDATE articles SET articleName = ?, descpt = ?, Price = ?, imagePath = ? WHERE articleId = ?"
-            const values = [article.ArticleName, article.Descpt, article.Price, article.ImagePath, article.ArticleId];
+            const values = [article.articleName, article.descpt, article.price, article.imagePath, article.articleId];
             con.query(sql, values).then(res => {
                 resolve(res)
                 con.end()

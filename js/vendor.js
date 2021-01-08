@@ -23,6 +23,7 @@ function createArticleForm(userInfo, article) {
                         }
                     }
                     root.querySelector('#submit').set_content('Speichern');
+                    root.querySelector('#form').setAttribute('action', 'edit');
                 }
                 resolve(root.toString().replace('{ image }', ' '));
             })
@@ -108,97 +109,50 @@ function createEditForm(userInfo, articleId) {
 
 function updateArticle(userInfo, article, files) {
     return new Promise((resolve, reject) => {
-        const articleIsValid = article.articleId && article.articleName && article.descpt && article.price;
+        const articleIsValid = !!(article.articleId && article.articleName && article.descpt && article.price);
 
-        if (!articleIsValid) {
-            errorHanlder.createErrorResponse("No articleId", userInfo, 400, "Bad Request")
-                .then(html => {
-                    reject(html);
-                });
-        }
-
-        // reading article for comparsion
-        db_conector.getArtcileById(article.articleId)
+        if (articleIsValid) {
+             // reading article for comparsion
+            db_conector.getArtcileById(article.articleId)
             .then(rows => {
                 const dbArticle = rows[0];
-                for (const key of Object.keys(article)) {
-                    // this should already avoid saving image if there is no image
-                    switch (key.toLowerCase()) {
-                        case 'imagepath':
-                            const imageName = files.imagePath.name;
-                            const storedImage = jimp.read(dbArticle.imagePath);
-                            const uploadImage = jimp.read(fs.readFileSync(imageName));
+                let finalImagePath = dbArticle.ImagePath;;
+                if (files.imagePath.size > 0) {
+                    const folderPath = `/images/${userInfo.userId}/${article.articleName.replace(' ', '')}`;
+                    const imageName = files.imagePath.name;
+                    const imagePath = `${folderPath}/${imageName}`;
 
-                            // check if hash of image changed 
-                            if (jimp.diff(storedImage, uploadImage) !== 0) {
-                                const newPath = `./assets/images/${userId}/${dbArticle.articleName}/${files.imagePath.name}`;
-
-                                // delete image from file System
-                                try {
-                                    fs.unlinkSync(dbArticle.imagePath);
-                                } catch (err) {
-                                    console.log(err);
-                                }
-
-                                // read image from client
-                                const rawData = fs.readFileSync(files.imagePath.name);
-
-                                // write image to file system
-                                fs.writeFile(newpath, rawData, function (err) {
-                                    if (err) {
-                                        errorHandler.createErrorResponse(err, userInfo, 500, "Internal Server Error")
-                                            .then(html => reject(html));
-                                    }
-                                });
-
-                                // set new image for article
-                                dbArticle.imagePath = newPath;
-                            }
-                            break;
-
-                        default:
-                            // update to new values, except articleId
-                            if (key.toLowerCaae() !== 'articleid') {
-                                dbArticle[key] = article[key];
-                            }
-                            break;
+                    const clientFilePath = files.imagePath.path;
+                    const rawData = fs.readFileSync(clientFilePath);
+                    const absoluteDirectory = `${__dirname}/../assets${folderPath}`;
+                    if (!fs.existsSync(absoluteDirectory)) {
+                        try {
+                            fs.mkdirSync(absoluteDirectory, {recursive: true});
+                        } catch (err) {
+                            console.log('Error while creating directory: ', {err});
+                        }
                     }
-                }
-                db_conector.updateArticle(dbArticle)
-                    .then(rows => {
-                        const message = "Bearbeiten erfolgreich"
-                        index.createIndex(userInfo)
-                            .then(html => {
-                                const root = htmlParser.parse(html);
-                                root.querySelector('#head').appendChild(`<script> window.alert(${message}) </script>`);
-                                resolve(root.toString());
-                            }).catch(err => {
-                                errorHanlder.createErrorResponse(userInfo, 500, "Internal Server Error")
-                                .then(html => {
-                                    reject(html);
-                                });
-                        });
-                    }).catch(err => {
+                    const absoluteImage = `${absoluteDirectory}/${imageName}`;
+                    fs.writeFile(absoluteImage, rawData, function (err) {
                         console.log(err);
-                        cerrorHanlder.createErrorResponse(userInfo, 500, "Internal Server Error")
-                        .then(html => {
-                            reject(html);
-                        });  
-                    }); 
-                }).catch(err => {
-                    console.log(err);
-                    errorHanlder.createErrorResponse(userInfo, 500, "Internal Server Error")
-                    .then(html => {
-                        reject(html);
-                    });  
-            })
-            .catch(err => {
-                console.log(err);
-                errorHanlder.createErrorResponse(userInfo, 500, "Internal Server Error")
-                    .then(html => {
-                        reject(html);
                     });
+                    
+                    finalImagePath = imagePath;
+                }
+
+                db_conector.updateArticle({...article, imagePath: finalImagePath})
+                .then(resolve(true)).catch(err => {
+                    console.log(err);
+                    reject(false);
+                });
+            
+            }).catch(err => {
+                console.log(err);
+                reject(false);
             });
+        } else {
+            reject(false);
+        }
     });
 }
 
