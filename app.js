@@ -17,6 +17,7 @@ const articleView = require('./js/article');
 const tools = require("./js/tools");
 const interceptor = require('./js/interceptor');
 const session = require('express-session');
+const admin = require('./js/admin_panel')
 
 // basic app setup
 const app = express();
@@ -58,8 +59,6 @@ app.use(session({
     'QkFCQUFCQUFCQUFBQkFBQkFBQUJBQkFBQUFCQkFCQUFCQUJBQkJCQQ==': '123'
 }))
 
-// TODO: replace hard-coded user info with cookie
-const fakeUserInfo = { userID: '0000000000', role: 'guest', loggedIn: false };
 const htmlPath = path.join(__dirname) + '/html';
 
 //#region userAuthentication
@@ -211,7 +210,42 @@ app.get('/product', function(req, res) {
 app.get('/adminPanel', function (req, res) {
     // TODO: check for role
     // TODO: return admin page
-    throw Error('Method adminPanel not implemented')
+    const session = tools.checkSession(req.session);
+
+    if (session.role === 'admin') {
+        admin.createAdminPanel(session)
+            .then(html => res.send(html))
+            .catch(err => {
+                res.status = err.code;
+                res.send(err.html);
+            });
+    } else {
+        res.redirect('/')
+    }
+
+});
+
+app.get('/adminPanel/delete', function (req, res) {
+    const session = tools.checkSession(req.session);
+    const isAdmin = userInfo.role === 'admin';
+    const userId = req.query.userId;
+    
+    if (!isAdmin) {
+        errorHandler.createErrorResponse(userInfo, 403, "Access Denied")
+        .then(err => {
+            res.status = err.code;
+            res.send(err.html);
+        });
+    } else {
+        admin.deleteArticle(session, userId)
+            .then(html => {
+                res.send(html);
+            })
+            .catch(err => {
+                res.status = err.code;
+                res.send(err.html);
+            });
+    }
 });
 
 // #endregion
@@ -281,17 +315,23 @@ app.get('/article/edit', function (req, res) {
     const isVendor = userInfo.role === 'vendor';
     const articleId = req.query.articleId;
 
-    if (isVendor) {
-        vendor.createEditForm(userInfo, articleId)
-        .then(html => {
-            res.send(html);
-        })
-        .catch(err => {
+    if (!isVendor) {
+        // TODO: Replace userInfo
+        errorHandler.createErrorResponse(userInfo, 403, "Access Denied")
+        .then(err => {
             res.status = err.code;
             res.send(err.html);
-        });
+        }); 
     } else {
-        res.redirect('/');
+        // TODO: Replace userInfo
+        vendor.createEditForm(userInfo, articleId)
+            .then(html => {
+                res.send(html);
+            })
+            .catch(err => {
+                res.status = err.code;
+                res.send(err.html);
+            });
     }
 });
 
@@ -299,20 +339,23 @@ app.post('/article/edit', function (req, res) {
     const userInfo = tools.checkSession(req.session);
     const isVendor = userInfo.role === 'vendor';
 
-    if (isVendor) {
+    if (!isVendor) {
+        // TODO: replace userInfo
+        errorHandler.createErrorResponse(userInfo, 403, "Access Denied")
+        .then(err => {
+            res.status = err.code;
+            res.send(err.html);
+        });  
+    } else {
         const form = new formidable.IncomingForm();
         form.parse(req, function (err, fields, files) {
             vendor.updateArticle(userInfo, fields, files)
-                .then(html => {
-                    res.redirect('/');
-                })
+                .then(html => res.send(html))
                 .catch(err => {
-                    console.log(err);
-                    res.redirect('article/edit?articleId=' + articleId);
+                    res.status = err.code;
+                    res.send(err.html);
                 });
         });
-    } else {
-        res.redirect('/');
     }
 });
 
