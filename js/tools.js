@@ -75,9 +75,9 @@ function buildUserTable(users) {
             userTable += '       <td class="user-firstname">' + user.FirstName + '</td>\n'
             userTable += '       <td class="user-email">' + user.Email + '</td>\n'
 
-            if (!(user.Userrole === 'admin')) {
+            if (!(user.Userrole === 'admin' || user.Userrole === 'vendor')) {
                 userTable += `<td> <a href='article/lock?userId=${user.userId}'> Sperren </a> </td>\n`;
-                artTable += `<td> <a href='article/delete?userId=${user.userId}'> Löschen </a> </td>\n`;
+                userTable += `<td> <a href='article/delete?userId=${user.userId}'> Löschen </a> </td>\n`;
             }
 
             userTable += '   </tr>\n'
@@ -168,5 +168,6 @@ module.exports = {
     readHtmlAndAddNav: readHtmlAndAddNavAndHead,
     createPasswordHash,
     checkSession,
-    encodeCookie
+    encodeCookie,
+    buildUserTable,
 }
