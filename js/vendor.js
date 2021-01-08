@@ -8,7 +8,7 @@ const fs = require('fs');
 
 function createArticleForm(userInfo, article) {
     return new Promise((resolve, reject) => {
-        tools.readHtmlAndAddNav(userInfo, 'articleForm.html')
+        tools.readHtmlAndAddNav(userInfo, '/articleForm.html')
             .then(res => {
                 let root = htmlParser.parse(res);
                 if (article) {

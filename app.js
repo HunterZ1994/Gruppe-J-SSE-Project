@@ -55,6 +55,8 @@ app.use(session({
         maxAge: SESS_LIFETIME,
         sameSite: true,
         secure: IN_PROD,
+        sameSite: 'strict',
+        httpOnly: true,
     },
     'QkFCQUFCQUFCQUFBQkFBQkFBQUJBQkFBQUFCQkFCQUFCQUJBQkJCQQ==': '123'
 }))
