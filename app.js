@@ -3,6 +3,10 @@ const express = require('express');
 const path = require('path');
 const formidable = require('formidable');
 const cookieParser = require('cookie-parser');
+const helmet = require('helmet');
+const csrf = require('csurf');
+const rateLimit = require('express-rate-limit');
+const fs = require('fs');
 const { BADQUERY } = require('dns');
 const { check, validationResult } = require('express-validator');
 
@@ -22,17 +26,30 @@ const admin = require('./js/admin_panel')
 
 // basic app setup
 const app = express();
-app.use(express.urlencoded());
+app.use(express.urlencoded({extended: true}));
 app.use(express.json());
-app.use(cookieParser());
 app.use(express.static('public'));
 app.use('/images', express.static(__dirname + '/assets/images'));
 app.use('/css', express.static(__dirname + '/assets/css'));
 app.use('/js', express.static(__dirname + '/assets/js'));
-app.use(interceptor.decodeRequestCookie);
+app.use(rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // only 100 requests per client per windowMS
+    delayMs: 0 // disable delay -> user hasfull speed until limit
+}));
+
+// Setting helmet Options 
+app.use(helmet.dnsPrefetchControl());
+app.use(helmet.expectCt());
+app.use(helmet.frameguard());
+app.use(helmet.hidePoweredBy());
+app.use(helmet.hsts());
+app.use(helmet.ieNoOpen());
+app.use(helmet.noSniff());
+app.use(helmet.permittedCrossDomainPolicies());
+app.use(helmet.referrerPolicy());
 
 // Sesion parameters
-
 const TWO_HOURS = 1000 * 60 * 60 * 2;
 
 const {
@@ -47,7 +64,6 @@ const {
 const IN_PROD = NODE_ENV === 'production';
 
 // build coockie
-
 app.use(session({
     name: SESS_NAME,
     resave : false,
@@ -62,6 +78,20 @@ app.use(session({
     'QkFCQUFCQUFCQUFBQkFBQkFBQUJBQkFBQUFCQkFCQUFCQUJBQkJCQQ==': '123'
 }))
 
+
+// This has to be in this order!! 
+// honestly don't mess with it, it will crash EVERYTHING!
+app.use(cookieParser());
+const csrfProtection = csrf({
+    cookie: true, 
+    httpOnly: true, 
+    maxAge: TWO_HOURS, 
+    sameSite: 'strict', 
+    secure: IN_PROD
+});
+app.use(csrfProtection);
+app.use(interceptor.decodeRequestCookie);
+
 const securityHeaders = {
     contentSecurityPolicy: {
         name: 'Content-Security-Policy',
@@ -69,6 +99,7 @@ const securityHeaders = {
     }
 };
 
+// function to add security headers if needed
 app.use(function(req, res, next){
     // needs to be toggeld for security issue
     if (req.path.toLowerCase().includes('product')) {
@@ -77,8 +108,24 @@ app.use(function(req, res, next){
         res.setHeader(securityHeaders.contentSecurityPolicy.name, securityHeaders.contentSecurityPolicy.value);
     }
     next();
-})
+});
 
+
+// function to replace the { csrf } handle in every form
+app.use(function(req, res, next) {
+    const oldSend = res.send;
+    const csrf = `<input type="hidden" name="_csrf" value="${req.csrfToken()}"/>`;
+    res.send = function(data) {
+        oldSend.apply(res, [data.replace('{ csrf }', csrf)]);
+    }  
+
+    res.sendFile = function(data) {
+        const str = fs.readFileSync(data, 'utf-8');
+        oldSend.apply(res, [str.replace('{ csrf }', csrf)]);
+    }
+
+    next();
+});
 
 const htmlPath = path.join(__dirname) + '/html';
 

@@ -70,6 +70,10 @@ function getCommentForm() {
                 <input type="textArea" name="comText" id="commText" required/>
                 <button type="submit">Speichern</button>
 
+                <div class="row">
+                    { csrf }
+                </div>
+
         </form>`);
     });
 }
