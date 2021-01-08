@@ -88,35 +88,13 @@ function getArticleHtml(article) {
 
 }
 
-function getCommenTsAndUser(comments) {
-    return new Promise((resolve, reject) => {
-        const promises = [];
-        for (const cm of comments) {
-            promises.push(db_conector.getUserById(cm.User));
-        }
-
-        Promise.all(promises).then(results => {
-            resolve(results);
-        }).catch(err => {
-            console.log(err);
-            reject(err);
-        });
-    })
-}
-
 function getCommentsHtml(comments) {
     return new Promise((resolve, reject) => {
-        getCommenTsAndUser(comments).then(users => {
-            let res = '<hr/>\n<div>\n';
-            for (const cm of comments) {
-                const user = users.find(u => u.UserId === comments.User)[0];
-                res += `<p> ${user.FirstName}: </p> <p style="border: 1px solid black;"> ${cm.ComText} </p>\n`
-            }
-            resolve( res += '</div><br/>\n');
-        }).catch(err => {
-            console.log(err);
-            reject(err);
-        });
+        let res = '<hr/>\n<div>\n';
+        for (const cm of comments) {
+            res += `<p> ${cm.FirstName}: </p> <p style="border: 1px solid black;"> ${cm.ComText} </p>\n`
+        }
+        resolve( res += '</div><br/>\n');
     });
 }
 

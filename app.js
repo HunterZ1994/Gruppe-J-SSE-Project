@@ -68,6 +68,7 @@ const securityHeaders = {
 };
 
 app.use(function(req, res, next){
+    // needs to be toggeld for security issue
     if (req.path.toLowerCase().includes('product')) {
         res.removeHeader(securityHeaders.contentSecurityPolicy.name);
     } else {

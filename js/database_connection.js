@@ -5,7 +5,8 @@ const pool = mariadb.createPool({
     password: '123',
     database: 'hardwarebay',
     port: '3306',
-    multipleStatements: true
+    multipleStatements: true,
+    connectionLimit: 15
 });
 
 //#region articles
@@ -138,7 +139,8 @@ function addArticleComment(comment, articleId, userId) {
             con.query(sql, values).then(res => {
                 resolve(res)
                 con.end()
-            }).catch(err => {
+            }).catch(err => { 
+                console.log(err);
                 reject(err)
                 con.end()
             });
@@ -149,7 +151,7 @@ function addArticleComment(comment, articleId, userId) {
 function getCommentsOfArticle(articleId) {
     return new Promise((resolve, reject) => {
         pool.getConnection().then(con => {
-            const sql = "SELECT * FROM comments WHERE article = ?";
+            const sql = "SELECT FirstName, ComText FROM (comments INNER JOIN articles ON comments.Article = articles.ArticleId) INNER JOIN users ON comments.User = users.UserId WHERE article = ?";
             con.query(sql, articleId).then(res => {
                 resolve(res)
                 con.end()
@@ -164,7 +166,7 @@ function getCommentsOfArticle(articleId) {
 function getCommentsOfUser(userId) {
     return new Promise((resolve, reject) => {
         pool.getConnection().then(con => {
-            const sql = "SELECT * FROM comments WHERE user = ?";
+            const sql = "SELECT * FROM comments INNER JOIN users ON comments.User = users.UserId WHERE user = ?";
             con.query(sql, userId).then(res => {
                 resolve(res)
                 con.end()
