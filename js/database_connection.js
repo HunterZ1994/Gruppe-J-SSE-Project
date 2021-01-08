@@ -193,6 +193,21 @@ function getAllUsers() {
     });
 }
 
+function deleteUser(userId) {
+    return new Promise((resolve, reject) => {
+        pool.getConnection().then(con => {
+            const sql = "DELETE FROM users WHERE UserId = ?";
+            con.query(sql, [articleId, userId).then(res => {
+                resolve(res)
+                con.end()
+            }).catch(err => {
+                reject(err)
+                con.end()
+            });
+        }).catch(err => reject(err));
+    });
+}
+
 function getUserById(userId = ''){
     return new Promise((resolve, reject) => {
         pool.getConnection()

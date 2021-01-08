@@ -16,6 +16,41 @@ function createAdminPanel(userInfo) {
         });
 }
 
+function deleteUser(userInfo, userId) {
+    return new Promise((resolve, reject) => {
+        if (!userId) {
+            errorHanlder.createErrorResponse(userInfo, 400, "Bad Request, No User Id")
+                .then(err => {
+                    reject(err);
+                });
+        }
+	
+	Promise.all ([
+	    db_connector.geUserById()
+
+	]).then(results => {
+	    if (!(results[0].Userrole === 'admin' || results[0].Userrol === 'vendor')) {
+
+	        db_conector.deleteUser(userId)
+            	.then(rows => {
+
+                    admin_panel.createAdminPaneö(userInfo)
+            	})
+            	.catch(err => {
+                    errorHandler.createErrorResponse(err, userInfo, 500, "Internal Server Error")
+                    .then(html => {
+                        console.log(err);
+                        reject(html);
+                    });
+                });
+	    }
+	})
+
+            
+    });
+}
+
 module.exports = {
     createAdminPanel,
+    deleteUser
 }

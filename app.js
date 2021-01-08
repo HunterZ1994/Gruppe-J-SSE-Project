@@ -225,6 +225,29 @@ app.get('/adminPanel', function (req, res) {
 
 });
 
+app.get('/adminPanel/delete', function (req, res) {
+    const session = tools.checkSession(req.session);
+    const isAdmin = userInfo.role === 'admin';
+    const userId = req.query.userId;
+    
+    if (!isAdmin) {
+        errorHandler.createErrorResponse(userInfo, 403, "Access Denied")
+        .then(err => {
+            res.status = err.code;
+            res.send(err.html);
+        });
+    } else {
+        admin.deleteArticle(session, userId)
+            .then(html => {
+                res.send(html);
+            })
+            .catch(err => {
+                res.status = err.code;
+                res.send(err.html);
+            });
+    }
+});
+
 // #endregion
 
 // #region vendor
