@@ -1,6 +1,5 @@
 const tools = require('./tools');
 const db_conector = require('./database_connection');
-const errorHandler = require('./errorHandler');
 const htmlParser = require('node-html-parser');
 
 function createArticleView(userInfo, articleId) {
@@ -24,7 +23,7 @@ function createArticleView(userInfo, articleId) {
 
 function buildArticlePage(userInfo, article, comments) {
     return new Promise((resolve, reject) => {
-        tools.readHtmlAndAddNav(userInfo, '/article/article.html')
+        tools.readHtmlAndAddNav(userInfo, '/article.html')
         .then(html => {
             Promise.all([
                 getArticleHtml(article),

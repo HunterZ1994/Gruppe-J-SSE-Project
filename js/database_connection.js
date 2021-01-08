@@ -1,4 +1,3 @@
-const { query } = require('express');
 const mariadb = require('mariadb');
 const pool = mariadb.createPool({
     host: 'localhost',
@@ -194,6 +193,21 @@ function getAllUsers() {
                     con.end()
                 });
             }).catch(err => reject(err));
+    });
+}
+
+function deleteUser(userId) {
+    return new Promise((resolve, reject) => {
+        pool.getConnection().then(con => {
+            const sql = "DELETE FROM users WHERE UserId = ?";
+            con.query(sql, [articleId, userId).then(res => {
+                resolve(res)
+                con.end()
+            }).catch(err => {
+                reject(err)
+                con.end()
+            });
+        }).catch(err => reject(err));
     });
 }
 
@@ -493,6 +507,7 @@ module.exports = {
     getAllUsers,
     getUserById,
     getUserByEmail,
+    deletUser;
     getCartByUserId,
     getCartArticles,
     createCart,

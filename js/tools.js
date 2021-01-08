@@ -58,14 +58,49 @@ function buildArticlesTable(articles, userInfo) {
     return artTable
 }
 
-function readHtmlAndAddNav(userInfo, filename) {
-    return new Promise((resolve, reject) => {
-        fs.readFile(__dirname + '/../html/' + filename, 'utf8', function (err, html) {
-            if (err) {
-                throw err
+function buildUserTable(users) {
+    let userTable = ''
+
+    if (users.length > 0) {
+        userTable += '<table class="item-table-component">\n'
+        userTable += '   <tr>\n'
+        userTable += '       <th>Name</th>\n'
+        userTable += '       <th>FirstName      '
+        userTable += '       <th>E-Mail</th>\n'
+        userTable += '   </tr>\n'
+
+        for (const user of users) {
+            userTable += '   <tr>\n'
+            userTable += '        <td class="user-name">' + user.SureName + '</td>\n'
+            userTable += '       <td class="user-firstname">' + user.FirstName + '</td>\n'
+            userTable += '       <td class="user-email">' + user.Email + '</td>\n'
+
+            if (!(user.Userrole === 'admin' || user.Userrole === 'vendor')) {
+                userTable += `<td> <a href='adminPanel/lock?userId=${user.userId}'> Sperren </a> </td>\n`;
+                userTable += `<td> <a href='adminPanel/delete?userId=${user.userId}'> Löschen </a> </td>\n`;
             }
-            resolve(html.replace('{ navigation }', navigation.createNavigationHTML(userInfo)))
-        })
+
+            userTable += '   </tr>\n'
+        }
+    }
+	return userTable
+}
+
+function readHtmlAndAddNavAndHead(userInfo, filename) {
+    return new Promise((resolve, reject) => {
+        try {
+            fs.readFile(__dirname + '/../html/' + filename, 'utf8', function (err, html) {
+                resolve(html.replace('{ navigation }', navigation.createNavigationHTML(userInfo))
+                    .replace('{ head }', '<meta charset="UTF-8">\n' +
+                        '    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n' +
+                        '    <title>HardwareBay</title>\n' +
+                        '    <link rel="stylesheet" href="css/style.css">\n' +
+                        '    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">'))
+            })
+        } catch (err) {
+            console.log(err);
+            reject(err);
+        }
     })
 }
 
@@ -130,8 +165,9 @@ function getEncodedName() {
 
 module.exports = {
     buildArticlesTable,
-    readHtmlAndAddNav,
+    readHtmlAndAddNav: readHtmlAndAddNavAndHead,
     createPasswordHash,
     checkSession,
-    encodeCookie
+    encodeCookie,
+    buildUserTable,
 }
