@@ -1,1 +1,0 @@
-"mysql -u root -pHardwareBay < ./init.sql --force"

@@ -1,6 +1,5 @@
 const tools = require('./tools');
 const db_conector = require('./database_connection');
-const errorHandler = require('./errorHandler');
 const htmlParser = require('node-html-parser');
 
 function createArticleView(userInfo, articleId) {

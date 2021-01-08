@@ -1,4 +1,3 @@
-const { query } = require('express');
 const mariadb = require('mariadb');
 const pool = mariadb.createPool({
     host: 'localhost',

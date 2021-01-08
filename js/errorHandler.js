@@ -1,6 +1,5 @@
 const tools = require('./tools');
 const index = require('./index');
-const htmlParser = require('node-html-parser');
 
 function createErrorResponse(error, userInfo, statusCode, message, redirectHtmlFileName,) {
     return new Promise((resolve, reject) => {

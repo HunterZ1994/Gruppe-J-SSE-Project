@@ -1,6 +1,4 @@
 const bacon = require('bacon-cipher');
-const db_connector = require('./database_connection');
-const tools = require('./tools');
 const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 
