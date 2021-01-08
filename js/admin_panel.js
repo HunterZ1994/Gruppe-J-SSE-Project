@@ -4,7 +4,7 @@ const errorHandler = require('./errorHandler');
 const htmlParser = require('node-html-parser');
 
 
-function createAdminPanel() {
+function createAdminPanel(userinfo) {
     return new Promise((resolve, reject) => {
         Promise.all([
            tools.readHtmlAndAddNav(userInfo, 'admin_panel.html'),

@@ -213,7 +213,7 @@ app.get('/adminPanel', function (req, res) {
     const session = tools.checkSession(req.session);
 
     if (session.role === 'admin') {
-        admin.createAdminPanel()
+        admin.createAdminPanel(session)
             .then(html => res.send(html))
             .catch(err => {
                 res.status = err.code;
@@ -222,7 +222,7 @@ app.get('/adminPanel', function (req, res) {
     } else {
         res.redirect('/')
     }
-    throw Error('Method adminPanel not implemented')
+
 });
 
 // #endregion
