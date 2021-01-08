@@ -507,7 +507,7 @@ module.exports = {
     getAllUsers,
     getUserById,
     getUserByEmail,
-    deletUser;
+    deleteUser,
     getCartByUserId,
     getCartArticles,
     createCart,

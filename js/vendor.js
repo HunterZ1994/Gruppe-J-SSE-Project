@@ -8,19 +8,23 @@ const fs = require('fs');
 
 function createArticleForm(userInfo, article) {
     return new Promise((resolve, reject) => {
-        tools.readHtmlAndAddNav(userInfo, 'article/articleForm.html')
+        tools.readHtmlAndAddNav(userInfo, 'articleForm.html')
             .then(res => {
-                const root = htmlParser.parse(res);
+                let root = htmlParser.parse(res);
                 if (article) {
                     for (const key of Object.keys(article)) {
                         if (key.toLowerCase() !== 'seller') {
+                            let value = article[key];
+                            if (key.toLowerCase() === 'imagepath' ) {
+                                root = htmlParser.parse(root.toString().replace('{ image }', article[key] ? `<img src="${article[key]}" alt="Artikelbild"/>` : ' '))
+                            }
                             const id = `#${key.charAt(0).toLowerCase() + key.slice(1)}`
-                            root.querySelector(id).setAttribute('value', article[key]);
+                            root.querySelector(id).setAttribute('value', value);
                         }
                     }
                     root.querySelector('#submit').set_content('Speichern');
                 }
-                resolve(root.toString());
+                resolve(root.toString().replace('{ image }', ' '));
             })
             .catch(err => {
                 errorHandler.createErrorResponse(err, userInfo, 500, "Internal Server Error")
@@ -85,7 +89,7 @@ function createEditForm(userInfo, articleId) {
                         resolve(html);
                     })
                     .catch(err => {
-                        errorHanlder.createErrorResponse(err, userInfo, 500, "Internal Server Error")
+                        errorHandler.createErrorResponse(err, userInfo, 500, "Internal Server Error")
                             .then(html => {
                                 console.log(html);
                                 reject(html);
