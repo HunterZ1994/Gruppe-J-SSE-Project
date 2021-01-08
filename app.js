@@ -4,6 +4,7 @@ const path = require('path');
 const formidable = require('formidable');
 const cookieParser = require('cookie-parser');
 const { BADQUERY } = require('dns');
+const { check, validationResult } = require('express-validator');
 
 // own modules
 const db_connector = require("./js/database_connection");
@@ -146,7 +147,6 @@ app.post('/register', function (req, res) {
         } else {
              db_connector.addUser(user).then(result => {
                  if (result.warningStatus === 0) {
-                     console.log(result)
                      db_connector.createCart(result.insertId)
                     const userInfo = { loggedIn: true, userID: user.email, role: 'customer' }
                     res.cookie('userInfo', userInfo).redirect('/');
@@ -172,9 +172,10 @@ app.get('/forgotPassword', function (req, res) {
     }
 });
 
-app.post('/forgotPassword', function (req, res) {
+app.post('/forgotPassword', [check('email').escape().isEmail()], function (req, res) {
     const user = tools.checkSession(req.session);
-    if (!session.loggedIn) {
+    const errors = validationResult(req);
+    if (!session.loggedIn && errors.isEmpty()) {
         user.email = req.body.email;
         forgot_password.createForgotPassword(user).then(result => {
             res.send(result)
@@ -182,12 +183,12 @@ app.post('/forgotPassword', function (req, res) {
     } else {
         res.redirect('/');
     }
-
 });
 
-app.post('/changePassword', function (req, res) {
+app.post('/changePassword', [check('email').escape().isEmail()], function (req, res) {
     const session = tools.checkSession(req.session);
-    if (!session.loggedIn) {
+    const errors = validationResult(req);
+    if (!session.loggedIn && errors.isEmpty()) {
         const user = req.body
         user.security_answer = tools.createPasswordHash(user.security_answer)
         user.new_password = tools.createPasswordHash(user.new_password)
@@ -358,14 +359,12 @@ app.get('/article/edit', function (req, res) {
     const articleId = req.query.articleId;
 
     if (!isVendor) {
-        // TODO: Replace userInfo
         errorHandler.createErrorResponse(userInfo, 403, "Access Denied")
         .then(err => {
             res.status = err.code;
             res.send(err.html);
         }); 
     } else {
-        // TODO: Replace userInfo
         vendor.createEditForm(userInfo, articleId)
             .then(html => {
                 res.send(html);
@@ -382,7 +381,6 @@ app.post('/article/edit', function (req, res) {
     const isVendor = userInfo.role === 'vendor';
 
     if (!isVendor) {
-        // TODO: replace userInfo
         errorHandler.createErrorResponse(userInfo, 403, "Access Denied")
         .then(err => {
             res.status = err.code;
