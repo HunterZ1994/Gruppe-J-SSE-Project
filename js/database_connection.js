@@ -451,6 +451,28 @@ function deletreArticleFromCart(cartId, articleId) {
     });
 }
 
+function clearCart(cartId='') {
+    return new Promise((resolve, reject) => { 
+        pool.getConnection()
+        .then(conn => {
+            const sql = "DELETE FROM holds WHERE Cart = ?;"
+            conn.query(sql, [cartId])
+            .then(rows => {
+                conn.end();
+                resolve(rows)
+            })
+            .catch(err => {
+                conn.end();
+                console.log(err);
+                reject(err);
+            });
+        }).catch(err => {
+                console.log(err);
+                reject(err);
+        });
+    });
+}
+
 module.exports = {
     getSearchedArticles, 
     getUserByUName, 
@@ -477,5 +499,5 @@ module.exports = {
     getSeqQuestionByEmail: getSecQuestionByEmail,
     checkSecurityAnswer,
     changePassword,
-
+    clearCart
 }

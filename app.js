@@ -334,7 +334,6 @@ app.post('/article/edit', function (req, res) {
 
 app.get('/cart', (req, res) => {
     const session = tools.checkSession(req.session);
-
     if (session.role === 'customer') {
         cart.createCart(session).then(result => {
             res.send(result);
@@ -349,7 +348,6 @@ app.get('/cart', (req, res) => {
 
 app.get('/cart/add', (req, res) => {
     const session = tools.checkSession(req.session);
-
     if (session.role === 'customer') {
         const articleId = req.query.articleId;
         cart.addToCart(session, articleId)
@@ -384,10 +382,13 @@ app.get('/cart/delete', (req, res) => {
 
 //#region checkout
 
-app.get('/checkout', (req, res) => {
-    // read user id
-    // clear cart 
-    // send response
+app.get('/checkout/:json', (req, res) => {
+    const userInfo = tools.checkSession(req.session);
+    const cartJSON = JSON.parse(req.params.json);
+    console.log(cartJSON);
+    if (userInfo, cartJSON) {
+        cart.checkOut(userInfo, cartJSON).then(html => res.send(html)).catch(err => res.redirect('/cart'));
+    }
 });
 
 //#endregion

@@ -10,8 +10,9 @@ function createCart(userInfo) {
             db_connector.getCartArticles(results[1][0].CartId)
             .then(articles => {
                 const table = tools.buildArticlesTable(articles);
+                const articleJSON = createArticleJSON(articles);
                 const buyButton = articles.length > 0 ?
-                    '<Button id=\'checkout_button\' value="Go to checkout" onclick="window.location.href = \'checkout\'">Kaufen</Button>' :
+                    `<a  href=/checkout/${JSON.stringify(articleJSON)}><Button id=\'checkout_button\' value="Go to checkout">Kaufen</Button><a/>` :
                     '';
                 resolve(results[0].replace('{ articles }', table).replace('{ buy_button }', buyButton)
                     .replace('No products matching search criteria', 'Your cart is currently empty'));
@@ -24,6 +25,18 @@ function createCart(userInfo) {
             reject(err);
         });
     });
+}
+
+function createArticleJSON(articles) {
+    let json = {};
+
+    for (const art of articles) {
+        json[art.ArticleId] = {
+            price: art.Price
+        };
+    }
+
+    return json;
 }
 
 
@@ -77,9 +90,39 @@ function deleteFromCart(userInfo, articleId ) {
     });
 } 
 
+function checkOut(userInfo, cartJSON) {
+    return new Promise((resolve, reject) => {
+        db_connector.getCartByUserId(userInfo.userId)
+        .then(cart => {
+            db_connector.clearCart(cart[0].CartId)
+            .then(res => {
+                tools.readHtmlAndAddNav(userInfo, 'checkout.html')
+                .then(html => {
+                    let price = 0;
+                    for (const key of Object.keys(cartJSON)) {
+                        price += cartJSON[key].price;
+                    }
+                    resolve(html.replace('{ price }', price + '€').replace('{ script }', ''));
+                })
+                .catch(err => {
+                    console.log(err);
+                    reject(err);
+                });
+            }).catch(err => {
+                console.log(err);
+                    reject(err);
+            });
+        }).catch(err => {
+            console.log(err);
+            reject(err);
+        });
+    }); 
+}
+
 
 module.exports = {
     createCart,
     addToCart,
-    deleteFromCart
+    deleteFromCart,
+    checkOut
 }
