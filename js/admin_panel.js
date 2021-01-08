@@ -7,8 +7,8 @@ const htmlParser = require('node-html-parser');
 function createAdminPanel(userinfo) {
     return new Promise((resolve, reject) => {
         Promise.all([
-           tools.readHtmlAndAddNav(userInfo, 'admin_panel.html'),
-           db_connector.getAllUsers()
+           tools.readHtmlAndAddNav(userinfo, 'admin_panel.html'),
+           db_connector.getAllUsers()ear
         ]).then(results => {
             
                 const table = tools.buildUserTable(results[1]);
