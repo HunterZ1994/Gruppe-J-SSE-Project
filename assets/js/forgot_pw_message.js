@@ -1,1 +1,3 @@
-window.alert('Email nicht gefunden')
+$(document).ready(function() {
+    window.alert('Email nicht gefunden')
+})

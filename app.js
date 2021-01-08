@@ -65,7 +65,7 @@ app.use(session({
 const securityHeaders = {
     contentSecurityPolicy: {
         name: 'Content-Security-Policy',
-        value: "script-src 'self' https://apis.google.com"
+        value: `script-src https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js 'self'`
     }
 };
 
@@ -182,8 +182,6 @@ app.post('/forgotPassword', [check('email').escape().isEmail()], function (req, 
             res.send(result)
         })
     } else {
-        if (!errors.isEmpty())
-            console.log(errors)
         res.redirect('/');
     }
 });
