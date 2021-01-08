@@ -29,6 +29,12 @@ app.use('/images', express.static(__dirname + '/assets/images'));
 app.use('/css', express.static(__dirname + '/css'));
 app.use(interceptor.decodeRequestCookie);
 
+app.use(function(req, res, next){
+    console.log(res);
+    res.setHeader("Content-Security-Policy", "script-src 'self' https://apis.google.com");
+    next();
+})
+
 // Sesion parameters
 
 const TWO_HOURS = 1000 * 60 * 60 * 2;
