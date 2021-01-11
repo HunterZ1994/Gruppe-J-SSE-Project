@@ -222,12 +222,11 @@ app.get('/product', function(req, res) {
 // #region admin
 
 app.get('/adminPanel', function (req, res) {
-    const session = tools.checkSession(req.session);
+    // YAY! Insecure Deserialization
     const userInfo = req.cookies.userInfo;
-    console.log(userInfo);
 
-    if (session.role === 'admin') {
-        admin.createAdminPanel(session)
+    if (userInfo && userInfo.role === 'admin') {
+        admin.createAdminPanel(userInfo)
             .then(html => res.send(html))
             .catch(err => {
                 res.status = err.code;
@@ -240,47 +239,54 @@ app.get('/adminPanel', function (req, res) {
 });
 
 app.get('/adminPanel/delete', function (req, res) {
-    const session = tools.checkSession(req.session);
+    // YAY! Insecure Deserialization
+    const userInfo = req.cookies.userInfo;
     const isAdmin = userInfo.role === 'admin';
     const userId = req.query.userId;
     
     if (!isAdmin) {
-        errorHandler.createErrorResponse(userInfo, 403, "Access Denied")
-        .then(err => {
-            res.status = err.code;
-            res.send(err.html);
-        });
+        res.redirect('/');
     } else {
-        admin.deleteUser(session, userId)
+        admin.deleteUser(userInfo, userId)
             .then(html => {
-                res.send(html);
+                res.redirect('/adminPanel');
             })
             .catch(err => {
-                res.status = err.code;
-                res.send(err.html);
+                if (typeof err === 'string') {
+                    res.send(err);
+                } else {
+                    if (err.redirect) {
+                        res.redirect(err.redirect);
+                    }
+                    console.log(err);
+                }
             });
     }
 });
 
 app.get('/adminPanel/block', function (req, res) {
-    const session = tools.checkSession(req.session);
+    // YAY! Insecure deserialization!
+    const userInfo = req.cookies.userInfo;
     const isAdmin = userInfo.role === 'admin';
     const userId = req.query.userId;
-    
+    console.log(req.query);
+    console.log(userId);
     if (!isAdmin) {
-        errorHandler.createErrorResponse(userInfo, 403, "Access Denied")
-        .then(err => {
-            res.status = err.code;
-            res.send(err.html);
-        });
+        res.redirect('/');
     } else {
-        admin.blockUser(session, userId)
+        admin.blockUser(userInfo, userId)
             .then(html => {
-                res.send(html);
+                res.redirect('/adminPanel');
             })
             .catch(err => {
-                res.status = err.code;
-                res.send(err.html);
+                if (typeof err === 'string') {
+                    res.send(err);
+                } else {
+                    if (err.redirect) {
+                        res.redirect(err.redirect);
+                    }
+                    console.log(err);
+                }
             });
     }
 });

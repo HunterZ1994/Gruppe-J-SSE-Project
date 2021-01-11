@@ -201,8 +201,8 @@ function getAllUsers() {
 function blockUser(userId) {
     return new Promise((resolve, reject) => {
         pool.getConnection().then(con => {
-            const sql = "INSERT INTO user (Blocked) VALUES (?) WHERE UserId = ?"
-            con.query(sql, userId).then(res => {
+            const sql = "UPDATE Users SET Blocked = ? WHERE UserId = ?"
+            con.query(sql, [true, userId]).then(res => {
                 resolve(res)
                 con.end()
             }).catch(err => {

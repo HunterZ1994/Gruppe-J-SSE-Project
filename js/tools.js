@@ -72,17 +72,20 @@ function buildUserTable(users) {
         userTable += '       <th>Name</th>\n'
         userTable += '       <th>FirstName      '
         userTable += '       <th>E-Mail</th>\n'
+        userTable += '       <th>Gesperrt</th>\n'
         userTable += '   </tr>\n'
 
+        console.log(users);
         for (const user of users) {
             userTable += '   <tr>\n'
             userTable += '        <td class="user-name">' + user.SureName + '</td>\n'
             userTable += '       <td class="user-firstname">' + user.FirstName + '</td>\n'
             userTable += '       <td class="user-email">' + user.Email + '</td>\n'
+            userTable += `      <td class="user-email">  ${user.Blocked ? "Gesperrt" : " -- "} </td>\n`
 
             if (!(user.Userrole === 'admin' || user.Userrole === 'vendor')) {
-                userTable += `<td> <a href='adminPanel/block?userId=${user.userId}'> Sperren </a> </td>\n`;
-                userTable += `<td> <a href='adminPanel/delete?userId=${user.userId}'> Löschen </a> </td>\n`;
+                userTable += `<td class="user-name"> <a href='adminPanel/block?userId=${user.UserId}'> Sperren </a> </td>\n`;
+                userTable += `<td class="user-name"> <a href='adminPanel/delete?userId=${user.UserId}'> Löschen </a> </td>\n`;
             }
 
             userTable += '   </tr>\n'

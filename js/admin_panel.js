@@ -19,32 +19,24 @@ function createAdminPanel(userInfo) {
 function deleteUser(userInfo, userId) {
     return new Promise((resolve, reject) => {
         if (!userId) {
-            errorHanlder.createErrorResponse(userInfo, 400, "Bad Request, No User Id")
-                .then(err => {
-                    reject(err);
-                });
+            reject({ redirect: '/adminPanel' });
         }
 	
-	Promise.all ([
-	    db_connector.geUserById()
-
-	]).then(results => {
-	    if (!(results[0].Userrole === 'admin' || results[0].Userrol === 'vendor')) {
-
-	        db_conector.deleteUser(userId)
-            	.then(rows => {
-
-                    admin_panel.createAdminPanel(userInfo)
-            	})
-            	.catch(err => {
-                    errorHandler.createErrorResponse(err, userInfo, 500, "Internal Server Error")
-                    .then(html => {
-                        console.log(err);
-                        reject(html);
+        db_connector.getUserById(userId)
+        .then(results => {
+            if (!(results[0].Userrole === 'admin' || results[0].Userrol === 'vendor')) {
+                db_connector.deleteUser(userId)
+                    .then(rows => {
+                        resolve(true);
+                    })
+                    .catch(err => {
+                        reject({err, redirect: '/adminPanel'});
                     });
-                });
-	    }
-    })      
+            } else {
+                reject({ redirect: '/adminPanel' });
+            }
+        })
+        .catch(err => reject({err, redirect: 'adminPanel'}));
     });
 }
 
@@ -52,32 +44,25 @@ function deleteUser(userInfo, userId) {
 function blockUser(userInfo, userId) {
     return new Promise((resolve, reject) => {
         if (!userId) {
-            errorHanlder.createErrorResponse(userInfo, 400, "Bad Request, No User Id")
-            .then(err => {
-                reject(err);
-            });
+            reject({ redirect: '/adminPanel' });
         }
-
-        Promise.all ([
-            db_connector.geUserById()
-    
-        ]).then(results => {
+        db_connector.getUserById(userId)
+        .then(results => {
             if (!(results[0].Userrole === 'admin' || results[0].Userrole === 'vendor')) {
-    
-                db_conector.blockUser(userId)
+                db_connector.blockUser(userId)
                     .then(rows => {
-    
-                        admin_panel.createAdminPanel(userInfo)
+                        resolve(true);
                     })
                     .catch(err => {
-                        errorHandler.createErrorResponse(err, userInfo, 500, "Internal Server Error")
-                        .then(html => {
-                            console.log(err);
-                            reject(html);
-                        });
+                        reject({err, redirect: '/adminPanel'});
                     });
+            } else {
+                reject({ redirect: '/adminPanel' });
             }
         })
+        .catch(err => {
+           reject({err, redirect: '/adminPanel'});
+        });
     })
 }
 
