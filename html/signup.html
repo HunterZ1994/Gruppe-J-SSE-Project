@@ -2,27 +2,12 @@
 <html lang="en">
 
 <head>
-   {head}
-    <script>
-        function checkPassword(){
-            const password = document.getElementById("password").value;
-            const password2 = document.getElementById("password_second").value;
-            if (password === password2 && password !== "") {
-                const element = document.getElementById("passwordCorrect");
-                element.innerHTML = "Passwörter stimmen überein!";
-                element.style.color = 'green';
-                document.getElementById("submit").removeAttribute("disabled")
-            } else {
-                const element = document.getElementById("passwordCorrect");
-                element.innerHTML = "Passwörter stimmen nicht überein!";
-                element.style.color = 'red';
-                document.getElementById("submit").setAttribute("disabled", true)
-            }
-        }
-    </script>
-</head>
-
+   <!-- { head } -->
+      
+    <script type="application/javascript;charset=utf-8" src="/js/signup.js"></script>
+    </head>
 <body>
+    { navigation }
     <form id="register" method="POST" action="register" class="column">
         <h1>Registration</h1>
         
@@ -63,12 +48,12 @@
 
         <div class="row bottom-space">
             <label for="password">Passwort</label>
-            <input type="password" name="password" id="password" oninput="checkPassword()" required>
+            <input type="password" name="password" id="password" required>
         </div>
 
         <div class="row bottom-space">
             <label for="password second">Passwort widerholen</label>
-            <input type="password" name="password_second" id="password_second" oninput="checkPassword()">
+            <input type="password" name="password_second" id="password_second" oninput="">
             <lable for="password_second" id="passwordCorrect" style="color: red;">Passwörter stimmen nicht überein!</lable>
         </div>
 
@@ -86,6 +71,6 @@
         <a href="/login">Login</a>
     </form>
 
-    <script src="/js/signup.js"></script>
+   
 </body>
 </html>

@@ -17,7 +17,8 @@ const articleView = require('./js/article');
 const tools = require("./js/tools");
 const interceptor = require('./js/interceptor');
 const session = require('express-session');
-const admin = require('./js/admin_panel')
+const admin = require('./js/admin_panel');
+const signin = require("./js/signin")
 
 // basic app setup
 const app = express();
@@ -79,44 +80,13 @@ app.get('/', function (req, res) {
 });
 
 app.get('/login', function (req, res) {
-    res.sendFile(htmlPath + '/signIn.html');
+    signin.getSignin(tools.checkSession(req.session)).then(result =>{
+        res.send(result);
+    })
 });
 
-app.post('/login', function (req, res, next) {
-    const dbpwd = tools.createPasswordHash(req.body.password);
-    db_connector.getUserByUName(req.body.email).then(result => {
-        let path = '';
-        let userInfo = {};
-        if (Object.keys(result).length > 1) {
-            const users = result[0];
-            if (dbpwd.toUpperCase() === users.PwdHash.toUpperCase() && !users.Blocked) {
-                userInfo = { loggedIn: true, userId: users.UserId, role: users.Userrole }
-                path = '/';
-                // TODO set error paths back to error.
-            } else{
-                this.userInfo = { loggedIn: false, userId: users.UserId, role: users.Userrole }
-                userInfo = { loggedIn: false, userId: users.UserId, role: users.Userrole }
-                path = '/signin';
-            }
-        } else {
-            this.userInfo = { loggedIn: false, userId: "", role: "" }
-            userInfo = { loggedIn: false, userId: "", role: "" };
-            path = '/signin_error.html';
-        }
-        const encoded = tools.encodeCookie('userInfo', userInfo);
-        req.session[encoded.name] = encoded.cookie;
-        req.session.save();
-        res.cookie(encoded.name, encoded.cookie);
-        if (path === '/') {
-            res.redirect(path);
-        } else {
-            tools.injectScript(tools.checkSession(req.session), htmlPath + "/signin.html", 
-                "<script>window.alert('Username or password wrong! Please try agaim. );</script>"
-            ).then(result =>{
-                res.send(result);
-            })
-        }
-    });
+app.post('/login', function (req, res) {
+   
 });
 
 app.get('/logout', function (req, res) {
