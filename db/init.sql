@@ -94,8 +94,8 @@ VALUES ("Pfannenwender", "Hydrodynamischer Pfannenwender mit Turbo", 100, "/imag
         ("Illegale Sachen", "Illegale Sachen mit Turbo", 10000, "/images/illegale_sachen.jpg", 3);
 
 INSERT INTO Comments (ComText, User, Article) 
-    VALUES ("Was ein super Pfannenwender!", 3, 1); 
+    VALUES ("Was ein super Pfannenwender!", 4, 1);
 
-INSERT INTO Carts (User) VALUES (3);
+INSERT INTO Carts (User) VALUES (4);
 
 INSERT INTO Holds (Cart, Article, ArticleAmount) VALUES (1, 1, 10);
