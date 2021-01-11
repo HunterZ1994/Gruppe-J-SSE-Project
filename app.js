@@ -38,7 +38,8 @@ app.use(rateLimit(security.rateLimitConfig));
 app.use(helmet.contentSecurityPolicy({
     directives: {
         ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-        "script-src": security.securityHeaders.contentSecurityPolicy.value,
+        "script-src": security.securityHeaders.contentSecurityPolicy.scrtiptSrc,
+        "style-src": security.securityHeaders.contentSecurityPolicy.styleSrc
     }
 }));
 app.use(helmet.dnsPrefetchControl());

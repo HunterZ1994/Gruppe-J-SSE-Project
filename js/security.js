@@ -16,7 +16,8 @@ const securityScriptHash = "be2d765fca5c51b3f430bb73ede903b7f530dbf82152af238736
 const securityHeaders = {
     contentSecurityPolicy: {
         name: 'Content-Security-Policy',
-        value: ["'self'", "https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js", `'nonce-${securityScriptHash}'`]
+        scrtiptSrc: ["'self'", "https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js", `'nonce-${securityScriptHash}'`],
+        styleSrc: [ "'self'"]
     }
 };
 
