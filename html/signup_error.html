@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrierung</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
     <style>
         .bottom-space {
@@ -13,6 +13,7 @@
         }
     </style>
     <script>
+        window.alert("User already Exists! Please log in.");
         function checkPassword(){
             const password = document.getElementById("password").value;
             const password2 = document.getElementById("password_second").value;
@@ -32,64 +33,53 @@
 </head>
 
 <body>
-    { navigation }
-    <form id="register" method="POST" action="register" class="column">
+    <form id="login" method="POST" class="column">
         <h1>Registration</h1>
         
         <div class="row bottom-space">
             <label for="firstName">Vorname</label>
-            <input type="text" name="firstName" id="firstName" required>
+            <input type="text" name="firstName" id="firstName">
         </div>
         
         <div class="row bottom-space">
             <label for="sureName">Nachname</label>
-            <input type="text" name="sureName" id="sureName" required>
+            <input type="text" name="sureName" id="sureName">
         </div>
 
         <div class="row bottom-space">
             <label for="street">Straße</label>
-            <input type="text" name="street" id="street" required>
+            <input type="text" name="street" id="street">
         </div>
 
         <div class="row bottom-space">
             <label for="houseNr">Haus Nr</label>
-            <input type="number" name="houseNr" id="houseNr" required>
+            <input type="number" name="houseNr" id="houseNr">
         </div>
         
         <div class="row bottom-space">
             <label for="postalCode">PLZ</label>
-            <input type="number" name="postalCode" id="postalCode" required>
+            <input type="number" name="postalCode" id="postalCode">
         </div>
         
         <div class="row bottom-space">
             <label for="city">Stadt</label>
-            <input type="text" name="city" id="city" required>
+            <input type="text" name="city" id="city">
         </div>       
 
         <div class="row bottom-space">
             <label for="email">E-Mail Adresse</label>
-            <input type="email" name="email" id="email" required>
+            <input type="email" name="email" id="email">
         </div>
 
         <div class="row bottom-space">
             <label for="password">Passwort</label>
-            <input type="password" name="password" id="password" required>
+            <input type="password" name="password" id="password" oninput="checkPassword()">
         </div>
 
         <div class="row bottom-space">
             <label for="password second">Passwort widerholen</label>
-            <input type="password" name="password_second" id="password_second" oninput="">
+            <input type="password" name="password_second" id="password_second" oninput="checkPassword()">
             <lable for="password_second" id="passwordCorrect" style="color: red;">Passwörter stimmen nicht überein!</lable>
-        </div>
-
-        <div class="row bottom-space">
-            <label for="security_question">Sicherheitsfrage</label>
-            <input type="text" name="security_question" id="security_question">
-        </div>
-
-        <div class="row bottom-space">
-            <label for="security_answer">Antwort</label>
-            <input type="text" name="security_answer" id="security_answer">
         </div>
 
         <div class="row">
@@ -99,7 +89,6 @@
         <button type="submit" disabled="true" id="submit" style="width: 30%;">Registrieren</button>
         <a href="/login">Login</a>
     </form>
-
-   
 </body>
+
 </html>

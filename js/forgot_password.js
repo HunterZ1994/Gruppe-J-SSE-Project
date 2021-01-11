@@ -1,5 +1,7 @@
 const db_connection = require('./database_connection')
 const tools = require('./tools')
+const emailNotFound = '<script type="application/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>' +
+    '<script type="application/javascript" src="/js/forgot_pw_message.js"></script>'
 
 const createForgotPwInput = (userInfo, script='') => {
     return new Promise((resolve, reject) => {
@@ -9,16 +11,16 @@ const createForgotPwInput = (userInfo, script='') => {
     })
 }
 
-const createForgotPassword = (userInfo, script='') => {
+const createForgotPassword = (userInfo) => {
     const secQuestion = db_connection.getSeqQuestionByEmail(userInfo.email);
     return new Promise((resolve, reject) => {
         Promise.all([tools.readHtmlAndAddNav(userInfo, 'forgot_password.html'), secQuestion])
             .then(results => {
-                if (!!(results[1][0].SecQuestion)) {
+                if (!!results[1][0] && !!results[1][0].SecQuestion) {
                     resolve(results[0].replace('{ question }', results[1][0].SecQuestion).replace('{ script }', '')
                         .replace('{ email }', userInfo.email));
                 } else {
-                    createForgotPwInput(userInfo, '<script>window.alert(\'Email nicht gefunden\')</script>').then(page => {
+                    createForgotPwInput(userInfo, emailNotFound).then(page => {
                         resolve(page);
                     })
                 }

@@ -5,20 +5,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Anmeldung</title>
-    <link rel="stylesheet" type="text/css;charset=utf-8" href="css/style.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
     <style>
         .bottom-space {
             margin-bottom: 10px;
         }
     </style>
+    <script>window.alert("Nutzername oder passwort falsch. Bitte erneut versuchen.");</script>
 </head>
 
 <body>
-    { navigation }
-    <br>
-    <br>
-    <form id="login" action="login" method="POST" class="column">
+    <form id="login" method="POST" class="column">
         <h1>Anmeldung</h1>
 
         <div class="row bottom-space">
@@ -32,20 +30,18 @@
         </div>
 
         <div class="row bottom-space">
-            <a href="/forgotPassword">Passwort vergessen?</a>
+            <a href="/forgot-password">Passwort vergessen?</a>
         </div>
 
         <div class="row bottom-space">
             <a href="/register">Registrieren</a>
         </div>
 
-        <button type="submit" style="width: 30%;">Anmelden</button>
-
-        <div class="row bottom-space">
+        <div class="row">
             { csrf }
         </div>
-    </form>
 
-    <script src="/js/signin.js"></script>
+        <button type="submit" style="width: 30%;">Anmelden</button>
+    </form>
 </body>
 </html>

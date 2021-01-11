@@ -3,7 +3,12 @@ const express = require('express');
 const path = require('path');
 const formidable = require('formidable');
 const cookieParser = require('cookie-parser');
+const helmet = require('helmet');
+const csrf = require('csurf');
+const rateLimit = require('express-rate-limit');
+const fs = require('fs');
 const { BADQUERY } = require('dns');
+const { check, validationResult } = require('express-validator');
 
 // own modules
 const db_connector = require("./js/database_connection");
@@ -22,22 +27,30 @@ const signin = require("./js/signin")
 
 // basic app setup
 const app = express();
-app.use(express.urlencoded());
+app.use(express.urlencoded({extended: true}));
 app.use(express.json());
-app.use(cookieParser());
 app.use(express.static('public'));
 app.use('/images', express.static(__dirname + '/assets/images'));
-app.use('/css', express.static(__dirname + '/css'));
-app.use(interceptor.decodeRequestCookie);
+app.use('/css', express.static(__dirname + '/assets/css'));
+app.use('/js', express.static(__dirname + '/assets/js'));
+app.use(rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // only 100 requests per client per windowMS
+    delayMs: 0 // disable delay -> user hasfull speed until limit
+}));
 
-app.use(function(req, res, next){
-    console.log(res);
-    res.setHeader("Content-Security-Policy", "script-src 'self' https://apis.google.com");
-    next();
-})
+// Setting helmet Options 
+app.use(helmet.dnsPrefetchControl());
+app.use(helmet.expectCt());
+app.use(helmet.frameguard());
+app.use(helmet.hidePoweredBy());
+app.use(helmet.hsts());
+app.use(helmet.ieNoOpen());
+app.use(helmet.noSniff());
+app.use(helmet.permittedCrossDomainPolicies());
+app.use(helmet.referrerPolicy());
 
 // Sesion parameters
-
 const TWO_HOURS = 1000 * 60 * 60 * 2;
 
 const {
@@ -52,7 +65,6 @@ const {
 const IN_PROD = NODE_ENV === 'production';
 
 // build coockie
-
 app.use(session({
     name: SESS_NAME,
     resave : false,
@@ -60,13 +72,61 @@ app.use(session({
     secret : SESS_SECRET,
     cookie: {
         maxAge: SESS_LIFETIME,
-        sameSite: true,
         secure: IN_PROD,
         sameSite: 'strict',
         httpOnly: true,
     },
     'QkFCQUFCQUFCQUFBQkFBQkFBQUJBQkFBQUFCQkFCQUFCQUJBQkJCQQ==': '123'
 }))
+
+
+// This has to be in this order!! 
+// honestly don't mess with it, it will crash EVERYTHING!
+app.use(cookieParser());
+const csrfProtection = csrf({
+    cookie: true, 
+    httpOnly: true, 
+    maxAge: TWO_HOURS, 
+    sameSite: 'strict', 
+    secure: IN_PROD
+});
+app.use(csrfProtection);
+app.use(interceptor.decodeRequestCookie);
+
+const securityHeaders = {
+    contentSecurityPolicy: {
+        name: 'Content-Security-Policy',
+        value: `script-src https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js 'self'`
+    }
+};
+
+// function to add security headers if needed
+app.use(function(req, res, next){
+    // needs to be toggeld for security issue
+    if (req.path.toLowerCase().includes('product')) {
+        res.removeHeader(securityHeaders.contentSecurityPolicy.name);
+    } else {
+        res.setHeader(securityHeaders.contentSecurityPolicy.name, securityHeaders.contentSecurityPolicy.value);
+    }
+    next();
+});
+
+
+// function to replace the { csrf } handle in every form
+app.use(function(req, res, next) {
+    const oldSend = res.send;
+    const csrf = `<input type="hidden" name="_csrf" value="${req.csrfToken()}"/>`;
+    res.send = function(data) {
+        oldSend.apply(res, [data.replace('{ csrf }', csrf)]);
+    }  
+
+    res.sendFile = function(data) {
+        const str = fs.readFileSync(data, 'utf-8');
+        oldSend.apply(res, [str.replace('{ csrf }', csrf)]);
+    }
+
+    next();
+});
 
 const htmlPath = path.join(__dirname) + '/html';
 
@@ -109,7 +169,6 @@ app.post('/register', function (req, res) {
         } else {
              db_connector.addUser(user).then(result => {
                  if (result.warningStatus === 0) {
-                     console.log(result)
                      db_connector.createCart(result.insertId)
                     const userInfo = { loggedIn: true, userID: user.email, role: 'customer' }
                     res.cookie('userInfo', userInfo).redirect('/');
@@ -135,9 +194,10 @@ app.get('/forgotPassword', function (req, res) {
     }
 });
 
-app.post('/forgotPassword', function (req, res) {
+app.post('/forgotPassword', [check('email').escape().isEmail()], function (req, res) {
     const user = tools.checkSession(req.session);
-    if (!session.loggedIn) {
+    const errors = validationResult(req);
+    if (!session.loggedIn && errors.isEmpty()) {
         user.email = req.body.email;
         forgot_password.createForgotPassword(user).then(result => {
             res.send(result)
@@ -145,12 +205,12 @@ app.post('/forgotPassword', function (req, res) {
     } else {
         res.redirect('/');
     }
-
 });
 
-app.post('/changePassword', function (req, res) {
+app.post('/changePassword', [check('email').escape().isEmail()], function (req, res) {
     const session = tools.checkSession(req.session);
-    if (!session.loggedIn) {
+    const errors = validationResult(req);
+    if (!session.loggedIn && errors.isEmpty()) {
         const user = req.body
         user.security_answer = tools.createPasswordHash(user.security_answer)
         user.new_password = tools.createPasswordHash(user.new_password)
@@ -321,14 +381,12 @@ app.get('/article/edit', function (req, res) {
     const articleId = req.query.articleId;
 
     if (!isVendor) {
-        // TODO: Replace userInfo
         errorHandler.createErrorResponse(userInfo, 403, "Access Denied")
         .then(err => {
             res.status = err.code;
             res.send(err.html);
         }); 
     } else {
-        // TODO: Replace userInfo
         vendor.createEditForm(userInfo, articleId)
             .then(html => {
                 res.send(html);
@@ -345,7 +403,6 @@ app.post('/article/edit', function (req, res) {
     const isVendor = userInfo.role === 'vendor';
 
     if (!isVendor) {
-        // TODO: replace userInfo
         errorHandler.createErrorResponse(userInfo, 403, "Access Denied")
         .then(err => {
             res.status = err.code;
@@ -438,10 +495,11 @@ app.post('/comment/add', (req, res) => {
     if (session.loggedIn) {
         articleView.addComment(comment.comText, comment.articleId, session)
             .then(html => {
-                res.send(html);
+                res.redirect('/product?articleId=' + comment.articleId)
             })
             .catch(err => {
                 console.log(err);
+                res.redirect('/product?articleId=' + comment.articleId)
             });
     } else {
         res.redirect('/product?articleId=' + comment.articleId)

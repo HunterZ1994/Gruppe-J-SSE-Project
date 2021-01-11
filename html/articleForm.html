@@ -11,31 +11,38 @@
 
         <form id="form" method="POST" action="add" class="column" enctype="multipart/form-data">
             <input type="hidden" name="articleId" id="articleId"/>
-            <div class="row" name>
+            <div class="row bottom-space" name>
                 <label for="articleName">Artikelbezeichnung</label>
                 <input name="articleName" id="articleName" type="text" required/>
             </div>
 
-            <div class="row" beschreibung>
+            <div class="row bottom-space" beschreibung>
                 <label for="descpt">Beschreibung</label>
                 <input name="descpt" id="descpt" type="text" required/>
             </div>
 
-            <div class="row">
+            <div class="row bottom-space">
                 <label for="price">Preis</label>
                 <input name="price" id="price" type="number" required/>
             </div>
 
-            <div class="row" image>
+            <div class="row bottom-space" image>
                 <label for="image">Artikelbild</label>
                 <input name="imagePath" type="file" id="imagePath" accept="image/png, image/jpeg"/>
             </div>
             
-            <div class="row">
+            <div class="row bottom-space">
                 { image }
             </div>
 
-            <button type="submit" id="submit">Hinzufügen</button>
+            <div class="row">
+                { csrf }
+            </div>
+
+            <div class="row bottom-space">
+                <button type="submit" id="submit">Hinzufügen</button>
+            </div>
+            
         </form>
     </body>
     </html>

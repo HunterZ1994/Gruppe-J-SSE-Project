@@ -12,6 +12,10 @@ body {
     flex-flow: column;
 }
 
+.bottom-space {
+    margin-bottom: 10px;
+}
+
 .topnav {
     background-color: rgba(185, 215, 211, 0.54);
     overflow: hidden;
@@ -85,4 +89,8 @@ body {
 
 .item-descr {
     text-align: left;
+}
+
+button {
+    max-width: 30%;
 }
