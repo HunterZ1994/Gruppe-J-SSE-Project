@@ -6,7 +6,6 @@ const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 const csrf = require('csurf');
 const rateLimit = require('express-rate-limit');
-const fs = require('fs');
 const { BADQUERY } = require('dns');
 const { check, validationResult } = require('express-validator');
 
@@ -24,28 +23,23 @@ const interceptor = require('./js/interceptor');
 const session = require('express-session');
 const admin = require('./js/admin_panel');
 const signin = require("./js/signin");
+const security = require("./js/security");
+
+const htmlPath = path.join(__dirname) + '/html';
 
 // basic app setup
 const app = express();
+// disabling this so client is not seeing we use nodejs
+app.disable('x-powered-by');
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
-app.use(express.static('public'));
-app.use('/images', express.static(__dirname + '/assets/images'));
-app.use('/css', express.static(__dirname + '/assets/css'));
-app.use('/js', express.static(__dirname + '/assets/js'));
-app.use(rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // only 100 requests per client per windowMS
-    delayMs: 0 // disable delay -> user hasfull speed until limit
-}));
-app.disable('x-powered-by');
+app.use(rateLimit(security.rateLimitConfig));
 
 // Setting helmet Options 
+app.use(helmet.contentSecurityPolicy());
 app.use(helmet.dnsPrefetchControl());
 app.use(helmet.expectCt());
-app.use(helmet.frameguard({
-    action: 'deny'
-}));
+app.use(helmet.frameguard({action: 'deny'}));
 app.use(helmet.hidePoweredBy());
 app.use(helmet.hsts());
 app.use(helmet.ieNoOpen());
@@ -53,84 +47,34 @@ app.use(helmet.noSniff());
 app.use(helmet.permittedCrossDomainPolicies());
 app.use(helmet.referrerPolicy());
 
-// Sesion parameters
-const TWO_HOURS = 1000 * 60 * 60 * 2;
+// this needs to be after helmet config, so helmet also secures this
+app.use(express.static('public', security.staticFileOptions));
+app.use('/images', express.static(__dirname + '/assets/images', security.staticFileOptions));
+app.use('/css', express.static(__dirname + '/assets/css', security.staticFileOptions));
+app.use('/js', express.static(__dirname + '/assets/js', security.staticFileOptions));
 
-const {
-    PORT = 8080,
-    NODE_ENV = 'developmnet',
-
-    SESS_NAME = 'ssid',
-    SESS_SECRET = 'ssh!quiet,it\'asecret',
-    SESS_LIFETIME = TWO_HOURS
-} = process.env;
-
-const IN_PROD = NODE_ENV === 'production';
-
-// build coockie
-app.use(session({
-    name: SESS_NAME,
-    resave : false,
-    saveUninitialized: false,
-    secret : SESS_SECRET,
-    cookie: {
-        maxAge: SESS_LIFETIME,
-        secure: IN_PROD,
-        sameSite: 'strict',
-        httpOnly: true,
-    },
-    'QkFCQUFCQUFCQUFBQkFBQkFBQUJBQkFBQUFCQkFCQUFCQUJBQkJCQQ==': '123'
-}))
-
+// build session and cookie
+app.use(session(security.sessionConfig))
 
 // This has to be in this order!! 
 // honestly don't mess with it, it will crash EVERYTHING!
 app.use(cookieParser());
-app.use(csrf({
-    cookie: true, 
-    httpOnly: true, 
-    maxAge: TWO_HOURS, 
-    sameSite: true, 
-    secure: IN_PROD,
-}));
+app.use(csrf(security.csrfConfig))
+
+// setting the middleWare to decode the request cookie
+// this cookie is only used for insecure deserialization leak
 app.use(interceptor.decodeRequestCookie);
 
-const securityHeaders = {
-    contentSecurityPolicy: {
-        name: 'Content-Security-Policy',
-        value: `script-src https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js 'self'`
-    }
-};
-
-// function to add security headers if needed
-app.use(function(req, res, next){
-    // needs to be toggeld for security issue
-    if (req.path.toLowerCase().includes('product')) {
-        res.removeHeader(securityHeaders.contentSecurityPolicy.name);
-    } else {
-        res.setHeader(securityHeaders.contentSecurityPolicy.name, securityHeaders.contentSecurityPolicy.value);
-    }
-    next();
-});
-
+// toggles CSP header for security leak of XSS
+app.use(interceptor.allowXSS);
 
 // function to replace the { csrf } handle in every form
-app.use(function(req, res, next) {
-    const oldSend = res.send;
-    const csrf = `<input type="hidden" name="_csrf" value="${req.csrfToken()}"/>`;
-    res.send = function(data) {
-        oldSend.apply(res, [data.replace('{ csrf }', csrf)]);
-    }  
+app.use(interceptor.appendCSRFToken);
 
-    res.sendFile = function(data) {
-        const str = fs.readFileSync(data, 'utf-8');
-        oldSend.apply(res, [str.replace('{ csrf }', csrf)]);
-    }
-
-    next();
-});
-
-const htmlPath = path.join(__dirname) + '/html';
+if (!security.IN_PROD) {
+    // just for debugging logging
+    app.use(interceptor.responseLogging);
+}
 
 //#region userAuthentication
 
@@ -161,7 +105,7 @@ app.post('/login', function (req, res) {
         })
         .catch(err => {
             if (typeof err === 'string') {
-                res.send(html);
+                res.send(err);
             } else {
                 if (err.redirect) {
                     res.redirect(err.redirect);
@@ -272,8 +216,6 @@ app.get('/product', function(req, res) {
 // #region admin
 
 app.get('/adminPanel', function (req, res) {
-    // TODO: check for role
-    // TODO: return admin page
     const session = tools.checkSession(req.session);
 
     if (session.role === 'admin') {

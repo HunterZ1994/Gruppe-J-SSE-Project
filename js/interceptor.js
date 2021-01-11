@@ -1,6 +1,7 @@
 const bacon = require('bacon-cipher');
+const security = require('./security');
+const fs = require('fs');
 const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-
 
 function decodeRequestCookie(req, res, next) {
     let cookieName = Buffer.from(bacon.encode('userInfo', {alphabet})).toString('base64');
@@ -28,9 +29,51 @@ function decodeRequestCookie(req, res, next) {
         req.cookies = {userInfo};
     }
     next();
-
 }
+
+function allowXSS(req, res, next) {
+    // needs to be diabled for XXS
+    if (req.path.toLowerCase().includes('product')) {
+        res.removeHeader(security.securityHeaders.contentSecurityPolicy.name);
+    }
+    next();
+}
+
+function appendCSRFToken(req, res, next) {
+    const oldSend = res.send;
+    const csrf = `<input type="hidden" name="_csrf" value="${req.csrfToken()}"/>`;
+    res.send = function(data) {
+        oldSend.apply(res, [data.replace('{ csrf }', csrf)]);
+    }  
+
+    res.sendFile = function(data) {
+        const str = fs.readFileSync(data, 'utf-8');
+        oldSend.apply(res, [str.replace('{ csrf }', csrf)]);
+    }
+
+    next();
+}
+
+
+function responseLogging(res, req, next, config = {field: 'headers'}) {
+    console.log("\n\n### Response Logger ###\n");
+    if (config && config.field !== '') {
+        console.log(`### Logging: [${config.field}] ###\n`);
+        console.log(res[config.field]);
+        console.log("\n");
+    } else {
+        console.log(`### Logging: res ###\n`);
+        console.log(res);
+        console.log("\n");
+    }
+    console.log('### End of Logging ###\n\n');
+    next();
+}
+
 
 module.exports = {
     decodeRequestCookie,
+    allowXSS,
+    appendCSRFToken,
+    responseLogging
 }
