@@ -25,8 +25,7 @@ function buildArticlesTable(articles, userInfo) {
             artTable += '       <td class="item-name"><a href="/product?articleId=' + article.ArticleId + '">' + article.ArticleName + '</a></td>\n'
             artTable += '       <td class="item-descr">' + article.Descpt + '</td>\n'
             artTable += '       <td class="item-price">' + article.Price + '$</td>\n'
-            artTable += '       <td class="item-image"><img src="' + article.ImagePath
-                + '" style="max-height: 150px; max-width: 150px;"></td>\n'
+            artTable += '       <td class="item-image"><img src="' + article.ImagePath + '"></td>\n'
 
             if (!!userInfo && userInfo.role === 'vendor') {
                 artTable += `<td> <a href='article/edit?articleId=${article.ArticleId}'> Bearbeiten </a> </td>\n`; 

@@ -2,16 +2,7 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registrierung</title>
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
-    <style>
-        .bottom-space {
-            margin-bottom: 10px;
-        }
-    </style>
+    { head }
     { script }
 </head>
 
@@ -65,7 +56,7 @@
         <div class="row bottom-space">
             <label for="password second">Passwort widerholen</label>
             <input type="password" name="password_second" id="password_second" oninput="" required>
-            <lable for="password_second" id="passwordCorrect" style="color: red;">Passwörter stimmen nicht überein!</lable>
+            <lable for="password_second" id="passwordCorrect">Passwörter stimmen nicht überein!</lable>
         </div>
 
         <div class="row bottom-space">
@@ -82,7 +73,7 @@
             { csrf }
         </div>
         
-        <button type="submit" disabled="true" id="submit" style="width: 30%;">Registrieren</button>
+        <button type="submit" disabled="true" id="submit">Registrieren</button>
         <a href="/login">Login</a>
     </form>
    

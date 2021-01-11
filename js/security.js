@@ -3,7 +3,7 @@ const TWO_HOURS = 1000 * 60 * 60 * 2;
 
 const {
     PORT = 8080,
-    NODE_ENV = 'developmnet',
+    NODE_ENV = 'production',
     SESS_NAME = 'ssid',
     SESS_SECRET = '6u4/I/%$76v5&4vkuG7i(87%G%B(&NH((O%"§%$(&)?@€|~^^=)(/&!&%§"$',
     SESS_LIFETIME = TWO_HOURS
@@ -11,13 +11,14 @@ const {
 
 const IN_PROD = NODE_ENV === 'production';
 
-const securityScriptHash = "be2d765fca5c51b3f430bb73ede903b7f530dbf82152af238736b0882edfd41d";
-
 const securityHeaders = {
     contentSecurityPolicy: {
         name: 'Content-Security-Policy',
         scrtiptSrc: ["'self'", "https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"],
-        styleSrc: [ "'self'"]
+        styleSrc: [ "'self'"],
+        https: ["'self'"],
+        frame_ancestors: ["'none'"],
+        form_action: ["'self'"]
     }
 };
 
@@ -62,6 +63,5 @@ module.exports = {
     sessionConfig,
     csrfConfig,
     rateLimitConfig,
-    IN_PROD,
-    securityScriptHash
+    IN_PROD
 };

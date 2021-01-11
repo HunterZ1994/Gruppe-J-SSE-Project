@@ -32,7 +32,7 @@ const app = express();
 app.disable('x-powered-by');
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
-app.use(rateLimit(security.rateLimitConfig));
+// app.use(rateLimit(security.rateLimitConfig));
 
 // Setting helmet Options 
 app.use(helmet.contentSecurityPolicy({
