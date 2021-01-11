@@ -25,7 +25,6 @@ function signinErrorUserExists(userInfo) {
 
 
 function checkSignUp(user) {
-    console.log(user);
     return new Promise((resolve, reject) => {
         user.pwHash = tools.createPasswordHash(user.password);
         user.secAnswerHash = tools.createPasswordHash(user.security_answer)

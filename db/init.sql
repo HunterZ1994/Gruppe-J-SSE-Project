@@ -4,6 +4,7 @@ use hardwareBay;
 
 create TABLE Users (
     UserId int NOT NULL AUTO_INCREMENT,
+    UId bigint unsigned NOT NULL,
     Email  varchar(255) NOT NULL,
     FirstName varchar(255),
     SureName varchar(255),
@@ -64,19 +65,19 @@ create TABLE Comments (
 
 -- creating admin user with password 9pa.%{7>TeYb\G~9Kz%'r@aR and security answer >cHq9tx5(-,SkdL*vaJxav['
 INSERT INTO Users (Email, FirstName, SureName, Userrole, PwdHash, SecQuestion, SecAnswer)
-VALUES ('admin@hardwareBay.de', 'Peter', 'Wiener', "admin", 'ff9628c8b2bc0494868f76435f361036e4fbdabe85698cf7772bb384202c8600', "Forget it!", "99ca0ecb1cba528c0296b46baa1a979fb23fef7fa8ac89a2bc2e6f5b01fa427b");
+VALUES ('1610405070847', 'admin@hardwareBay.de', 'Peter', 'Wiener', "admin", 'ff9628c8b2bc0494868f76435f361036e4fbdabe85698cf7772bb384202c8600', "Forget it!", "99ca0ecb1cba528c0296b46baa1a979fb23fef7fa8ac89a2bc2e6f5b01fa427b");
 
 -- creating admin user with password A3Y8A~V62]n+ksd; and security answer Mr Buttons
 INSERT INTO Users (Email, FirstName, SureName, Userrole, PwdHash, SecQuestion, SecAnswer)
-VALUES ('eve.grossmann@eg.com', 'Eve', 'Großmann', "admin", '3b4d02a87127b1e38ceb8e2581803d5848133385b35f3a4b2a29f084ce3d5aa4', "Wie hieß meine erste Katze?", "f55cb57b105062ff3c443397632e5485b1c4c650520257befa15d0da744133a5");
+VALUES ('1610405237540','eve.grossmann@eg.com', 'Eve', 'Großmann', "admin", '3b4d02a87127b1e38ceb8e2581803d5848133385b35f3a4b2a29f084ce3d5aa4', "Wie hieß meine erste Katze?", "f55cb57b105062ff3c443397632e5485b1c4c650520257befa15d0da744133a5");
 
 -- test vendor pwd = jc#VgvZ$P+6!/JCC2{.Eg>Uk and security answer >cHq9tx5(-,SkdL*vaJxav['
 INSERT INTO Users (Email, FirstName, SureName, Userrole, PwdHash, SecQuestion, SecAnswer)
-    VALUES ("bezos@hardwareBay.de", "Jeff", "Bezos", "vendor", "b15a7c851cdb675c6b0863a38095be91320db0aaa980dc0fb12328864e2fa9b7", "Forget it!", "99ca0ecb1cba528c0296b46baa1a979fb23fef7fa8ac89a2bc2e6f5b01fa427b");
+    VALUES ('1610405040523',"bezos@hardwareBay.de", "Jeff", "Bezos", "vendor", "b15a7c851cdb675c6b0863a38095be91320db0aaa980dc0fb12328864e2fa9b7", "Forget it!", "99ca0ecb1cba528c0296b46baa1a979fb23fef7fa8ac89a2bc2e6f5b01fa427b");
 
 -- test usert pwd = wiener and security answer >cHq9tx5(-,SkdL*vaJxav['
 INSERT INTO Users (Email, FirstName, SureName, Street, HouseNr, City, PostCode, Userrole, PwdHash, SecQuestion, SecAnswer)
-    VALUES ("wiener@gmail.de", "Peter", "Wiener", "Wienerstreet", 10, "Wienertown", 1234, "customer", "29FEB5D3B68F493955A9C688197C580C99CD2EC416221D3537CE00C48C5765F2", "Forget it!", "99ca0ecb1cba528c0296b46baa1a979fb23fef7fa8ac89a2bc2e6f5b01fa427b");
+    VALUES ('1610405071354',"wiener@gmail.de", "Peter", "Wiener", "Wienerstreet", 10, "Wienertown", 1234, "customer", "29FEB5D3B68F493955A9C688197C580C99CD2EC416221D3537CE00C48C5765F2", "Forget it!", "99ca0ecb1cba528c0296b46baa1a979fb23fef7fa8ac89a2bc2e6f5b01fa427b");
 
 INSERT INTO Articles (ArticleName, Descpt, Price, ImagePath, Seller) 
 VALUES ("Pfannenwender", "Hydrodynamischer Pfannenwender mit Turbo", 100, "/images/hydrodyn_pfannenwender.jpg", 3),

@@ -282,13 +282,20 @@ function getUserByUName(username ='') {
 function addUser(user) {
     return new Promise((resolve, reject) =>{
         pool.getConnection().then(con => {
-            let sql = 'INSERT INTO users (Email , FirstName, SureName, Street , HouseNr, PostCode, City, Userrole, PwdHash, SecQuestion, SecAnswer) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
-            const values = [user.email, user.firstName, user.sureName, user.street, user.houseNr, user.postalCode, user.city, 'customer', user.pwHash, user.security_question, user.secAnswerHash];
-            con.query(sql, values).then(rows => {
-                resolve(rows);
+            con.query('SELECT COUNT(*) AS userCount FROM users').then(rows => {
+                const UId = Date.now() + rows[0].userCount + 13417;
+                const sql = 'INSERT INTO users (UId, Email , FirstName, SureName, Street , HouseNr, PostCode, City, Userrole, PwdHash, SecQuestion, SecAnswer) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+                const values = [UId, user.email, user.firstName, user.sureName, user.street, user.houseNr, user.postalCode, user.city, 'customer', user.pwHash, user.security_question, user.secAnswerHash];
+                con.query(sql, values).then(rows => {
+                    con.end()
+                    resolve(rows);
+                }).catch(err => {
+                    con.end()
+                    reject(err)
+                })
             }).catch(err => {
-                reject(err)
                 con.end()
+                reject(err)
             })
         }).catch(err => reject(err))
     });
