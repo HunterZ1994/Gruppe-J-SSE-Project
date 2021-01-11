@@ -5,7 +5,7 @@ const {
     PORT = 8080,
     NODE_ENV = 'developmnet',
     SESS_NAME = 'ssid',
-    SESS_SECRET = 'ssh!quiet,it\'asecret',
+    SESS_SECRET = '6u4/I/%$76v5&4vkuG7i(87%G%B(&NH((O%"§%$(&)?@€|~^^=)(/&!&%§"$',
     SESS_LIFETIME = TWO_HOURS
 } = process.env;
 
@@ -16,7 +16,7 @@ const securityScriptHash = "be2d765fca5c51b3f430bb73ede903b7f530dbf82152af238736
 const securityHeaders = {
     contentSecurityPolicy: {
         name: 'Content-Security-Policy',
-        value: ["'self'", "https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js", `'nonce-${securityScriptHash}'`]
+        value: ["'self'", "https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"]
     }
 };
 
@@ -50,7 +50,7 @@ const csrfConfig = {
 };
 
 const rateLimitConfig = {
-    windowMs: 15 * 60 * 1000, // 15 minutes
+    windowMs: 5 * 60 * 1000, // 15 minutes
     max: 100, // only 100 requests per client per windowMS
     delayMs: 0 // disable delay -> user hasfull speed until limit
 }
