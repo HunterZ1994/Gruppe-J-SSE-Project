@@ -3,7 +3,9 @@ const db_connector = require('./database_connection');
 const { responseLogging } = require("./interceptor");
 
 const passwordWrong = '<script type="application/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>' +
-    '<script type="application/javascript" src="js/checkSignupForm.js"></script>'
+    '<script type="application/javascript" src="js/check_signup_form.js"></script>'
+const UserExistsErrorScript = '<script type="application/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>' +
+'<script type="application/javascript" src="js/User_already_exists.js"></script>'
 
 function getSignup(userInfo) {
     return new Promise((resolve, reject) => {
@@ -13,48 +15,45 @@ function getSignup(userInfo) {
     });
 }
 
-function signinErrorWrongPassword(userInfo) {
+function signinErrorUserExists(userInfo) {
     return new Promise((resolve, reject) => {
-        tools.injectScript(userInfo, "/signin.html", passwordWrong )
-        .then(res => resolve(res))
-        .catch(err => reject(err));
+        tools.readHtmlAndAddNav(userInfo, "/signin.html").then(result => {
+            resolve(result.replace('{ script }', UserExistsErrorScript));
+        }).catch(err => reject(err));
     });
 }
 
 
-function signinErrorWrongEmail(userInfo) {
+function checkSignUp(user) {
+    console.log(user);
     return new Promise((resolve, reject) => {
-        tools.injectScript(userInfo, "/signin.html", passwordWrong )
-            .then(res => resolve(res))
-            .catch(err => reject(err));
-    });
-}
-
-function checkSignIn(email, password){
-    return new Promise((resolve, reject) => {
-        const pwdHash = tools.createPasswordHash(password);
-        db_connector.getUserByUName(email).then(result => {
-            const user = result[0];
-            let userInfo = {loggedIn: false, userId: "", role: ""};
-            if (user) {
-                // TODO: need to get rid of toUpperCase()
-                if (pwdHash.toUpperCase() === user.PwdHash.toUpperCase() && !user.IsBlocked) {
-                    resolve({ loggedIn: true, userId: user.UserId, role: user.Userrole }); 
-                } else {
-                    signinErrorWrongPassword(userInfo).then(res => reject(res)).catch(err => reject(err));                
-                }
+        user.pwHash = tools.createPasswordHash(user.password);
+        user.secAnswerHash = tools.createPasswordHash(user.security_answer)
+        db_connector.checkIfEmailExists(user).then(result => {
+            if (Object.keys(result).length > 1) {
+                resolve(signinErrorUserExists(user));
             } else {
-                signinErrorWrongEmail(userInfo).then(res => reject(res)).catch(err => console.log(err));
+                db_connector.addUser(user).then(result => {
+                    if (result.warningStatus === 0) {
+                        return new Promise((resolve, reject) => {
+                            tools.readHtmlAndAddNav(userInfo, "/").then(result => {
+                                resolve(result.replace('{ script }', ""));
+                            }).catch(err => reject(err));
+                        });
+                    } else {
+                        resolve(signinErrorUserExists(user));
+                    }
+                });
             }
         }).catch(err => {
-            reject({err, redirect: '/register'});
-        });
+            console.log(err);
+        })
+
     });
 }
 
 module.exports = {
-    getSignup,
-    signinErrorWrongPassword,
-    signinErrorWrongEmail,
-    checkSignIn,
-}
+            getSignup,
+            signinErrorUserExists,
+            checkSignUp,
+        }
