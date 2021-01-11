@@ -138,29 +138,42 @@ app.get('/register', function (req, res) {
     })
 });
 
-app.post('/register', function (req, res) {
-    const user = req.body;
-    user.pwHash = tools.createPasswordHash(user.password);
-    user.secAnswerHash = tools.createPasswordHash(user.security_answer)
-    db_connector.checkIfEmailExists(user).then(result => {
-        if (Object.keys(result).length > 1){
-            const userInfo = { loggedIn: false, userID: user.UserId, role: user.Userrole }
+app.post('/register', [check('firstName').escape().trim(),
+    check('sureName').escape().trim(),
+    check('street').escape().trim(),
+    check('houseNr').escape().isNumeric().trim(),
+    check('postalCode').escape().isNumeric().trim(),
+    check('city').escape().trim(),
+    check('email').escape().isEmail().trim(),
+    check('security_question').escape().trim(),
+    check('security_answer').escape().trim()], function (req, res) {
+    const errors = validationResult(req);
+
+    if (errors.isEmpty()) {
+        const user = req.body;
+        user.pwHash = tools.createPasswordHash(user.password);
+        user.secAnswerHash = tools.createPasswordHash(user.security_answer)
+        db_connector.checkIfEmailExists(user).then(result => {
+            if (Object.keys(result).length > 1){
+                const userInfo = { loggedIn: false, userID: user.UserId, role: user.Userrole }
                 res.cookie('userInfo', userInfo).sendFile(htmlPath + '/signup_error.html');
-        } else {
-             db_connector.addUser(user).then(result => {
-                 if (result.warningStatus === 0) {
-                     db_connector.createCart(result.insertId)
-                    const userInfo = { loggedIn: true, userID: user.email, role: 'customer' }
-                    res.cookie('userInfo', userInfo).redirect('/');
-                } else {
-                    res.sendStatus(BADQUERY);
-                 }
-            });
-        }
-    }).catch(err => {
-        console.log(err);
-    })
-   
+            } else {
+                db_connector.addUser(user).then(result => {
+                    if (result.warningStatus === 0) {
+                        db_connector.createCart(result.insertId)
+                        const userInfo = { loggedIn: true, userID: user.email, role: 'customer' }
+                        res.cookie('userInfo', userInfo).redirect('/');
+                    } else {
+                        res.sendStatus(BADQUERY);
+                    }
+                });
+            }
+        }).catch(err => {
+            console.log(err);
+        })
+    } else {
+        res.redirect('/');
+    }
 });
 
 app.get('/forgotPassword', function (req, res) {
