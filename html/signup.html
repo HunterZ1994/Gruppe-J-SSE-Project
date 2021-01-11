@@ -12,23 +12,7 @@
             margin-bottom: 10px;
         }
     </style>
-    <script>
-        function checkPassword(){
-            const password = document.getElementById("password").value;
-            const password2 = document.getElementById("password_second").value;
-            if (password === password2 && password !== "") {
-                const element = document.getElementById("passwordCorrect");
-                element.innerHTML = "Passwörter stimmen überein!";
-                element.style.color = 'green';
-                document.getElementById("submit").removeAttribute("disabled")
-            } else {
-                const element = document.getElementById("passwordCorrect");
-                element.innerHTML = "Passwörter stimmen nicht überein!";
-                element.style.color = 'red';
-                document.getElementById("submit").setAttribute("disabled", true)
-            }
-        }
-    </script>
+    { script }
 </head>
 
 <body>
@@ -78,7 +62,7 @@
 
         <div class="row bottom-space">
             <label for="password second">Passwort widerholen</label>
-            <input type="password" required name="password_second" id="password_second" oninput="">
+            <input type="password" required name="password_second" id="password_second">
             <lable for="password_second" id="passwordCorrect" style="color: red;">Passwörter stimmen nicht überein!</lable>
         </div>
 
@@ -99,6 +83,9 @@
         <button type="submit" disabled="true" id="submit" style="width: 30%;">Registrieren</button>
         <a href="/login">Login</a>
     </form>
+
+    <input type="button" id="button" value="Test">
+    <p id="ausgabe"></p>
 
    
 </body>

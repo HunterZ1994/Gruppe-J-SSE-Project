@@ -23,6 +23,7 @@ const interceptor = require('./js/interceptor');
 const session = require('express-session');
 const admin = require('./js/admin_panel');
 const signin = require("./js/signin");
+const signup = require("./js/signup");
 const security = require("./js/security");
 
 const htmlPath = path.join(__dirname) + '/html';
@@ -133,7 +134,9 @@ app.get('/logout', function (req, res) {
 });
 
 app.get('/register', function (req, res) {
-    res.sendFile(htmlPath + '/signup.html');
+    signup.getSignup(tools.checkSession(req.session)).then(result =>{
+        res.send(result);
+    })
 });
 
 app.post('/register', function (req, res) {
