@@ -12,7 +12,6 @@ const { check, validationResult } = require('express-validator');
 // own modules
 const db_connector = require("./js/database_connection");
 const vendor = require('./js/vendor');
-const errorHandler = require('./js/errorHandler');
 const search_results = require('./js/search_results');
 const index = require('./js/index');
 const forgot_password = require('./js/forgot_password');
@@ -329,10 +328,7 @@ app.post('/article/add', function (req, res) {
                 });
         });
     } else {
-        errorHandler.createErrorResponse(null, userInfo, 403, "Access Denied")
-        .then(err => {
-            res.redirect('/article/add')
-        }); 
+        res.redirect('/');
     }
 });
 
@@ -342,11 +338,7 @@ app.get('/article/delete', function (req, res) {
     const articleId = req.query.articleId;
     
     if (!isVendor) {
-        errorHandler.createErrorResponse(userInfo, 403, "Access Denied")
-        .then(err => {
-            res.status = err.code;
-            res.send(err.html);
-        });
+        res.redirect('/');
     } else {
         vendor.deleteArticle(userInfo, articleId)
             .then(html => {
@@ -365,11 +357,7 @@ app.get('/article/edit', function (req, res) {
     const articleId = req.query.articleId;
 
     if (!isVendor) {
-        errorHandler.createErrorResponse(userInfo, 403, "Access Denied")
-        .then(err => {
-            res.status = err.code;
-            res.send(err.html);
-        }); 
+        res.redirect('/');
     } else {
         vendor.createEditForm(userInfo, articleId)
             .then(html => {
@@ -387,11 +375,7 @@ app.post('/article/edit', function (req, res) {
     const isVendor = userInfo.role === 'vendor';
 
     if (!isVendor) {
-        errorHandler.createErrorResponse(userInfo, 403, "Access Denied")
-        .then(err => {
-            res.status = err.code;
-            res.send(err.html);
-        });  
+        res.redirect('/');
     } else {
         const form = new formidable.IncomingForm();
         form.parse(req, function (err, fields, files) {
