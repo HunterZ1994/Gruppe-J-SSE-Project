@@ -97,7 +97,6 @@ app.get('/login', function (req, res) {
 app.post('/login', [check('email').escape().isEmail()], function (req, res) {
     const errors = validationResult(req);
     if (errors.isEmpty()) {
-        console.log(req.body.email, req.body.password)
         signin.checkSignIn(req.body.email, req.body.password)
             .then(userInfo => {
                 const encoded = tools.encodeCookie('userInfo', userInfo);
