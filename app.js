@@ -77,7 +77,7 @@ app.use(interceptor.appendCSRFToken);
 
 if (!security.IN_PROD) {
     // just for debugging logging
-    app.use(interceptor.responseLogging);
+    // app.use(interceptor.responseLogging);
 }
 
 //#region userAuthentication
@@ -95,28 +95,35 @@ app.get('/login', function (req, res) {
     })
 });
 
-app.post('/login', function (req, res) {
-    signin.checkSignIn(req.body.email, req.body.password)
-        .then(userInfo => {
-            const encoded = tools.encodeCookie('userInfo', userInfo);
-            req.session[encoded.name] = encoded.cookie;
-            req.session.save();
-            res.cookie(encoded.name, encoded.cookie, {
-                httpOnly: true,
-                sameSite: 'strict',
-            });
-            res.redirect('/');
-        })
-        .catch(err => {
-            if (typeof err === 'string') {
-                res.send(err);
-            } else {
-                if (err.redirect) {
-                    res.redirect(err.redirect);
+app.post('/login', [check('email').escape().isEmail()], function (req, res) {
+    const errors = validationResult(req);
+    if (errors.isEmpty()) {
+        console.log(req.body.email, req.body.password)
+        signin.checkSignIn(req.body.email, req.body.password)
+            .then(userInfo => {
+                const encoded = tools.encodeCookie('userInfo', userInfo);
+                req.session[encoded.name] = encoded.cookie;
+                req.session.save();
+                res.cookie(encoded.name, encoded.cookie, {
+                    httpOnly: true,
+                    sameSite: 'strict',
+                });
+                res.redirect('/');
+            })
+            .catch(err => {
+                if (typeof err === 'string') {
+                    res.send(err);
+                } else {
+                    if (err.redirect) {
+                        res.redirect(err.redirect);
+                    }
+                    console.log(err);
                 }
-                console.log(err);
-            }
-        });
+            });
+    } else {
+        res.redirect('/');
+    }
+
 });
 
 app.get('/logout', function (req, res) {
