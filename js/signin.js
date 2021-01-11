@@ -1,5 +1,6 @@
 const tools = require("./tools");
 const db_connector = require('./database_connection');
+const { responseLogging } = require("./interceptor");
 
 function getSignin(userInfo) {
     return new Promise((resolve, reject) => {
@@ -9,54 +10,50 @@ function getSignin(userInfo) {
     });
 }
 
-function SigninErrorWrongPassword(userInfo) {
+function signinErrorWrongPassword(userInfo) {
     return new Promise((resolve, reject) => {
-        tools.readHtmlAndAddNav(userInfo, "/signin.html").then(result => {
-            resolve(result.replace('{ script }', '<script>window.alert("Username or pasword wrong! Please try again.);</script> '));
-        }).catch(err => reject(err));
+        tools.injectScript(userInfo, "/signin.html", 
+            '<script>window.alert("Username or pasword wrong! Please try again.");</script>')
+        .then(res => resolve(res))
+        .catch(err => reject(err));
     });
 }
 
 
-function SigninErrorWrongEmail(userInfo) {
+function signinErrorWrongEmail(userInfo) {
     return new Promise((resolve, reject) => {
-        tools.readHtmlAndAddNav(userInfo, "/signin.html").then(result => {
-            resolve(result.replace('{ script }', '<script>window.alert("User not found! Please try again.);</script> '));
-        }).catch(err => reject(err));
+        tools.injectScript(userInfo, "/signin.html",
+            '<script>window.alert("User not found! Please try again.");</script>')
+            .then(res => resolve(res))
+            .catch(err => reject(err));
     });
 }
 
 function checkSignIn(email, password){
     return new Promise((resolve, reject) => {
-        const dbpwd = tools.createPasswordHash(password);
+        const pwdHash = tools.createPasswordHash(password);
         db_connector.getUserByUName(email).then(result => {
+            const user = result[0];
             let userInfo = {loggedIn: false, userId: "", role: ""};
-            if (Object.keys(result).length > 1) {
-                const users = result[0];
-                if (dbpwd.toUpperCase() === users.PwdHash.toUpperCase() && !users.Blocked) {
-                    userInfo = { loggedIn: true, userId: users.UserId, role: users.Userrole }
+            if (user) {
+                // TODO: need to get rid of toUpperCase()
+                if (pwdHash.toUpperCase() == user.PwdHash.toUpperCase() && !user.IsBlocked) {
+                    resolve({ loggedIn: true, userId: user.UserId, role: user.Userrole }); 
+                } else {
+                    signinErrorWrongPassword(userInfo).then(res => reject(res)).catch(err => reject(err));                
                 }
-            }
-            if (userInfo.loggedIn) {
-                resolve(userInfo);
             } else {
-                tools.injectScript(userInfo, "/signin.html", 
-                    "<script>window.alert('Username or password wrong! Please try agaim. );</script>"
-                ).then(result =>{
-                    reject(result);
-                }).catch(err => {
-                    reject(err);
-                })
+                signinErrorWrongEmail(userInfo).then(res => reject(res)).catch(err => console.log(err));
             }
         }).catch(err => {
             reject({err, redirect: '/register'});
         });
-    });         
+    });
 }
 
 module.exports = {
     getSignin,
-    SigninErrorWrongPassword,
-    SigninErrorWrongEmail,
+    signinErrorWrongPassword,
+    signinErrorWrongEmail,
     checkSignIn,
 }

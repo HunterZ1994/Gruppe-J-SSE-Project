@@ -26,7 +26,6 @@ const signin = require("./js/signin");
 const security = require("./js/security");
 
 const htmlPath = path.join(__dirname) + '/html';
-
 // basic app setup
 const app = express();
 // disabling this so client is not seeing we use nodejs
@@ -36,7 +35,12 @@ app.use(express.json());
 app.use(rateLimit(security.rateLimitConfig));
 
 // Setting helmet Options 
-app.use(helmet.contentSecurityPolicy());
+app.use(helmet.contentSecurityPolicy({
+    directives: {
+        ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+        "script-src": ["'self'", "https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js", `'nonce-${security.securityScriptHash}'`],
+    }
+}));
 app.use(helmet.dnsPrefetchControl());
 app.use(helmet.expectCt());
 app.use(helmet.frameguard({action: 'deny'}));
@@ -116,6 +120,8 @@ app.post('/login', function (req, res) {
 });
 
 app.get('/logout', function (req, res) {
+    res.cookie(tools.getEncodedName(), '', {maxAge: 0});
+    req.session[tools.getEncodedName()] = "";
     req.session.destroy();
     res.redirect('/');
 });
@@ -217,6 +223,8 @@ app.get('/product', function(req, res) {
 
 app.get('/adminPanel', function (req, res) {
     const session = tools.checkSession(req.session);
+    const userInfo = req.cookies.userInfo;
+    console.log(userInfo);
 
     if (session.role === 'admin') {
         admin.createAdminPanel(session)

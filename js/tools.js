@@ -4,6 +4,10 @@ const crypto = require('crypto');
 const bacon = require('bacon-cipher');
 const moment = require('moment');
 const { resolve } = require('path');
+const { responseLogging } = require('./interceptor');
+const { createSearchResults } = require('./search_results');
+const security = require('./security');
+const htmlParser = require('node-html-parser');
 
 const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
@@ -87,8 +91,9 @@ function buildUserTable(users) {
 	return userTable
 }
 
-function readHtmlAndAddNavAndHead(userInfo, filename) {
+function readHtmlAndAddNavAndHead(userInfo, filename, scriptHandle=false) {
     return new Promise((resolve, reject) => {
+        const script = scriptHandle ? '\n     { script }' : '';
         try {
             fs.readFile(__dirname + '/../html/' + filename, 'utf8', function (err, html) {
                 resolve(html.replace('{ navigation }', navigation.createNavigationHTML(userInfo))
@@ -96,7 +101,9 @@ function readHtmlAndAddNavAndHead(userInfo, filename) {
                         '    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n' +
                         '    <title>HardwareBay</title>\n' +
                         '    <link rel="stylesheet" type="text/css;charset=utf-8" href="/../css/style.css">\n' +
-                        '    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">'))
+                        '    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">' + 
+                        script 
+                        ))
             })
         } catch (err) {
             console.log(err);
@@ -107,8 +114,10 @@ function readHtmlAndAddNavAndHead(userInfo, filename) {
 
 function injectScript(userInfo, filenmae, script){
     return new Promise((resolve, reject) => {
-       readHtmlAndAddNavAndHead(userInfo, filenmae).then(result =>{
-           resolve(result[0].replace('{script}', script));
+       readHtmlAndAddNavAndHead(userInfo, filenmae, true).then(result =>{
+            const root = htmlParser.parse(script);
+            root.firstChild.setAttribute('nonce', security.securityScriptHash);
+           resolve(result.replace('{ script }', root.toString() + '\n'));
        }).catch(err => reject(err));
     })
 }
@@ -180,4 +189,5 @@ module.exports = {
     encodeCookie,
     buildUserTable,
     injectScript,
+    getEncodedName
 }

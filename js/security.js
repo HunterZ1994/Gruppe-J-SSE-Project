@@ -18,6 +18,9 @@ const securityHeaders = {
     }
 };
 
+const securityScriptHash = "be2d765fca5c51b3f430bb73ede903b7f530dbf82152af238736b0882edfd41d";
+
+
 const staticFileOptions = {
     setHeaders: function(res, path, stat) {
         res.set(securityHeaders.contentSecurityPolicy.name, securityHeaders.contentSecurityPolicy.value);
@@ -59,5 +62,6 @@ module.exports = {
     sessionConfig,
     csrfConfig,
     rateLimitConfig,
-    IN_PROD
+    IN_PROD,
+    securityScriptHash
 };
