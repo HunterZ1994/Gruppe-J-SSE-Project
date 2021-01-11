@@ -474,6 +474,10 @@ app.post('/comment/add', (req, res) => {
     }
 });
 
+app.get('/logfiles', (req, res) => {
+    res.send("You should not be able to see this!")
+})
+
 
 // #endregion
 
