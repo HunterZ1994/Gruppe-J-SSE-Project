@@ -3,9 +3,6 @@ const fs = require('fs')
 const crypto = require('crypto');
 const bacon = require('bacon-cipher');
 const moment = require('moment');
-const { resolve } = require('path');
-const { responseLogging } = require('./interceptor');
-const { createSearchResults } = require('./search_results');
 const security = require('./security');
 const htmlParser = require('node-html-parser');
 
