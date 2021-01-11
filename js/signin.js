@@ -1,6 +1,5 @@
-const express = require('express');
-const path = require('path');
 const tools = require("./tools");
+const db_connector = require('./database_connection');
 
 function getSignin(userInfo) {
     return new Promise((resolve, reject) => {
@@ -27,41 +26,37 @@ function SigninErrorWrongEmail(userInfo) {
     });
 }
 
-function checkSignin(email, password){
-    const dbpwd = tools.createPasswordHash(password);
-    db_connector.getUserByUName(email).then(result => {
-        if (Object.keys(result).length > 1) {
-            const users = result[0];
-            if (dbpwd.toUpperCase() === users.PwdHash.toUpperCase() && !users.Blocked) {
-                path = '/';
-            } else{
-                this.userInfo = { loggedIn: false, userId: users.UserId, role: users.Userrole }
-                userInfo = { loggedIn: false, userId: users.UserId, role: users.Userrole }
-                path = '/signin';
+function checkSignIn(email, password){
+    return new Promise((resolve, reject) => {
+        const dbpwd = tools.createPasswordHash(password);
+        db_connector.getUserByUName(email).then(result => {
+            let userInfo = {loggedIn: false, userId: "", role: ""};
+            if (Object.keys(result).length > 1) {
+                const users = result[0];
+                if (dbpwd.toUpperCase() === users.PwdHash.toUpperCase() && !users.Blocked) {
+                    userInfo = { loggedIn: true, userId: users.UserId, role: users.Userrole }
+                }
             }
-        } else {
-            path = '/signin';
-        }
-        const encoded = tools.encodeCookie('userInfo', userInfo);
-        req.session[encoded.name] = encoded.cookie;
-        req.session.save();
-        res.cookie(encoded.name, encoded.cookie);
-        if (path === '/') {
-            res.redirect(path);
-        } else {
-            tools.injectScript(tools.checkSession(req.session), "/signin.html", 
-                "<script>window.alert('Username or password wrong! Please try agaim. );</script>"
-            ).then(result =>{
-                res.send(result);
-            })
-        }
-    });
-            
+            if (userInfo.loggedIn) {
+                resolve(userInfo);
+            } else {
+                tools.injectScript(userInfo, "/signin.html", 
+                    "<script>window.alert('Username or password wrong! Please try agaim. );</script>"
+                ).then(result =>{
+                    reject(result);
+                }).catch(err => {
+                    reject(err);
+                })
+            }
+        }).catch(err => {
+            reject({err, redirect: '/register'});
+        });
+    });         
 }
 
 module.exports = {
     getSignin,
     SigninErrorWrongPassword,
     SigninErrorWrongEmail,
-    checkSignin,
+    checkSignIn,
 }

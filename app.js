@@ -23,7 +23,7 @@ const tools = require("./js/tools");
 const interceptor = require('./js/interceptor');
 const session = require('express-session');
 const admin = require('./js/admin_panel');
-const signin = require("./js/signin")
+const signin = require("./js/signin");
 
 // basic app setup
 const app = express();
@@ -38,11 +38,14 @@ app.use(rateLimit({
     max: 100, // only 100 requests per client per windowMS
     delayMs: 0 // disable delay -> user hasfull speed until limit
 }));
+app.disable('x-powered-by');
 
 // Setting helmet Options 
 app.use(helmet.dnsPrefetchControl());
 app.use(helmet.expectCt());
-app.use(helmet.frameguard());
+app.use(helmet.frameguard({
+    action: 'deny'
+}));
 app.use(helmet.hidePoweredBy());
 app.use(helmet.hsts());
 app.use(helmet.ieNoOpen());
@@ -83,14 +86,13 @@ app.use(session({
 // This has to be in this order!! 
 // honestly don't mess with it, it will crash EVERYTHING!
 app.use(cookieParser());
-const csrfProtection = csrf({
+app.use(csrf({
     cookie: true, 
     httpOnly: true, 
     maxAge: TWO_HOURS, 
-    sameSite: 'strict', 
-    secure: IN_PROD
-});
-app.use(csrfProtection);
+    sameSite: true, 
+    secure: IN_PROD,
+}));
 app.use(interceptor.decodeRequestCookie);
 
 const securityHeaders = {
@@ -146,7 +148,27 @@ app.get('/login', function (req, res) {
 });
 
 app.post('/login', function (req, res) {
-   
+    signin.checkSignIn(req.body.email, req.body.password)
+        .then(userInfo => {
+            const encoded = tools.encodeCookie('userInfo', userInfo);
+            req.session[encoded.name] = encoded.cookie;
+            req.session.save();
+            res.cookie(encoded.name, encoded.cookie, {
+                httpOnly: true,
+                sameSite: 'strict',
+            });
+            res.redirect('/');
+        })
+        .catch(err => {
+            if (typeof err === 'string') {
+                res.send(html);
+            } else {
+                if (err.redirect) {
+                    res.redirect(err.redirect);
+                }
+                console.log(err);
+            }
+        });
 });
 
 app.get('/logout', function (req, res) {
