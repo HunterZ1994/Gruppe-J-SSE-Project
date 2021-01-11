@@ -74,8 +74,7 @@ function buildUserTable(users) {
         userTable += '       <th>E-Mail</th>\n'
         userTable += '       <th>Gesperrt</th>\n'
         userTable += '   </tr>\n'
-
-        console.log(users);
+        
         for (const user of users) {
             userTable += '   <tr>\n'
             userTable += '        <td class="user-name">' + user.SureName + '</td>\n'
