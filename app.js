@@ -1,5 +1,8 @@
 // node modules
 const express = require('express');
+const http = require('http');
+const https = require('https');
+const fs = require('fs');
 const path = require('path');
 const formidable = require('formidable');
 const cookieParser = require('cookie-parser');
@@ -500,6 +503,19 @@ app.get('/logfiles', (req, res) => {
 
 const port = process.env.PORT || 8080;
 
-const server = app.listen(port, function () {
-    console.log("Server listening on port %s...", port);
-});
+const options = {
+    hostname: "hardware.bay",
+    key: fs.readFileSync('./hardware.bay.key').toString(),
+    cert: fs.readFileSync('./hardware.bay.crt').toString()
+};
+
+if (security.IN_PROD) {
+    https.createServer(options, app).listen(port, function() {
+        console.log("Server PRODUCTION listening on port %s...", port);
+    });    
+} else {
+    http.createServer(app.listen(port, function() {
+        console.log("Server DEVELOPMENT listening on port %s...", port);
+    }));
+}   
+
