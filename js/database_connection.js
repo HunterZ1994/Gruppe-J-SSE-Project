@@ -1,6 +1,6 @@
 const mariadb = require('mariadb');
 const pool = mariadb.createPool({
-    host: 'localhost',
+    host: 'hwb_db',
     user:'hardwarebay',
     password: '123',
     database: 'hardwarebay',
@@ -14,7 +14,7 @@ const pool = mariadb.createPool({
 function getSearchedArticles(key = '') {
     return new Promise((resolve, reject) => {
         pool.getConnection().then(con => {
-            let sql = 'select * from articles'
+            let sql = 'select * from Articles'
             sql += (key === '') ? ' limit 10' : ' where ArticleName like ?'
             con.query(sql, `%${key}%`)
                 .then(rows => {
@@ -31,7 +31,7 @@ function getSearchedArticles(key = '') {
 function getArticleById(articleId='') {
     return new Promise((resolve, reject) => {
         pool.getConnection().then(con => {
-            const sql = 'SELECT * FROM articles WHERE articleId = ?';
+            const sql = 'SELECT * FROM Articles WHERE ArticleId = ?';
             con.query(sql, articleId).then(rows => {
                 resolve(rows);
                 con.end()
@@ -46,7 +46,7 @@ function getArticleById(articleId='') {
 function getArticleByName(articleName='') {
     return new Promise((resolve, reject) => {
         pool.getConnection().then(con => {
-            const sql = 'select * from articles where ArticleName LIKE %?%';
+            const sql = 'select * from Articles where ArticleName LIKE %?%';
             con.query(sql, articleName)
             .then(rows => {
                 resolve(rows);
@@ -62,7 +62,7 @@ function getArticleByName(articleName='') {
 function getArticlesOfVendor(userId = 0) {
     return new Promise((resolve, reject) => {
         pool.getConnection().then(con => {
-            const sql = 'SELECT * FROM articles  WHERE Seller = ?'
+            const sql = 'SELECT * FROM Articles WHERE Seller = ?'
             con.query(sql, userId)
             .then(res => {
                 resolve(res);
@@ -79,7 +79,7 @@ function getArticlesOfVendor(userId = 0) {
 function addArticle(article, userId) {
     return new Promise((resolve, reject) => {
        pool.getConnection().then(con => {
-            const sql = 'insert into articles (ArticleName, Descpt, Price, ImagePath, Seller) VALUES (?, ?, ?, ?, ?)'
+            const sql = 'insert into Articles (ArticleName, Descpt, Price, ImagePath, Seller) VALUES (?, ?, ?, ?, ?)'
             const values = [article.articleName, article.descpt, article.price, article.imagePath, userId];
            con.query(sql, values)
            .then(rows => {
@@ -99,7 +99,7 @@ function addArticle(article, userId) {
 function updateArticle(article) {
     return new Promise((resolve, reject) => {
         pool.getConnection().then(con => {
-            const sql = "UPDATE articles SET articleName = ?, descpt = ?, Price = ?, imagePath = ? WHERE articleId = ?"
+            const sql = "UPDATE Articles SET ArticleName = ?, Descpt = ?, Price = ?, ImagePath = ? WHERE ArticleId = ?"
             const values = [article.articleName, article.descpt, article.price, article.imagePath, article.articleId];
             con.query(sql, values).then(res => {
                 resolve(res)
@@ -115,7 +115,7 @@ function updateArticle(article) {
 function deleteArticle(articleId) {
     return new Promise((resolve, reject) => {
         pool.getConnection().then(con => {
-            const sql = "DELETE FROM holds WHERE Article = ?; DELETE FROM comments WHERE Article = ?; DELETE FROM articles WHERE ArticleId = ?";
+            const sql = "DELETE FROM Holds WHERE Article = ?; DELETE FROM Comments WHERE Article = ?; DELETE FROM Articles WHERE ArticleId = ?";
             con.query(sql, [articleId, articleId, articleId]).then(res => {
                 resolve(res)
                 con.end()
@@ -151,7 +151,7 @@ function addArticleComment(comment, articleId, userId) {
 function getCommentsOfArticle(articleId) {
     return new Promise((resolve, reject) => {
         pool.getConnection().then(con => {
-            const sql = "SELECT FirstName, ComText FROM (comments INNER JOIN articles ON comments.Article = articles.ArticleId) INNER JOIN users ON comments.User = users.UserId WHERE article = ?";
+            const sql = "SELECT FirstName, ComText FROM (Comments INNER JOIN Articles ON Comments.Article = Articles.ArticleId) INNER JOIN Users ON Comments.User = Users.UserId WHERE Article = ?";
             con.query(sql, articleId).then(res => {
                 resolve(res)
                 con.end()
@@ -166,7 +166,7 @@ function getCommentsOfArticle(articleId) {
 function getCommentsOfUser(userId) {
     return new Promise((resolve, reject) => {
         pool.getConnection().then(con => {
-            const sql = "SELECT * FROM comments INNER JOIN users ON comments.User = users.UserId WHERE user = ?";
+            const sql = "SELECT * FROM Comments INNER JOIN Users ON Comments.User = Users.UserId WHERE User = ?";
             con.query(sql, userId).then(res => {
                 resolve(res)
                 con.end()
@@ -186,7 +186,7 @@ function getAllUsers() {
     return new Promise((resolve, reject) => {
         pool.getConnection()
             .then(con => {
-                const sql = 'SELECT * FROM users';
+                const sql = 'SELECT * FROM Users';
                 con.query(sql).then(rows => {
                     resolve(rows)
                     con.end()
@@ -216,7 +216,7 @@ function blockUser(userId) {
 function deleteUser(userId) {
     return new Promise((resolve, reject) => {
         pool.getConnection().then(con => {
-            const sql = "DELETE FROM users WHERE UserId = ?";
+            const sql = "DELETE FROM Users WHERE UserId = ?";
             con.query(sql, userId).then(res => {
                 resolve(res)
                 con.end()
@@ -232,7 +232,7 @@ function getUserById(userId = ''){
     return new Promise((resolve, reject) => {
         pool.getConnection()
         .then(con => {
-            const sql = 'SELECT * FROM users WHERE UserId = ?';
+            const sql = 'SELECT * FROM Users WHERE UserId = ?';
             con.query(sql, userId)
             .then(rows => {
                 resolve(rows);
@@ -248,7 +248,7 @@ function getUserByEmail(userEmail ='') {
     return new Promise((resolve, reject) => {
         pool.getConnection()
             .then(con => {
-                const sql = 'SELECT * FROM users WHERE user.Email = ?';
+                const sql = 'SELECT * FROM Users WHERE User.Email = ?';
                 con.query(sql, userEmail)
                     .then(rows => {
                         resolve(rows)
@@ -265,7 +265,7 @@ function getUserByEmail(userEmail ='') {
 function getUserByUName(username ='') {
     return new Promise((resolve, reject) => {
         pool.getConnection().then(con => {
-            let sql = 'select * from users'
+            let sql = 'select * from Users'
             sql += (username === '') ? ' limit 10' : ' where Email like \'%' + username + '%\''
             con.query({sql: sql})
                 .then(rows => {
@@ -282,9 +282,9 @@ function getUserByUName(username ='') {
 function addUser(user) {
     return new Promise((resolve, reject) =>{
         pool.getConnection().then(con => {
-            con.query('SELECT COUNT(*) AS userCount FROM users').then(rows => {
+            con.query('SELECT COUNT(*) AS UserCount FROM Users').then(rows => {
                 const UId = Date.now() + rows[0].userCount + 13417;
-                const sql = 'INSERT INTO users (UId, Email , FirstName, SureName, Street , HouseNr, PostCode, City, Userrole, PwdHash, SecQuestion, SecAnswer) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+                const sql = 'INSERT INTO Users (UId, Email , FirstName, SureName, Street , HouseNr, PostCode, City, Userrole, PwdHash, SecQuestion, SecAnswer) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
                 const values = [UId, user.email, user.firstName, user.sureName, user.street, user.houseNr, user.postalCode, user.city, 'customer', user.pwHash, user.security_question, user.secAnswerHash];
                 con.query(sql, values).then(rows => {
                     con.end()
@@ -304,7 +304,7 @@ function addUser(user) {
 function checkIfEmailExists(user) {
     return new Promise((resolve, reject) =>{
         pool.getConnection().then(con =>{
-            let sql = 'select * from users where Email = ?';
+            let sql = 'select * from Users where Email = ?';
             con.query(sql, user.email).then(rows => {
                 resolve(rows)
                 con.end()
@@ -319,7 +319,7 @@ function checkIfEmailExists(user) {
 function isValidUserID(user){
     return new Promise((resolve, reject) =>{
         pool.getConnection().then(con =>{
-            let sql = 'select * from users where UserId = ?';
+            let sql = 'select * from Users where UserId = ?';
             con.query(sql, user.userID).then(rows => {
                 resolve(rows)
                 con.end()
@@ -334,7 +334,7 @@ function isValidUserID(user){
 function getSecQuestionByEmail(email = '') {
     return new Promise((resolve, reject) => {
         pool.getConnection().then(con => {
-            let sql = 'select SecQuestion from users where Email like ?'
+            let sql = 'select SecQuestion from Users where Email like ?'
             con.query(sql, email)
                 .then(rows => {
                     resolve(rows)
@@ -350,7 +350,7 @@ function getSecQuestionByEmail(email = '') {
 function checkSecurityAnswer(email, answer) {
     return new Promise((resolve, reject) => {
         pool.getConnection().then(con => {
-            let sql = 'select count(UserId) as found from users where Email = ? and SecAnswer = ?';
+            let sql = 'select count(UserId) as found from Users where Email = ? and SecAnswer = ?';
             con.query(sql, [email, answer]).then(rows => {
                 resolve(rows)
                 con.end()
@@ -365,7 +365,7 @@ function checkSecurityAnswer(email, answer) {
 function changePassword(email, password) {
     return new Promise((resolve, reject) => {
         pool.getConnection().then(con => {
-            let sql = 'update users set PwdHash = ? WHERE Email = ?'
+            let sql = 'update Users set PwdHash = ? WHERE Email = ?'
             con.query(sql, [password, email])
                 .then(rows => {
                     resolve()
@@ -384,7 +384,7 @@ function getCartByUserId(userId='') {
     return new Promise((resolve, reject) => {
         pool.getConnection()
         .then(conn => {
-            const sql = 'SELECT * FROM carts WHERE User = ?';
+            const sql = 'SELECT * FROM Carts WHERE User = ?';
             conn.query(sql, userId)
             .then(rows => {
                 resolve(rows);
@@ -407,7 +407,7 @@ function getCartArticles(cartId='') {
     return new Promise((resolve, reject) => {
         pool.getConnection()
         .then(conn => {
-            const sql = "SELECT * FROM holds INNER JOIN articles ON articles.ArticleId = holds.Article WHERE cart = ?"
+            const sql = "SELECT * FROM Holds INNER JOIN Articles ON Articles.ArticleId = Holds.Article WHERE Cart = ?"
             conn.query(sql, cartId)
             .then(rows => {
                 resolve(rows);
@@ -430,7 +430,7 @@ function createCart(userId='') {
     return new Promise((resolve, reject) => {
         pool.getConnection()
         .then(conn => {
-            const sql = 'INSERT INTO carts (User) VALUES (?)'
+            const sql = 'INSERT INTO Carts (User) VALUES (?)'
             conn.query(sql, userId)
             .then(rows => {
                 resolve(rows)
@@ -452,7 +452,7 @@ function addArticleToCart(cartId = '', articleId = '', amount='') {
     return new Promise((resolve, reject) => {
         pool.getConnection()
         .then(conn => {
-            const sql = 'INSERT INTO holds (Cart, Article, ArticleAmount) VALUES (?, ?, ?)'
+            const sql = 'INSERT INTO Holds (Cart, Article, ArticleAmount) VALUES (?, ?, ?)'
             conn.query(sql, [cartId, articleId, amount])
             .then(rows => {
                 resolve(rows)
@@ -474,7 +474,7 @@ function deletreArticleFromCart(cartId, articleId) {
     return new Promise((resolve, reject) => { 
         pool.getConnection()
         .then(conn => {
-            const sql = "DELETE FROM holds WHERE Cart = ? AND Article = ?;"
+            const sql = "DELETE FROM Holds WHERE Cart = ? AND Article = ?;"
             conn.query(sql, [cartId, articleId])
             .then(rows => {
                 conn.end();
@@ -496,7 +496,7 @@ function clearCart(cartId='') {
     return new Promise((resolve, reject) => { 
         pool.getConnection()
         .then(conn => {
-            const sql = "DELETE FROM holds WHERE Cart = ?;"
+            const sql = "DELETE FROM Holds WHERE Cart = ?;"
             conn.query(sql, [cartId])
             .then(rows => {
                 conn.end();
