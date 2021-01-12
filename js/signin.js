@@ -37,7 +37,6 @@ function checkSignIn(email, password){
             const user = result[0];
             let userInfo = {loggedIn: false, userId: "", role: ""};
             if (user) {
-                // TODO: need to get rid of toUpperCase()
                 if (pwdHash.toUpperCase() === user.PwdHash.toUpperCase() && !user.IsBlocked) {
                     resolve({ loggedIn: true, userId: user.UserId, role: user.Userrole }); 
                 } else {
