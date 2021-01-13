@@ -24,7 +24,7 @@ function deleteUser(userInfo, userId) {
 	
         db_connector.getUserById(userId)
         .then(results => {
-            if (!(results[0].Userrole === 'admin' || results[0].Userrol === 'vendor')) {
+            if (!(results[0].Userrole === 'customer' || results[0].Userrole === 'vendor')) {
                 db_connector.deleteUser(userId)
                     .then(rows => {
                         resolve(true);
@@ -33,7 +33,7 @@ function deleteUser(userInfo, userId) {
                         reject({err, redirect: '/adminPanel'});
                     });
             } else {
-                reject({ redirect: '/adminPanel' });
+                reject({ redirect: '/' });
             }
         })
         .catch(err => reject({err, redirect: 'adminPanel'}));
@@ -48,7 +48,7 @@ function blockUser(userInfo, userId) {
         }
         db_connector.getUserById(userId)
         .then(results => {
-            if (!(results[0].Userrole === 'admin' || results[0].Userrole === 'vendor')) {
+            if (!(results[0].Userrole === 'customer' || results[0].Userrole === 'vendor')) {
                 db_connector.blockUser(userId)
                     .then(rows => {
                         resolve(true);
@@ -57,7 +57,7 @@ function blockUser(userInfo, userId) {
                         reject({err, redirect: '/adminPanel'});
                     });
             } else {
-                reject({ redirect: '/adminPanel' });
+                reject({ redirect: '/' });
             }
         })
         .catch(err => {
