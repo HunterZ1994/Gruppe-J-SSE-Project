@@ -24,7 +24,7 @@ function deleteUser(userInfo, userId) {
 	
         db_connector.getUserById(userId)
         .then(results => {
-            if (!(results[0].Userrole === 'customer' || results[0].Userrole === 'vendor')) {
+            if (results[0].Userrole === 'admin') {
                 db_connector.deleteUser(userId)
                     .then(rows => {
                         resolve(true);
@@ -48,7 +48,7 @@ function blockUser(userInfo, userId) {
         }
         db_connector.getUserById(userId)
         .then(results => {
-            if (!(results[0].Userrole === 'customer' || results[0].Userrole === 'vendor')) {
+            if (results[0].Userrole === 'admin') {
                 db_connector.blockUser(userId)
                     .then(rows => {
                         resolve(true);
