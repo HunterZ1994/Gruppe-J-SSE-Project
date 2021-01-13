@@ -21,6 +21,7 @@ function createArticleView(userInfo, articleId) {
     });
 }
 
+
 function buildArticlePage(userInfo, article, comments) {
     return new Promise((resolve, reject) => {
         tools.readHtmlAndAddNav(userInfo, '/article.html')
