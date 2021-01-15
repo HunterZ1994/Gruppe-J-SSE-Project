@@ -50,12 +50,13 @@
 
         <div class="row bottom-space">
             <label for="password">Passwort</label>
-            <input type="password" name="password" id="password" required>
+            <input type="password" pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$" name="password" id="password" placeholder="Passwort" required>
+            <lable for="password" id="password_Format">Passwort muss aus min. ! Grußbuchstaben, min. 1 Kleinbuchstaben, min. 1 Sonderzeichen, min 1 Zahl und min. 8 Zeichen lang sein.</lable>
         </div>
 
         <div class="row bottom-space">
             <label for="password second">Passwort widerholen</label>
-            <input type="password" name="password_second" id="password_second" oninput="" required>
+            <input type="password" name="password_second" id="password_second" placeholder="Passwort widerholen"required>
             <lable for="password_second" id="passwordCorrect">Passwörter stimmen nicht überein!</lable>
         </div>
 
