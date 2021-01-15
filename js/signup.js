@@ -24,7 +24,7 @@ function signinErrorUserExists(userInfo) {
 }
 
 
-function checkSignUp(user, session) {
+function checkSignUp(user) {
     return new Promise((resolve, reject) => {
         user.pwHash = tools.createPasswordHash(user.password);
         user.secAnswerHash = tools.createPasswordHash(user.security_answer)
@@ -35,13 +35,15 @@ function checkSignUp(user, session) {
                 db_connector.addUser(user).then(result => {
                     if (result.warningStatus === 0) {
                         return new Promise((resolve, reject) => {
-                            tools.readHtmlAndAddNav(session, "/signin.html").then(result => {
+                            tools.readHtmlAndAddNav(userInfo, "/signin.html").then(result => {
                                 resolve(result.replace('{ script }', ""));
                             }).catch(err => reject(err));
                         });
                     } else {
                         resolve(signinErrorUserExists(user));
                     }
+                }).catch(err =>{
+                    reject(err);
                 });
             }
         }).catch(err => {

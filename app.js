@@ -149,6 +149,7 @@ app.post('/register', [check('firstName').escape().trim(),
     check('postalCode').escape().isNumeric().trim(),
     check('city').escape().trim(),
     check('email').escape().isEmail().trim(),
+    // check('password').escape().matches("(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$").trim(),
     check('security_question').escape().trim(),
     check('security_answer').escape().trim()], function (req, res) {
     const errors = validationResult(req);
@@ -157,10 +158,14 @@ app.post('/register', [check('firstName').escape().trim(),
         const user = req.body;
         user.pwHash = tools.createPasswordHash(user.password);
         user.secAnswerHash = tools.createPasswordHash(user.security_answer)
-        signup.checkSignUp(user, tools.checkSession(req.session)).then(result =>{
+        // var userInfo = tools.checkSession(req.session) 
+        signup.checkSignUp(user).then(result =>{
             res.send(result)
+        }).catch(err =>{
+            res.send(err);
         });
     } else {
+        console.log(errors);
         res.redirect('/');
     }
 });
