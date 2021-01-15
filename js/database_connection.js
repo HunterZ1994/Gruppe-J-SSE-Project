@@ -152,7 +152,7 @@ function addArticleComment(comment, articleId, userId) {
 function getCommentsOfArticle(articleId) {
     return new Promise((resolve, reject) => {
         pool.getConnection().then(con => {
-            const sql = "SELECT FirstName, ComText FROM (Comments INNER JOIN Articles ON Comments.Article = Articles.ArticleId) INNER JOIN Users ON Comments.User = Users.UserId WHERE Article = ?";
+            const sql = "SELECT FirstName, ComText FROM (Comments INNER JOIN Articles ON Comments.Article = Articles.ArticleId) INNER JOIN Users ON Comments.User = Users.UId WHERE Article = ?";
             con.query(sql, articleId).then(res => {
                 resolve(res)
                 con.end()
@@ -187,7 +187,7 @@ function getAllUsers() {
 function blockUser(userId) {
     return new Promise((resolve, reject) => {
         pool.getConnection().then(con => {
-            const sql = "UPDATE Users SET Blocked = ? WHERE UserId = ?"
+            const sql = "UPDATE Users SET Blocked = ? WHERE UId = ?"
             con.query(sql, [true, userId]).then(res => {
                 resolve(res)
                 con.end()
@@ -202,7 +202,7 @@ function blockUser(userId) {
 function deleteUser(userId) {
     return new Promise((resolve, reject) => {
         pool.getConnection().then(con => {
-            const sql = "DELETE FROM Users WHERE UserId = ?";
+            const sql = "DELETE FROM Users WHERE UId = ?";
             con.query(sql, userId).then(res => {
                 resolve(res)
                 con.end()
@@ -218,7 +218,7 @@ function getUserById(userId = ''){
     return new Promise((resolve, reject) => {
         pool.getConnection()
         .then(con => {
-            const sql = 'SELECT * FROM Users WHERE UserId = ?';
+            const sql = 'SELECT * FROM Users WHERE UId = ?';
             con.query(sql, userId)
             .then(rows => {
                 resolve(rows);
@@ -267,7 +267,7 @@ function addUser(user) {
             })
         }).catch(err => reject(err))
     });
-} 
+}
 
 function checkIfEmailExists(user) {
     return new Promise((resolve, reject) =>{
@@ -424,7 +424,7 @@ function addArticleToCart(cartId = '', articleId = '', amount='') {
 }
 
 function deletreArticleFromCart(cartId, articleId) {
-    return new Promise((resolve, reject) => { 
+    return new Promise((resolve, reject) => {
         pool.getConnection()
         .then(conn => {
             const sql = "DELETE FROM Holds WHERE Cart = ? AND Article = ?;"
@@ -446,7 +446,7 @@ function deletreArticleFromCart(cartId, articleId) {
 }
 
 function clearCart(cartId='') {
-    return new Promise((resolve, reject) => { 
+    return new Promise((resolve, reject) => {
         pool.getConnection()
         .then(conn => {
             const sql = "DELETE FROM Holds WHERE Cart = ?;"
@@ -468,14 +468,14 @@ function clearCart(cartId='') {
 }
 
 module.exports = {
-    getSearchedArticles, 
-    getUserByUName, 
+    getSearchedArticles,
+    getUserByUName,
     getArtcileById: getArticleById,
-    addArticle, 
+    addArticle,
     updateArticle,
     deleteArticle,
     getArtcileByName: getArticleByName,
-    getArticlesOfVendor, 
+    getArticlesOfVendor,
     addArticleComment,
     getCommentsOfArticle,
     addUser,

@@ -83,23 +83,23 @@ INSERT INTO Users (UId, Email, FirstName, SureName, Street, HouseNr, City, PostC
     VALUES (1610405071354,"wiener@gmail.de", "Peter", "Wiener", "Wienerstreet", 10, "Wienertown", 1234, "customer", "29FEB5D3B68F493955A9C688197C580C99CD2EC416221D3537CE00C48C5765F2", "Forget it!", "99ca0ecb1cba528c0296b46baa1a979fb23fef7fa8ac89a2bc2e6f5b01fa427b");
 
 INSERT INTO Articles (ArticleName, Descpt, Price, ImagePath, Seller) 
-VALUES ("Pfannenwender", "Hydrodynamischer Pfannenwender mit Turbo", 100, "/images/hydrodyn_pfannenwender.jpg", 3),
-        ("Node", "Node.js mit Turbo", 99, "/images/node_logo.jpg", 3),
-        ("RTX 3090", "Die neue Nvidia Geforce RTX 3090 mit Turbo", 1799, "/images/rtx.jpg", 3),
-        ("Intel Core i9 9900K 8x 3.60GHz", "Intel i9 mit Turbo", 338, "/images/intel_i9.jpg", 3),
-        ("Festplatte", "Eine 2000GB Festplatte mit Turbo", 49, "/images/festplatte.jpg", 3),
-        ("8GB MSI Radeon RX 580", "8GB MSI Radeon RX 580 Armor 8G OC Aktiv PCIe 3.0 x16 (Retail) OHNE Turbo", 100, "/images/armor.jpg", 3),
-        ("64GB RAM", "64GB (2x 32768MB) Patriot PC3200 Viper Steel.\nWer braucht so viel Arbeitsspeicher? Ich meine, das sind 64(!)GB?!? mit Turbo", 200, "/images/ram.jpg", 3),
-        ("CHERRY Stream Keyboard 2019 schwarz", "Tastatur mit Turbo", 25, "/images/keyboard.jpg", 3),
-        ("MSI Bildschirm", "34\" (86,36cm) MSI Prestige PS341WU Weiß 5120x2160 1xDisplayPort 1.4 / 2xHDMI 2.0 / 1xUSB-C mit Turbo", 1200, "/images/bildschirm_1.jpg", 3),
-        ("MSI Optix Bildschirm", "23,6\" (59,94cm) MSI Optix G241VC schwarz 1920x1080 1xHDMI 1.4 / 1xVGA mit Turbo", 300, "/images/bildschirm_2.jpg", 3),
-        ("Tomahawk Mainboard", "MSI MAG B550 Tomahawk, ATX, So.AM4 (7C91-001R) mit Turbo", 200, "/images/mb_1.jpg", 3),
-        ("Gaming Plus Mainboard", "MSI B450 Gaming Plus MAX AMD B450 So.AM4 Dual Channel DDR4 ATX Retail Turbo", 70, "/images/mb_2.jpg", 3),
-        ("Illegale Sachen", "Illegale Sachen mit Turbo", 10000, "/images/illegale_sachen.jpg", 3);
+VALUES ("Pfannenwender", "Hydrodynamischer Pfannenwender mit Turbo", 100, "/images/hydrodyn_pfannenwender.jpg", 1610405040523),
+        ("Node", "Node.js mit Turbo", 99, "/images/node_logo.jpg", 1610405040523),
+        ("RTX 3090", "Die neue Nvidia Geforce RTX 3090 mit Turbo", 1799, "/images/rtx.jpg", 1610405040523),
+        ("Intel Core i9 9900K 8x 3.60GHz", "Intel i9 mit Turbo", 338, "/images/intel_i9.jpg", 1610405040523),
+        ("Festplatte", "Eine 2000GB Festplatte mit Turbo", 49, "/images/festplatte.jpg", 1610405040523),
+        ("8GB MSI Radeon RX 580", "8GB MSI Radeon RX 580 Armor 8G OC Aktiv PCIe 3.0 x16 (Retail) OHNE Turbo", 100, "/images/armor.jpg", 1610405040523),
+        ("64GB RAM", "64GB (2x 32768MB) Patriot PC3200 Viper Steel.\nWer braucht so viel Arbeitsspeicher? Ich meine, das sind 64(!)GB?!? mit Turbo", 200, "/images/ram.jpg", 1610405040523),
+        ("CHERRY Stream Keyboard 2019 schwarz", "Tastatur mit Turbo", 25, "/images/keyboard.jpg", 1610405040523),
+        ("MSI Bildschirm", "34\" (86,36cm) MSI Prestige PS341WU Weiß 5120x2160 1xDisplayPort 1.4 / 2xHDMI 2.0 / 1xUSB-C mit Turbo", 1200, "/images/bildschirm_1.jpg", 1610405040523),
+        ("MSI Optix Bildschirm", "23,6\" (59,94cm) MSI Optix G241VC schwarz 1920x1080 1xHDMI 1.4 / 1xVGA mit Turbo", 300, "/images/bildschirm_2.jpg", 1610405040523),
+        ("Tomahawk Mainboard", "MSI MAG B550 Tomahawk, ATX, So.AM4 (7C91-001R) mit Turbo", 200, "/images/mb_1.jpg", 1610405040523),
+        ("Gaming Plus Mainboard", "MSI B450 Gaming Plus MAX AMD B450 So.AM4 Dual Channel DDR4 ATX Retail Turbo", 70, "/images/mb_2.jpg", 1610405040523),
+        ("Illegale Sachen", "Illegale Sachen mit Turbo", 10000, "/images/illegale_sachen.jpg", 1610405040523);
 
 INSERT INTO Comments (ComText, User, Article) 
-    VALUES ("Was ein super Pfannenwender!", 4, 1);
+    VALUES ("Was ein super Pfannenwender!", 1610405071354, 1);
 
-INSERT INTO Carts (User) VALUES (4);
+INSERT INTO Carts (User) VALUES (1610405071354);
 
-INSERT INTO Holds (Cart, Article, ArticleAmount) VALUES (1, 1, 10);
+INSERT INTO Holds (Cart, Article, ArticleAmount) VALUES (1, 1, 1);
