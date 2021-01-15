@@ -253,8 +253,6 @@ app.get('/adminPanel/delete', function (req, res) {
     const userInfo = req.cookies.userInfo;
     const isAdmin = userInfo.role === 'admin';
     const userId = req.query.userId;
-
-    console.log(userInfo)
     
     if (!isAdmin) {
         res.redirect('/');
@@ -349,7 +347,7 @@ app.get('/article/delete', function (req, res) {
     } else {
         vendor.deleteArticle(userInfo, articleId)
             .then(html => {
-                res.send(html);
+                res.redirect('/');
             })
             .catch(err => {
                 res.status = err.code;
@@ -387,7 +385,7 @@ app.post('/article/edit', function (req, res) {
         const form = new formidable.IncomingForm();
         form.parse(req, function (err, fields, files) {
             vendor.updateArticle(userInfo, fields, files)
-                .then(html => res.send(html))
+                .then(html => res.redirect('/'))
                 .catch(err => {
                     res.status = err.code;
                     res.send(err.html);

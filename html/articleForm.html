@@ -10,6 +10,9 @@
         <br/><br/><br/><br/>
 
         <form id="form" method="POST" action="add" class="column" enctype="multipart/form-data">
+            <div class="row">
+                { csrf }
+            </div>
             <input type="hidden" name="articleId" id="articleId"/>
             <div class="row bottom-space" name>
                 <label for="articleName">Artikelbezeichnung</label>
@@ -33,10 +36,6 @@
             
             <div class="row bottom-space">
                 { image }
-            </div>
-
-            <div class="row">
-                { csrf }
             </div>
 
             <div class="row bottom-space">

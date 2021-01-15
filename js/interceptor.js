@@ -1,6 +1,8 @@
 const bacon = require('bacon-cipher');
 const security = require('./security');
 const fs = require('fs');
+const htmlParser = require('node-html-parser');
+const { htmlPrefilter } = require('jquery');
 const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 function decodeRequestCookie(req, res, next) {
@@ -41,9 +43,15 @@ function allowXSS(req, res, next) {
 
 function appendCSRFToken(req, res, next) {
     const oldSend = res.send;
-    const csrf = `<input type="hidden" name="_csrf" value="${req.csrfToken()}"/>`;
+    const csrfToken = req.csrfToken();
+    const csrf = `<input type="hidden" name="_csrf" value="${csrfToken}"/>`;
     res.send = function(data) {
-        oldSend.apply(res, [data.replace('{ csrf }', csrf)]);
+        const root = htmlParser.parse(data);
+        if (req.path.toLowerCase().includes('article') && req.method === 'GET') {
+            root.querySelector('#form').setAttribute('action', root.querySelector('#form').getAttribute('action') + `/?_csrf=${csrfToken}`);
+            content = root.toString();
+        }
+        oldSend.apply(res, [root.toString().replace('{ csrf }', csrf)]);
     }  
 
     res.sendFile = function(data) {
