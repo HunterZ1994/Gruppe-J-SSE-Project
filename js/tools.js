@@ -85,6 +85,7 @@ function buildUserTable(users) {
 
             userTable += '   </tr>\n'
         }
+        userTable += '</table>'
     }
 	return userTable
 }

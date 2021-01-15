@@ -259,7 +259,9 @@ app.get('/adminPanel', function (req, res) {
 
     if (userInfo && userInfo.role === 'admin') {
         admin.createAdminPanel(userInfo)
-            .then(html => res.send(html))
+            .then(html => {
+                res.send(html);
+            })
             .catch(err => {
                 res.status = err.code;
                 res.send(err.html);
