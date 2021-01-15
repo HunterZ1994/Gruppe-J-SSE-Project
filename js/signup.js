@@ -35,7 +35,7 @@ function checkSignUp(user) {
                 db_connector.addUser(user).then(result => {
                     if (result.warningStatus === 0) {
                         return new Promise((resolve, reject) => {
-                            tools.readHtmlAndAddNav(userInfo, "/").then(result => {
+                            tools.readHtmlAndAddNav(userInfo, "/signin").then(result => {
                                 resolve(result.replace('{ script }', ""));
                             }).catch(err => reject(err));
                         });
