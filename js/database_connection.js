@@ -1,7 +1,7 @@
 const mariadb = require('mariadb');
 const security = require('./security');
 const pool = mariadb.createPool({
-    host: security.IN_PROD ? 'localhost' : 'hwb_db',
+    host: security.IN_PROD ? 'hwb_db' : 'localhost',
     user:'hardwarebay',
     password: '123',
     database: 'hardwarebay',
@@ -164,21 +164,6 @@ function getCommentsOfArticle(articleId) {
     });
 }
 
-function getCommentsOfUser(userId) {
-    return new Promise((resolve, reject) => {
-        pool.getConnection().then(con => {
-            const sql = "SELECT * FROM Comments INNER JOIN Users ON Comments.User = Users.UserId WHERE User = ?";
-            con.query(sql, userId).then(res => {
-                resolve(res)
-                con.end()
-            }).catch(err => {
-                reject(err)
-                con.end()
-            });
-        }).catch(err => reject(err));
-    });
-}
-
 //#endregion
 
 // #region user
@@ -245,24 +230,6 @@ function getUserById(userId = ''){
     });
 }
 
-function getUserByEmail(userEmail ='') {
-    return new Promise((resolve, reject) => {
-        pool.getConnection()
-            .then(con => {
-                const sql = 'SELECT * FROM Users WHERE User.Email = ?';
-                con.query(sql, userEmail)
-                    .then(rows => {
-                        resolve(rows)
-                        con.end()
-                    })
-                    .catch(err => {
-                        reject(err)
-                        con.end()
-                    });
-            }).catch(err => reject(err));
-    });
-}
-
 function getUserByUName(username ='') {
     return new Promise((resolve, reject) => {
         pool.getConnection().then(con => {
@@ -284,7 +251,7 @@ function addUser(user) {
     return new Promise((resolve, reject) =>{
         pool.getConnection().then(con => {
             con.query('SELECT COUNT(*) AS UserCount FROM Users').then(rows => {
-                const UId = Date.now() + rows[0].userCount + 13417;
+                const UId = Date.now() + (!!rows[0].UserCount ? rows[0].UserCount: 0) + 13417;
                 const sql = 'INSERT INTO Users (UId, Email , FirstName, SureName, Street , HouseNr, PostCode, City, Userrole, PwdHash, SecQuestion, SecAnswer) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
                 const values = [UId, user.email, user.firstName, user.sureName, user.street, user.houseNr, user.postalCode, user.city, 'customer', user.pwHash, user.security_question, user.secAnswerHash];
                 con.query(sql, values).then(rows => {
@@ -315,21 +282,6 @@ function checkIfEmailExists(user) {
             });
         }).catch(err => reject(err));
     }).catch(err => console.log(err));
-}
-
-function isValidUserID(user){
-    return new Promise((resolve, reject) =>{
-        pool.getConnection().then(con =>{
-            let sql = 'select * from Users where UserId = ?';
-            con.query(sql, user.userID).then(rows => {
-                resolve(rows)
-                con.end()
-            }).catch(err => {
-                reject(err)
-                con.end()
-            });
-        }).catch(err => reject(err));
-    });
 }
 
 function getSecQuestionByEmail(email = '') {
@@ -525,13 +477,11 @@ module.exports = {
     getArtcileByName: getArticleByName,
     getArticlesOfVendor, 
     addArticleComment,
-    getCommentsOfUser,
     getCommentsOfArticle,
     addUser,
     checkIfEmailExists,
     getAllUsers,
     getUserById,
-    getUserByEmail,
     deleteUser,
     blockUser,
     getCartByUserId,
@@ -539,7 +489,6 @@ module.exports = {
     createCart,
     addArticleToCart,
     deletreArticleFromCart,
-    isValidUserID,
     getSeqQuestionByEmail: getSecQuestionByEmail,
     checkSecurityAnswer,
     changePassword,
