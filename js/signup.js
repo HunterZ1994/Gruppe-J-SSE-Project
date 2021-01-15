@@ -27,26 +27,38 @@ function signinErrorUserExists(userInfo) {
 function checkSignUp(user) {
     return new Promise((resolve, reject) => {
         user.pwHash = tools.createPasswordHash(user.password);
-        user.secAnswerHash = tools.createPasswordHash(user.security_answer)
+        user.secAnswerHash = tools.createPasswordHash(user.security_answer);
+        let userInfo = { userID: '0000000000', role: 'guest', loggedIn: false };
         db_connector.checkIfEmailExists(user).then(result => {
             if (Object.keys(result).length > 1) {
                 resolve(signinErrorUserExists(user));
             } else {
                 db_connector.addUser(user).then(result => {
                     if (result.warningStatus === 0) {
+                        db_connector.getUserByUName(user.email)
+                        .then(users => {
+                            const newUser = users[0];
+                            resolve({loggedIn: true, userId: newUser.UId, role: newUser.Userrole });
+                        }).catch(err => {
+                            console.log(err);
+                            resolve({err, redirect: '/login'});
+                        });
                         tools.readHtmlAndAddNav(userInfo, "/signin.html")
-                        .then(result => {
-                            resolve(result.replace('{ script }', ""));
-                        }).catch(err => reject(err));
+                            .then(result => {
+                                resolve(result.replace('{ script }', ""));
+                            }).catch(err => {
+                                reject({err, redirect: '/register'});
+                            });
                     } else {
-                        resolve(signinErrorUserExists(user));
+                        signinErrorUserExists(userInfo).then(res => resolve(res)).catch(err => reject(err))
                     }
                 }).catch(err =>{
+                    console.log(err);
                     reject(err);
                 });
             }
         }).catch(err => {
-            console.log(err);
+            signinErrorUserExists(userInfo).then(res => resolve(res)).catch(err => reject(err))
         })
 
     });

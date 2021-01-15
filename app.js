@@ -27,6 +27,7 @@ const admin = require('./js/admin_panel');
 const signin = require("./js/signin");
 const signup = require("./js/signup");
 const security = require("./js/security");
+const { composite } = require('jimp');
 
 const htmlPath = path.join(__dirname) + '/html';
 // basic app setup
@@ -158,11 +159,27 @@ app.post('/register', [check('firstName').escape().trim(),
         const user = req.body;
         user.pwHash = tools.createPasswordHash(user.password);
         user.secAnswerHash = tools.createPasswordHash(user.security_answer)
-        // var userInfo = tools.checkSession(req.session) 
-        signup.checkSignUp(user).then(result =>{
-            res.send(result)
+        signup.checkSignUp(user)
+        .then(result =>{
+            if (typeof result === 'string') {
+                res.send(result)
+            } else {
+                const encoded = tools.encodeCookie('userInfo', result);
+                req.session[encoded.name] = encoded.cookie;
+                req.session.save();
+                res.cookie(encoded.name, encoded.cookie, {
+                    httpOnly: true,
+                    sameSite: 'strict',
+                });
+                res.redirect('/');
+            }
         }).catch(err =>{
-            res.send(err);
+            if (typeof err === 'object') {
+                if (err.redirect) {
+                    res.redirect(err.redirect);
+                }
+            } 
+            res.redirect('/register');
         });
     } else {
         console.log(errors);

@@ -12,7 +12,7 @@ function createCart(userInfo) {
                 const table = tools.buildArticlesTable(articles);
                 const articleJSON = createArticleJSON(articles);
                 const buyButton = articles.length > 0 ?
-                    `<a  href=/checkout/${JSON.stringify(articleJSON)}><Button id=\'checkout_button\' value="Go to checkout">Kaufen</Button><a/>` :
+                    `<a href="/checkout/${encodeURI(JSON.stringify(articleJSON))}"><Button id="checkout_button" value="Go to checkout">Kaufen</Button></a>` :
                     '';
                 resolve(results[0].replace('{ articles }', table).replace('{ buy_button }', buyButton)
                     .replace('No products matching search criteria', 'Your cart is currently empty'));

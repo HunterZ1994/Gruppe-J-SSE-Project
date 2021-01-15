@@ -7,7 +7,6 @@ const passwordWrong = '<script type="application/javascript" src="https://ajax.g
 
 function getSignin(userInfo) {
     return new Promise((resolve, reject) => {
-        console.log(userInfo);
         tools.readHtmlAndAddNav(userInfo, "/signin.html").then(result => {
             resolve(result.replace('{ script }', ' '));
         }).catch(err => reject(err));
