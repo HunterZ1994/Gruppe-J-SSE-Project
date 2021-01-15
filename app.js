@@ -494,13 +494,6 @@ const options = {
     cert: fs.readFileSync('./hardware.bay.crt').toString()
 };
 
-if (security.IN_PROD) {
-    https.createServer(options, app).listen(port, function() {
-        console.log("Server PRODUCTION listening on port %s...", port);
-    });    
-} else {
-    http.createServer(app.listen(port, function() {
-        console.log("Server DEVELOPMENT listening on port %s...", port);
-    }));
-}   
-
+https.createServer(options, app).listen(port, function() {
+    console.log("Server PRODUCTION listening on port %s...", port);
+});
