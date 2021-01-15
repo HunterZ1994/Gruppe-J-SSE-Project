@@ -26,7 +26,7 @@ create TABLE Users (
 
 create Table Carts (
     CartId int NOT NULL AUTO_INCREMENT,
-    User int NOT NULL,
+    User bigint unsigned NOT NULL,
 
     PRIMARY KEY (CartId),
     FOREIGN KEY (User) REFERENCES Users(UId)
@@ -38,7 +38,7 @@ create TABLE Articles (
     Descpt varchar(255) NOT NULL,
     Price int NOT NUll,
     ImagePath varchar(255),
-    Seller int NOT NULL,
+    Seller bigint unsigned NOT NULL,
 
     PRIMARY KEY(ArticleId),
     FOREIGN KEY (Seller) REFERENCES Users(UId)
@@ -57,7 +57,7 @@ create TABLE Holds (
 create TABLE Comments (
     CommentId int NOT NULL AUTO_INCREMENT,
     ComText text NOT NULL,
-    User int NOT NULL,
+    User bigint unsigned NOT NULL,
     Article int NOT NULL,
 
     PRIMARY KEY(CommentId),
