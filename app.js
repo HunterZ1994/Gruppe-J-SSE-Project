@@ -157,7 +157,7 @@ app.post('/register', [check('firstName').escape().trim(),
         const user = req.body;
         user.pwHash = tools.createPasswordHash(user.password);
         user.secAnswerHash = tools.createPasswordHash(user.security_answer)
-        signup.checkSignUp(user).then(result =>{
+        signup.checkSignUp(user, tools.checkSession(req.session)).then(result =>{
             res.send(result)
         });
     } else {
@@ -279,8 +279,8 @@ app.get('/adminPanel/block', function (req, res) {
     const userInfo = req.cookies.userInfo;
     const isAdmin = userInfo.role === 'admin';
     const userId = req.query.userId;
-    console.log(req.query);
-    console.log(userId);
+    // console.log(req.query);
+    // console.log(userId);
     if (!isAdmin) {
         res.redirect('/');
     } else {
