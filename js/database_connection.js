@@ -256,7 +256,11 @@ function addUser(user) {
                 const values = [UId, user.email, user.firstName, user.sureName, user.street, user.houseNr, user.postalCode, user.city, 'customer', user.pwHash, user.security_question, user.secAnswerHash];
                 con.query(sql, values).then(rows => {
                     con.end()
-                    resolve(rows);
+                    createCart(UId).then(rows => {
+                        resolve(rows);
+                    }).catch(err => {
+                        reject(err);
+                    })
                 }).catch(err => {
                     con.end()
                     reject(err)

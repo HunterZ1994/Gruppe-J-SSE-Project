@@ -279,8 +279,6 @@ app.get('/adminPanel/block', function (req, res) {
     const userInfo = req.cookies.userInfo;
     const isAdmin = userInfo.role === 'admin';
     const userId = req.query.userId;
-    // console.log(req.query);
-    // console.log(userId);
     if (!isAdmin) {
         res.redirect('/');
     } else {
