@@ -59,8 +59,8 @@ function addArticle(userInfo, article, files) {
                         fs.writeFile(absoluteImage, rawData, function (err) {
                             console.log(err);
                         });
-                        resolve(true);
                     }
+                    resolve(true);
                 })
                 .catch(err => {
                     console.log({err});
