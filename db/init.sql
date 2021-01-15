@@ -1,12 +1,11 @@
 create DATABASE hardwarebay;
-CREATE USER 'hardwarebay'@'%' IDENTIFIED BY '123';
-GRANT SELECT, INSERT, UPDATE, DELETE ON hardwarebay.* TO 'hardwarebay'@'%' IDENTIFIED BY '123';
-FLUSH PRIVILEGES;
+-- CREATE USER 'hardwarebay'@'%' IDENTIFIED BY '123';
+-- GRANT SELECT, INSERT, UPDATE, DELETE ON hardwarebay.* TO 'hardwarebay'@'%' IDENTIFIED BY '123';
+-- FLUSH PRIVILEGES;
 
 use hardwarebay;
 
 create TABLE Users (
-    UserId int NOT NULL AUTO_INCREMENT,
     UId bigint unsigned NOT NULL,
     Email  varchar(255) NOT NULL,
     FirstName varchar(255),
@@ -22,7 +21,7 @@ create TABLE Users (
     Blocked boolean,
 
     CHECK (Userrole IN("customer", "admin", "vendor")),
-    PRIMARY KEY(UserId)
+    PRIMARY KEY(UId)
 );
 
 create Table Carts (
@@ -30,8 +29,8 @@ create Table Carts (
     User int NOT NULL,
 
     PRIMARY KEY (CartId),
-    FOREIGN KEY (User) REFERENCES Users(UserId)
-); 
+    FOREIGN KEY (User) REFERENCES Users(UId)
+);
 
 create TABLE Articles (
     ArticleId int NOT NULL AUTO_INCREMENT,
@@ -42,7 +41,7 @@ create TABLE Articles (
     Seller int NOT NULL,
 
     PRIMARY KEY(ArticleId),
-    FOREIGN KEY (Seller) REFERENCES Users(UserId)
+    FOREIGN KEY (Seller) REFERENCES Users(UId)
 );
 
 create TABLE Holds (
@@ -62,7 +61,7 @@ create TABLE Comments (
     Article int NOT NULL,
 
     PRIMARY KEY(CommentId),
-    FOREIGN KEY (User) REFERENCES Users(UserId),
+    FOREIGN KEY (User) REFERENCES Users(UId),
     FOREIGN KEY (Article) REFERENCES Articles(ArticleId)
 );
 
