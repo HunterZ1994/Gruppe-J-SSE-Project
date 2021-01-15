@@ -253,6 +253,8 @@ app.get('/adminPanel/delete', function (req, res) {
     const userInfo = req.cookies.userInfo;
     const isAdmin = userInfo.role === 'admin';
     const userId = req.query.userId;
+
+    console.log(userInfo)
     
     if (!isAdmin) {
         res.redirect('/');

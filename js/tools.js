@@ -79,8 +79,8 @@ function buildUserTable(users) {
             userTable += `      <td class="user-email">  ${user.Blocked ? "Gesperrt" : " -- "} </td>\n`
 
             if (!(user.Userrole === 'admin' || user.Userrole === 'vendor')) {
-                userTable += `<td class="user-name"> <a href='adminPanel/block?userId=${user.UserId}'> Sperren </a> </td>\n`;
-                userTable += `<td class="user-name"> <a href='adminPanel/delete?userId=${user.UserId}'> Löschen </a> </td>\n`;
+                userTable += `<td class="user-name"> <a href='adminPanel/block?userId=${user.UId}'> Sperren </a> </td>\n`;
+                userTable += `<td class="user-name"> <a href='adminPanel/delete?userId=${user.UId}'> Löschen </a> </td>\n`;
             }
 
             userTable += '   </tr>\n'
