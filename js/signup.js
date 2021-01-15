@@ -34,11 +34,10 @@ function checkSignUp(user) {
             } else {
                 db_connector.addUser(user).then(result => {
                     if (result.warningStatus === 0) {
-                        return new Promise((resolve, reject) => {
-                            tools.readHtmlAndAddNav(userInfo, "/signin.html").then(result => {
-                                resolve(result.replace('{ script }', ""));
-                            }).catch(err => reject(err));
-                        });
+                        tools.readHtmlAndAddNav(userInfo, "/signin.html")
+                        .then(result => {
+                            resolve(result.replace('{ script }', ""));
+                        }).catch(err => reject(err));
                     } else {
                         resolve(signinErrorUserExists(user));
                     }
