@@ -29,7 +29,7 @@ create Table Carts (
     User bigint unsigned NOT NULL,
 
     PRIMARY KEY (CartId),
-    FOREIGN KEY (User) REFERENCES Users(UId)
+    FOREIGN KEY (User) REFERENCES Users(UId) ON DELETE CASCADE
 );
 
 create TABLE Articles (
@@ -41,7 +41,7 @@ create TABLE Articles (
     Seller bigint unsigned NOT NULL,
 
     PRIMARY KEY(ArticleId),
-    FOREIGN KEY (Seller) REFERENCES Users(UId)
+    FOREIGN KEY (Seller) REFERENCES Users(UId) ON DELETE CASCADE
 );
 
 create TABLE Holds (
@@ -50,8 +50,8 @@ create TABLE Holds (
     ArticleAmount int NOT NULL,
 
     PRIMARY KEY(Cart, Article),
-    FOREIGN KEY (Article) REFERENCES Articles(ArticleId),
-    FOREIGN KEY (Cart) REFERENCES Carts(CartId)
+    FOREIGN KEY (Article) REFERENCES Articles(ArticleId) ON DELETE CASCADE,
+    FOREIGN KEY (Cart) REFERENCES Carts(CartId) ON DELETE CASCADE
 );
 
 create TABLE Comments (
@@ -61,8 +61,8 @@ create TABLE Comments (
     Article int NOT NULL,
 
     PRIMARY KEY(CommentId),
-    FOREIGN KEY (User) REFERENCES Users(UId),
-    FOREIGN KEY (Article) REFERENCES Articles(ArticleId)
+    FOREIGN KEY (User) REFERENCES Users(UId) ON DELETE CASCADE,
+    FOREIGN KEY (Article) REFERENCES Articles(ArticleId) ON DELETE CASCADE
 );
 
 -- creating admin user with password 9pa.%{7>TeYb\G~9Kz%'r@aR and security answer >cHq9tx5(-,SkdL*vaJxav['
