@@ -85,7 +85,7 @@ function getArticleHtml(article) {
     return new Promise((resolve, reject) => {
         let res = '<div>\n';
         res += `<h4> ${article.ArticleName} </h4> <br/>\n`;
-        res += `<image src="${article.ImagePath}" alt="Artikelbild" />\n`;
+        res += `<img src="${article.ImagePath}" alt="Artikelbild" />\n`;
         res += `<p> ${article.Descpt} </p> <br/>\n`;
         res += `<p> ${article.Price}€ </p> <br/>\n`;
         resolve(res += '</div><br/>\n');
