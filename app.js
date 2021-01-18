@@ -508,7 +508,7 @@ app.get('/logfiles', (req, res) => {
 
 // #endregion
 
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 443;
 
 const options = {
     hostname: "hardware.bay",
