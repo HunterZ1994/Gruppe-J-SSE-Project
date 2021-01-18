@@ -139,7 +139,7 @@ function decodeCookie(cookieValue) {
                 orKey = 'loggedIn';
                 break;
         }
-        const orValue = typeof userBacon[key] === 'string' ? bacon.decode(userBacon[key], {alphabet}).toLowerCase() : userBacon[key];
+        const orValue = typeof userBacon[key] === 'string' ? bacon.decode(userBacon[key]).toLowerCase() : userBacon[key];
         userInfo[orKey] = orValue;
     }
 
@@ -152,9 +152,9 @@ function encodeCookie(cookieName='cookie', cookie) {
 
     for (const key of Object.keys(cookie)) {
         if (typeof cookie[key] === 'string') {
-            encoded[bacon.encode(key, {alphabet})] = bacon.encode(cookie[key], {alphabet});
+            encoded[bacon.encode(key, {alphabet} )] = bacon.encode(cookie[key]);
         } else {
-            encoded[bacon.encode(key, {alphabet})] = cookie[key];
+            encoded[bacon.encode(key, {alphabet} )] = cookie[key];
         }
     }
 
@@ -187,5 +187,6 @@ module.exports = {
     encodeCookie,
     buildUserTable,
     injectScript,
-    getEncodedName
+    getEncodedName,
+    decodeCookie
 }
