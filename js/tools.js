@@ -111,12 +111,11 @@ function readHtmlAndAddNavAndHead(userInfo, filename, scriptHandle=false) {
     })
 }
 
-function injectScript(userInfo, filenmae, script){
+function injectScript(userInfo, filename, script){
     return new Promise((resolve, reject) => {
-       readHtmlAndAddNavAndHead(userInfo, filenmae, true).then(result =>{
-            const root = htmlParser.parse(script);
-            root.firstChild.setAttribute('nonce', security.securityScriptHash);
-           resolve(result.replace('{ script }', root.toString() + '\n'));
+        // TODO: remove readHtmlAndAddNavAndHead and use it in signin instead
+       readHtmlAndAddNavAndHead(userInfo, filename, true).then(result => {
+           resolve(result.replace('{ script }', htmlParser.parse(script) + '\n'));
        }).catch(err => reject(err));
     })
 }

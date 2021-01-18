@@ -100,5 +100,3 @@ INSERT INTO Comments (ComText, User, Article)
     VALUES ("Was ein super Pfannenwender!", 1610405071354, 1);
 
 INSERT INTO Carts (User) VALUES (1610405071354);
-
-INSERT INTO Holds (Cart, Article, ArticleAmount) VALUES (1, 1, 1);

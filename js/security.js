@@ -1,8 +1,8 @@
-// Sesion parameters
+// Session parameters
 const TWO_HOURS = 1000 * 60 * 60 * 2;
 
 const {
-    PORT = 8080,
+    PORT = 443,
     NODE_ENV = 'production',
     SESS_NAME = 'ssid',
     SESS_SECRET = '6u4/I/%$76v5&4vkuG7i(87%G%B(&NH((O%"§%$(&)?@€|~^^=)(/&!&%§"$',
