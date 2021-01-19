@@ -253,7 +253,7 @@ app.get('/search', function (req, res) {
     const session = tools.checkSession(req.session)
     if (session.role === 'admin') {
         const key = req.query.key;
-        // Avoiding everything that tries to drop something
+        // Logging for fun
         if (key.toUpperCase().includes('DROP')) {
             logger.log(`Nice try, but no we wont let you DROP something in the Database ;D`, 4);
         }
