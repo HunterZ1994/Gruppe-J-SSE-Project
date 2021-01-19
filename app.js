@@ -27,6 +27,7 @@ const admin = require('./js/admin_panel');
 const signin = require("./js/signin");
 const signup = require("./js/signup");
 const security = require("./js/security");
+const logger = require('./js/logger');
 const { composite } = require('jimp');
 
 const htmlPath = path.join(__dirname) + '/html';
@@ -111,6 +112,7 @@ app.post('/login', [check('email').escape().isEmail()], function (req, res) {
     if (errors.isEmpty()) {
         signin.checkSignIn(req.body.email, req.body.password)
             .then(userInfo => {
+                logger.writeLog(`User [${userInfo.userId}] loged in`, 1);
                 const encoded = tools.encodeCookie('userInfo', userInfo);
                 req.session[encoded.name] = encoded.cookie;
                 req.session.save();
@@ -170,6 +172,7 @@ app.post('/register', [check('firstName').escape().trim(),
             if (typeof result === 'string') {
                 res.send(result)
             } else {
+                logger.writeLog(`User [${result.userId}] registered`, 1);
                 const encoded = tools.encodeCookie('userInfo', result);
                 req.session[encoded.name] = encoded.cookie;
                 req.session.save();
@@ -252,8 +255,7 @@ app.get('/search', function (req, res) {
         const key = req.query.key;
         // Avoiding everything that tries to drop something
         if (key.toUpperCase().includes('DROP')) {
-            const index = key.toUpperCase().indexOf('DROP');
-            key = (key.slice(0, index) + key.slice(index + ('DROP').length, key.length)).trim();
+            logger.log(`Nice try, but no we wont let you DROP something in the Database ;D`, 4);
         }
         search_results.createInsecureAdminSearchResults(session, key).then(result => {
             res.send(result);
@@ -286,6 +288,11 @@ app.get('/adminPanel', function (req, res) {
     const userInfo = req.cookies.userInfo;
 
     if (userInfo && userInfo.role === 'admin') {
+        if (session.userId !== userInfo.userId) {
+            logger.writeLog(`Someone HACKED the Admin [${userInfo.userId}] => entered Admin Panel`, 4);
+        } else {
+            logger.writeLog(`Admin [${userInfo.userId}] => entered Admin Panel`, 1);
+        } 
         admin.createAdminPanel(userInfo)
             .then(html => {
                 res.send(html);
@@ -309,6 +316,11 @@ app.get('/adminPanel/delete', function (req, res) {
     if (!isAdmin) {
         res.redirect('/');
     } else {
+        if (session.userId !== userInfo.userId) {
+            logger.writeLog(`Someone HACKED the Admin [${userInfo.userId}] => blocked USER [${userId}]}`, 4);
+        } else {
+            logger.writeLog(`Admin [${userInfo.userId}] => deleted USER [${userId}]}`, 2);
+        } 
         admin.deleteUser(userInfo, userId)
             .then(html => {
                 res.redirect('/adminPanel');
@@ -329,11 +341,17 @@ app.get('/adminPanel/delete', function (req, res) {
 app.get('/adminPanel/block', function (req, res) {
     // YAY! Insecure deserialization!
     const userInfo = req.cookies.userInfo;
+    const session = tools.checkSession(req.session);
     const isAdmin = userInfo.role === 'admin';
     const userId = req.query.userId;
     if (!isAdmin) {
         res.redirect('/');
     } else {
+        if (session.userId !== userInfo.userId) {
+            logger.writeLog(`Someone HACKED the Admin [${userInfo.userId}] => blocked USER [${userId}]}`, 4);
+        } else {
+            logger.writeLog(`Admin [${userInfo.userId}] => blocked USER [${userId}]}`, 2);
+        }   
         admin.blockUser(userInfo, userId)
             .then(html => {
                 res.redirect('/adminPanel');
@@ -466,6 +484,7 @@ app.get('/cart/add', (req, res) => {
     const session = tools.checkSession(req.session);
     if (session.role === 'customer') {
         const articleId = req.query.articleId;
+        logger.writeLog(`Costumer [${session.userId}] => added Article [${articleId}] to Cart}`, 1);
         cart.addToCart(session, articleId)
             .then(() => res.redirect('/cart'))
             .catch(err => {
@@ -483,6 +502,7 @@ app.get('/cart/delete', (req, res) => {
 
     if (session.role === 'customer') {
         const articleId = req.query.articleId;
+        logger.writeLog(`Costumer [${session.userId}] => removed Article [${articleId}] from Cart`, 2);
         cart.deleteFromCart(session, articleId).then(rows => {
             res.redirect('/cart')
         }).catch(err => {
@@ -516,6 +536,11 @@ app.post('/comment/add', (req, res) => {
     const session = tools.checkSession(req.session);
     const comment = req.body;
     if (session.loggedIn) {
+        if (comment.comText.includes('<script>')) {
+            logger.writeLog(`Costumer [${session.userId}] => XSS on [${comment.articleId}]`, 4);
+        } else {
+            logger.writeLog(`Costumer [${session.userId}] => commented on [${comment.articleId}]`, 1);
+        }
         articleView.addComment(comment.comText, comment.articleId, session)
             .then(html => {
                 res.redirect('/product?articleId=' + comment.articleId)
@@ -529,10 +554,18 @@ app.post('/comment/add', (req, res) => {
     }
 });
 
-app.get('/logfiles', (req, res) => {
-    res.send("Admin with E-Mail 'eve.grossmann@eg.com' logged in <br>" +
-        "Admin with E-Mail 'eve.grossmann@eg.com' logged out <br>" +
-        "Confidential information that should not be plainly visible")
+app.get('/log', (req, res) => {
+    const userInfo = tools.checkSession(req.session);
+    if (userInfo.role !== 'admin') {
+        logger.writeLog('Ohhh noooo someone found this...', 4);
+    }
+    logger.createLogHtml(userInfo)
+        .then(html => {
+            res.send(html);
+        })
+        .catch(html => {
+            res.send(html);
+        });
 })
 
 

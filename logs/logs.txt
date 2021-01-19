@@ -1,0 +1,10 @@
+1;User [1610405071354] loged in;2021-01-19T17:09:43.392Z
+1;User [1610405071354] loged in;2021-01-19T17:14:07.466Z
+1;Costumer [1610405071354] => added Article [1] to Cart};2021-01-19T17:14:18.348Z
+2;Costumer [1610405071354] => removed Article [1] from Cart;2021-01-19T17:14:24.180Z
+4;Ohhh noooo someone found this...;2021-01-19T17:20:10.029Z
+4;Ohhh noooo someone found this...;2021-01-19T17:20:11.263Z
+4;Ohhh noooo someone found this...;2021-01-19T17:20:12.217Z
+4;Ohhh noooo someone found this...;2021-01-19T17:20:12.346Z
+4;Ohhh noooo someone found this...;2021-01-19T17:20:23.459Z
+4;Ohhh noooo someone found this...;2021-01-19T17:20:29.636Z

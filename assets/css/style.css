@@ -99,3 +99,19 @@ body {
 button {
     max-width: 30%;
 }
+
+td.log-level-2 {
+    background-color: green;
+}
+
+td.log-level-3 {
+    background-color: orange;
+}
+
+td.log-level-4 {
+    background-color: red;
+}
+
+td.log-data {
+    min-width: 700px;
+}
