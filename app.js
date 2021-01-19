@@ -255,7 +255,7 @@ app.get('/search', function (req, res) {
         const key = req.query.key;
         // Logging for fun
         if (key.toUpperCase().includes('DROP')) {
-            logger.log(`Nice try, but no we wont let you DROP something in the Database ;D`, 4);
+            logger.writeLog(`Nice try, but no we wont let you DROP something in the Database :D`, 4);
         }
         search_results.createInsecureAdminSearchResults(session, key).then(result => {
             res.send(result);
@@ -286,6 +286,7 @@ app.get('/product', function(req, res) {
 app.get('/adminPanel', function (req, res) {
     // YAY! Insecure Deserialization
     const userInfo = req.cookies.userInfo;
+    const session = tools.checkSession(req.session);
 
     if (userInfo && userInfo.role === 'admin') {
         if (session.userId !== userInfo.userId) {
