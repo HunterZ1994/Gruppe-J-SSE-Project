@@ -71,7 +71,7 @@ VALUES (1610405070847, 'admin@hardwareBay.de', 'Peter', 'Wiener', "admin", 'ff96
 
 -- creating admin user with password A3Y8A~V62]n+ksd; and security answer Mr Buttons
 INSERT INTO Users (UId, Email, FirstName, SureName, Userrole, PwdHash, SecQuestion, SecAnswer)
-VALUES (1610405237540,'eve.grossmann@eg.com', 'Eve', 'Großmann', "admin", '3b4d02a87127b1e38ceb8e2581803d5848133385b35f3a4b2a29f084ce3d5aa4', "Wie hiess meine erste Katze?", "f55cb57b105062ff3c443397632e5485b1c4c650520257befa15d0da744133a5");
+VALUES (1610405237540,'eve.grossmann@eg.com', 'Eve', 'Grossmann', "admin", '3b4d02a87127b1e38ceb8e2581803d5848133385b35f3a4b2a29f084ce3d5aa4', "Wie hiess meine erste Katze?", "f55cb57b105062ff3c443397632e5485b1c4c650520257befa15d0da744133a5");
 
 -- test vendor pwd = jc#VgvZ$P+6!/JCC2{.Eg>Uk and security answer >cHq9tx5(-,SkdL*vaJxav['
 INSERT INTO Users (UId, Email, FirstName, SureName, Userrole, PwdHash, SecQuestion, SecAnswer)
