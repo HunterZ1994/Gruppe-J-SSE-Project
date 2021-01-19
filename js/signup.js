@@ -66,6 +66,5 @@ function checkSignUp(user) {
 
 module.exports = {
             getSignup,
-            signinErrorUserExists,
             checkSignUp,
         }

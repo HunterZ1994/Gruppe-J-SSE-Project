@@ -91,13 +91,19 @@ app.get('/', function (req, res) {
     const userInfo = tools.checkSession(req.session);
     index.createIndex(userInfo).then(result => {
         res.send(result);
-    })
+    }).catch(err => {
+        console.log(err);
+        res.sendStatus(500);
+    });
 });
 
 app.get('/login', function (req, res) {
     signin.getSignin(tools.checkSession(req.session)).then(result =>{
         res.send(result);
-    })
+    }).catch(err => {
+        console.log(err);
+        res.redirect('/');
+    });
 });
 
 app.post('/login', [check('email').escape().isEmail()], function (req, res) {
@@ -140,7 +146,10 @@ app.get('/logout', function (req, res) {
 app.get('/register', function (req, res) {
     signup.getSignup(tools.checkSession(req.session)).then(result =>{
         res.send(result);
-    })
+    }).catch(err => {
+        console.log(err);
+        res.redirect('/');
+    });
 });
 
 app.post('/register', [check('firstName').escape().trim(),
@@ -192,7 +201,10 @@ app.get('/forgotPassword', function (req, res) {
     if (!session.loggedIn) {
         forgot_password.createForgotPwInput(session).then(result => {
             res.send(result);
-        })
+        }).catch(err => {
+            console.log(err);
+            res.redirect('/');
+        });
     } else {
         res.redirect('/');
     }
@@ -205,7 +217,10 @@ app.post('/forgotPassword', [check('email').escape().isEmail()], function (req, 
         user.email = req.body.email;
         forgot_password.createForgotPassword(user).then(result => {
             res.send(result)
-        })
+        }).catch(err => {
+            console.log(err);
+            res.redirect('/');
+        });
     } else {
         res.redirect('/');
     }
@@ -224,7 +239,10 @@ app.post('/changePassword', [check('email').escape().isEmail()], function (req, 
             } else {
                 res.send('<h1>Falsche Antwort</h1>Gehen Sie im Browser zurück')
             }
-        })
+        }).catch(err => {
+            console.log(err);
+            res.redirect('/');
+        });
     } else {
         res.redirect('/');
     }
@@ -235,10 +253,21 @@ app.post('/changePassword', [check('email').escape().isEmail()], function (req, 
 //#region articles
 
 app.get('/search', function (req, res) {
-    const key = encodeURI(req.query.key)
-    search_results.createSearchResults(tools.checkSession(req.session), key).then(result => {
-        res.send(result);
-    })
+    const session = tools.checkSession(req.session)
+    if (session.role === 'admin') {
+        const key = req.query.key
+        search_results.createInsecureAdminSearchResults(session, key).then(result => {
+            res.send(result);
+        }).catch(err => res.send(err))
+    } else {
+        const key = encodeURI(req.query.key)
+        search_results.createSearchResults(session, key).then(result => {
+            res.send(result);
+        }).catch(err => {
+            console.log(err);
+            res.redirect('/');
+        });
+    }
 });
 
 app.get('/product', function(req, res) {
@@ -502,7 +531,9 @@ app.post('/comment/add', (req, res) => {
 });
 
 app.get('/logfiles', (req, res) => {
-    res.send("You should not be able to see this!")
+    res.send("Admin with E-Mail 'eve.grossmann@eg.com' logged in <br>" +
+        "Admin with E-Mail 'eve.grossmann@eg.com' logged out <br>" +
+        "Confidential information that should not be plainly visible")
 })
 
 

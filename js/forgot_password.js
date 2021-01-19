@@ -7,6 +7,9 @@ const createForgotPwInput = (userInfo, script='') => {
     return new Promise((resolve, reject) => {
         tools.readHtmlAndAddNav(userInfo, 'forgot_pw_input.html').then(result => {
             resolve(result.replace('{ script }', script))
+        }).catch(err => {
+            console.log(err)
+            reject(err)
         })
     })
 }
@@ -24,6 +27,9 @@ const createForgotPassword = (userInfo) => {
                         resolve(page);
                     })
                 }
+            }).catch(err => {
+            console.log(err)
+            reject(err)
         })
     })
 }
@@ -37,6 +43,9 @@ const changePassword = (userInfo) => {
             } else {
                 resolve(false)
             }
+        }).catch(err => {
+            console.log(err)
+            reject(err)
         })
     })
 }

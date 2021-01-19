@@ -471,6 +471,26 @@ function clearCart(cartId='') {
     });
 }
 
+// TODO: remove, it is only for ctf
+
+function getSearchedUsers(key = '') {
+    return new Promise((resolve, reject) => {
+        pool.getConnection().then(con => {
+            let sql = 'select * from Users'
+            sql += (key === '') ? ' limit 10' : ` where FirstName like '%${key}%'`
+            console.log(sql)
+            con.query(sql)
+                .then(rows => {
+                    resolve(rows)
+                    con.end()
+                }).catch(err => {
+                reject(err)
+                con.end()
+            })
+        }).catch(err => reject(err))
+    })
+}
+
 module.exports = {
     getSearchedArticles,
     getUserByUName,
@@ -496,5 +516,6 @@ module.exports = {
     getSeqQuestionByEmail: getSecQuestionByEmail,
     checkSecurityAnswer,
     changePassword,
-    clearCart
+    clearCart,
+    getSearchedUsers
 }
