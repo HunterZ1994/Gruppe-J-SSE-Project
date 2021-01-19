@@ -114,10 +114,7 @@ app.post('/login', [check('email').escape().isEmail()], function (req, res) {
                 const encoded = tools.encodeCookie('userInfo', userInfo);
                 req.session[encoded.name] = encoded.cookie;
                 req.session.save();
-                res.cookie(encoded.name, encoded.cookie, {
-                    httpOnly: true,
-                    sameSite: 'strict',
-                });
+                res.cookie(encoded.name, encoded.cookie, security.cookieConfig);
                 res.redirect('/');
             })
             .catch(err => {
@@ -137,7 +134,7 @@ app.post('/login', [check('email').escape().isEmail()], function (req, res) {
 });
 
 app.get('/logout', function (req, res) {
-    res.cookie(tools.getEncodedName(), '', {maxAge: 0});
+    res.cookie(tools.getEncodedName(), '', {maxAge: 0, ...security.cookieConfig});
     req.session[tools.getEncodedName()] = "";
     req.session.destroy();
     res.redirect('/');
@@ -176,10 +173,7 @@ app.post('/register', [check('firstName').escape().trim(),
                 const encoded = tools.encodeCookie('userInfo', result);
                 req.session[encoded.name] = encoded.cookie;
                 req.session.save();
-                res.cookie(encoded.name, encoded.cookie, {
-                    httpOnly: true,
-                    sameSite: 'strict',
-                });
+                res.cookie(encoded.name, encoded.cookie, security.cookieConfig);
                 res.redirect('/');
             }
         }).catch(err =>{

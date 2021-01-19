@@ -125,8 +125,14 @@ function createPasswordHash(value) {
 }
 
 function decodeCookie(cookieValue) {
-    const userBacon = JSON.parse(Buffer.from(cookieValue, 'base64').toString('ascii'));
-        
+    const jsonString = Buffer.from(cookieValue, 'base64').toString('ascii');
+
+    if (!checkValidJSON(jsonString)) {
+        return { userID: '0000000000', role: 'guest', loggedIn: false };
+    }
+
+    const userBacon = JSON.parse(jsonString);
+      
     let userInfo = {};
 
     for (const key of Object.keys(userBacon)) {
@@ -147,7 +153,7 @@ function decodeCookie(cookieValue) {
 
 }
 
-function encodeCookie(cookieName='cookie', cookie) {
+function encodeCookie(cookieName='cookie', cookie={}) {
     let encoded = {};
 
     for (const key of Object.keys(cookie)) {
@@ -159,6 +165,15 @@ function encodeCookie(cookieName='cookie', cookie) {
     }
 
     return {name: Buffer.from(bacon.encode(cookieName, {alphabet})).toString('base64'), cookie: Buffer.from(JSON.stringify(encoded)).toString('base64')};
+}
+
+function checkValidJSON(value='') {
+    try {
+        JSON.parse(value);
+    } catch (err) {
+        return false;
+    }
+    return true;
 }
 
 function checkSession(session) {
@@ -188,5 +203,5 @@ module.exports = {
     buildUserTable,
     injectScript,
     getEncodedName,
-    decodeCookie
+    decodeCookie,
 }

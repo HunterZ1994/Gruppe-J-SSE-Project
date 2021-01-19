@@ -57,11 +57,19 @@ const rateLimitConfig = {
     delayMs: 0 // disable delay -> user hasfull speed until limit
 }
 
+const cookieConfig = { 
+    sameSite: 'strict', 
+    httpOnly: true, 
+    secure:true,
+    maxAge: SESS_LIFETIME
+};
+
 module.exports = {
     securityHeaders,
     staticFileOptions,
     sessionConfig,
     csrfConfig,
     rateLimitConfig,
-    IN_PROD
+    IN_PROD,
+    cookieConfig
 };

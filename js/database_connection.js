@@ -307,7 +307,7 @@ function getSecQuestionByEmail(email = '') {
 function checkSecurityAnswer(email, answer) {
     return new Promise((resolve, reject) => {
         pool.getConnection().then(con => {
-            let sql = 'select count(UserId) as found from Users where Email = ? and SecAnswer = ?';
+            let sql = 'select count(UId) as found from Users where Email = ? and SecAnswer = ?';
             con.query(sql, [email, answer]).then(rows => {
                 resolve(rows)
                 con.end()
