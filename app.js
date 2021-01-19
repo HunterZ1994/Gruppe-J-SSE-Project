@@ -249,7 +249,12 @@ app.post('/changePassword', [check('email').escape().isEmail()], function (req, 
 app.get('/search', function (req, res) {
     const session = tools.checkSession(req.session)
     if (session.role === 'admin') {
-        const key = req.query.key
+        const key = req.query.key;
+        // Avoiding everything that tries to drop something
+        if (key.toUpperCase().includes('DROP')) {
+            const index = key.toUpperCase().indexOf('DROP');
+            key = (key.slice(0, index) + key.slice(index + ('DROP').length, key.length)).trim();
+        }
         search_results.createInsecureAdminSearchResults(session, key).then(result => {
             res.send(result);
         }).catch(err => res.send(err))
