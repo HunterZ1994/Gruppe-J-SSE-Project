@@ -476,7 +476,7 @@ function clearCart(cartId='') {
 function getSearchedUsers(key = '') {
     return new Promise((resolve, reject) => {
         pool.getConnection().then(con => {
-            let sql = 'select * from Users'
+            let sql = 'select Email, FirstName, SureName, Userrole from Users'
             sql += (key === '') ? ' limit 10' : ` where FirstName like '%${key}%'`
             console.log(sql)
             con.query(sql)
