@@ -9,9 +9,9 @@ Development is done with NodeJs on Serverside.
 In Browser plain HTML/CSS and JS is used.  
 
 For Testing purposes a user with  
-    Email: wiener@gmail.de  
+    __*Email*__: *wiener@gmail.de*  
     and   
-    Password: wiener  
+    __*Password*__: *wiener*  
 is configurated.  
 
 **NOTE**: User shall be removed for production!  
