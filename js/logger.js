@@ -10,7 +10,7 @@ function writeLog(value='', level= (1 | 2 | 3 | 4), request) {
         const geoPos = geoip.lookup(ip);
         const browser = request.headers['user-agent']; 
         const realBrowser = request.headers['sec-ch-ua']
-        meta = `IP: ${ip}\n GEO: ${geoPos}\n BROWSER: ${browser}\n VERSION: ${realBrowser}\n`;
+        meta = `IP: ${ip}\n GEO: ${JSON.stringify(geoPos)}\n BROWSER: ${browser}\n VERSION: ${realBrowser}\n`;
     }
     const message = `${level};${value};${new Date().toISOString()};${meta};\n`;
     fs.appendFileSync(__dirname + '/../logs/logs.txt', message, function(err) {
