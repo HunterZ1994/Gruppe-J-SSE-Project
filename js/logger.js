@@ -30,6 +30,7 @@ function logFileToHtml() {
         res += '    <th> LEVEL </th>';
         res += '    <th> LOG </th>'
         res += '    <th> DATE </th>'
+        res += '    <th> META </th>'
         res += '</tr>';
         res += '</thead>'
         res += '<tbody>'
