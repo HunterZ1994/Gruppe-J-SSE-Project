@@ -18,7 +18,7 @@ const createInsecureAdminSearchResults = (userInfo, key) => {
         Promise.all([
             tools.readHtmlAndAddNav(userInfo, 'search_results.html'),
             db_connection.getSearchedUsers(key)]).then(results => {
-            const users = tools.buildUserTable(results[1], userInfo)
+            const users = tools.buildInsecureUserTable(results[1], userInfo)
             resolve(results[0].replace('{ articles }', users).replace('{ key }', key))
         }).catch(err => reject(err))
     })

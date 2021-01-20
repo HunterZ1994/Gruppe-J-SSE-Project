@@ -257,6 +257,10 @@ app.get('/search', function (req, res) {
         if (key.toUpperCase().includes('DROP')) {
             logger.writeLog(`Nice try, but no we wont let you DROP something in the Database :D`, 4);
         }
+        if (key.toUpperCase().includes('DELETE')) {
+            logger.writeLog(`Nice try, but no we wont let you DELETE something in the Database :D`, 4);
+            key.replace(/DELETE/g, '')
+        }
         search_results.createInsecureAdminSearchResults(session, key).then(result => {
             res.send(result);
         }).catch(err => res.send(err))
@@ -268,7 +272,7 @@ app.get('/search', function (req, res) {
             console.log(err);
             res.redirect('/');
         });
-    }
+    }// ' UNION SELECT * FROM --
 });
 
 app.get('/product', function(req, res) {

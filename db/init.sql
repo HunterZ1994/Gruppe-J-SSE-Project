@@ -1,6 +1,6 @@
 create DATABASE hardwarebay;
-CREATE USER 'hardwarebay'@'%' IDENTIFIED BY '123';
-GRANT SELECT, INSERT, UPDATE, DELETE ON hardwarebay.* TO 'hardwarebay'@'%' IDENTIFIED BY '123';
+CREATE USER 'hardwarebay'@'%' IDENTIFIED BY 'waj+m2jibow7';
+GRANT SELECT, INSERT, UPDATE, DELETE ON hardwarebay.* TO 'hardwarebay'@'%' IDENTIFIED BY 'waj+m2jibow7';
 FLUSH PRIVILEGES;
 
 use hardwarebay;

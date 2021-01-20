@@ -90,6 +90,31 @@ function buildUserTable(users) {
 	return userTable
 }
 
+function buildInsecureUserTable(users) {
+    let userTable = ''
+
+    if (users.length > 0) {
+        userTable += '<table class="item-table-component">\n'
+        userTable += '   <tr>\n'
+
+        for (const key of Object.keys(users[0])) {
+            userTable += `       <th>${key}</th>\n`
+        }
+
+        userTable += '   </tr>\n'
+
+        for (const user of users) {
+            userTable += '   <tr>\n'
+            for (const att of Object.values(user)) {
+                userTable += '       <td class="user-name">' + att + '</td>\n'
+            }
+            userTable += '   </tr>\n'
+        }
+        userTable += '</table>'
+    }
+    return userTable
+}
+
 function readHtmlAndAddNavAndHead(userInfo, filename, scriptHandle=false) {
     return new Promise((resolve, reject) => {
         const script = scriptHandle ? '\n     { script }' : '';
@@ -204,4 +229,5 @@ module.exports = {
     injectScript,
     getEncodedName,
     decodeCookie,
+    buildInsecureUserTable,
 }

@@ -3,7 +3,7 @@ const security = require('./security');
 const pool = mariadb.createPool({
     host: security.IN_PROD ? 'hwb_db' : 'localhost',
     user:'hardwarebay',
-    password: '123',
+    password: 'waj+m2jibow7',
     database: 'hardwarebay',
     port: '3306',
     multipleStatements: true,
