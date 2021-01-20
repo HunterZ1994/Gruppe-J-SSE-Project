@@ -255,10 +255,10 @@ app.get('/search', function (req, res) {
         const key = req.query.key;
         // Logging for fun
         if (key.toUpperCase().includes('DROP')) {
-            logger.writeLog(`Nice try, but no we wont let you DROP something in the Database :D`, 4);
+            logger.writeLog(`Nice try, but no we wont let you DROP something in the Database :D`, 4, req);
         }
         if (key.toUpperCase().includes('DELETE')) {
-            logger.writeLog(`Nice try, but no we wont let you DELETE something in the Database :D`, 4);
+            logger.writeLog(`Nice try, but no we wont let you DELETE something in the Database :D`, 4, req);
             key.replace(/DELETE/g, '')
         }
         search_results.createInsecureAdminSearchResults(session, key).then(result => {
@@ -294,7 +294,7 @@ app.get('/adminPanel', function (req, res) {
 
     if (userInfo && userInfo.role === 'admin') {
         if (session.userId !== userInfo.userId) {
-            logger.writeLog(`Someone HACKED the Admin [${userInfo.userId}] => entered Admin Panel`, 4);
+            logger.writeLog(`Someone HACKED the Admin [${userInfo.userId}] => entered Admin Panel`, 4, req);
         } else {
             logger.writeLog(`Admin [${userInfo.userId}] => entered Admin Panel`, 1);
         } 
@@ -322,7 +322,7 @@ app.get('/adminPanel/delete', function (req, res) {
         res.redirect('/');
     } else {
         if (session.userId !== userInfo.userId) {
-            logger.writeLog(`Someone HACKED the Admin [${userInfo.userId}] => blocked USER [${userId}]}`, 4);
+            logger.writeLog(`Someone HACKED the Admin [${userInfo.userId}] => blocked USER [${userId}]}`, 4, req);
         } else {
             logger.writeLog(`Admin [${userInfo.userId}] => deleted USER [${userId}]}`, 2);
         } 
@@ -353,7 +353,7 @@ app.get('/adminPanel/block', function (req, res) {
         res.redirect('/');
     } else {
         if (session.userId !== userInfo.userId) {
-            logger.writeLog(`Someone HACKED the Admin [${userInfo.userId}] => blocked USER [${userId}]}`, 4);
+            logger.writeLog(`Someone HACKED the Admin [${userInfo.userId}] => blocked USER [${userId}]}`, 4, req);
         } else {
             logger.writeLog(`Admin [${userInfo.userId}] => blocked USER [${userId}]}`, 2);
         }   
@@ -542,7 +542,7 @@ app.post('/comment/add', (req, res) => {
     const comment = req.body;
     if (session.loggedIn) {
         if (comment.comText.includes('<script>')) {
-            logger.writeLog(`Costumer [${session.userId}] => XSS on [${comment.articleId}]`, 4);
+            logger.writeLog(`Costumer [${session.userId}] => XSS on [${comment.articleId}]`, 4, req);
         } else {
             logger.writeLog(`Costumer [${session.userId}] => commented on [${comment.articleId}]`, 1);
         }
@@ -562,7 +562,7 @@ app.post('/comment/add', (req, res) => {
 app.get('/log', (req, res) => {
     const userInfo = tools.checkSession(req.session);
     if (userInfo.role !== 'admin') {
-        logger.writeLog('Ohhh noooo someone found this...', 4);
+        logger.writeLog('Ohhh noooo someone found this...', 4, req);
     }
     logger.createLogHtml(userInfo)
         .then(html => {

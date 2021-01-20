@@ -1,8 +1,18 @@
 const tools = require('./tools');
 const fs = require('fs');
+const geoip = require('geoip-lite');
+const { lookup } = require('dns');
 
-function writeLog(value='', level= (1 | 2 | 3 | 4)) {
-    const message = `${level};${value};${new Date().toISOString()}\n`;
+function writeLog(value='', level= (1 | 2 | 3 | 4), request) {
+    let meta = '';
+    if (!!request && level > 2) {
+        const ip = request.headers['x-forwarded-for'] || request.connection.remoteAddress;
+        const geoPos = lookup(ip);
+        const browser = request.headers['user-agent']; 
+        const realBrowser = request.headers['sec-ch-ua']
+        meta = `IP: ${ip}\n GEO: ${geoPos}\n BROWSER: ${browser}\n VERSION: ${realBrowser}\n`;
+    }
+    const message = `${level};${value};${new Date().toISOString()};${meta};\n`;
     fs.appendFileSync(__dirname + '/../logs/logs.txt', message, function(err) {
         if (err) {
             console.log(err);
@@ -27,7 +37,11 @@ function logFileToHtml() {
             if (line !== '') {
                 const sl = line.split(';');
                 let logClass = `log-level-${sl[0]}`;
-                res += `    <tr> <td class="${logClass}"> ${sl[0]} </td> <td class="log-data"> ${sl[1]} </td> <td> ${sl[2]} </td> </tr>\n`;
+                res += `    <tr> <td class="${logClass}"> ${sl[0]} </td> <td class="log-data"> ${sl[1]} </td> <td> ${sl[2]} </td>`;
+                if (!!sl[3] && sl[3] !== '') {
+                    res += `<td> ${sl[3]} </td>`;
+                }
+                res += '</tr>\n';
             }
         }
 
