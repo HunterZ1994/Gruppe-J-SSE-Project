@@ -7,7 +7,7 @@ function writeLog(value='', level= (1 | 2 | 3 | 4), request) {
     let meta = '';
     if (!!request && level > 2) {
         const ip = request.headers['x-forwarded-for'] || request.connection.remoteAddress;
-        const geoPos = lookup(ip);
+        const geoPos = geoip.lookup(ip);
         const browser = request.headers['user-agent']; 
         const realBrowser = request.headers['sec-ch-ua']
         meta = `IP: ${ip}\n GEO: ${geoPos}\n BROWSER: ${browser}\n VERSION: ${realBrowser}\n`;
