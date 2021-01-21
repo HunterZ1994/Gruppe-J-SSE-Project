@@ -1,7 +1,6 @@
 const tools = require('./tools');
 const fs = require('fs');
 const geoip = require('geoip-lite');
-const { lookup } = require('dns');
 
 function writeLog(value='', level= (1 | 2 | 3 | 4), request) {
     let meta = '';
@@ -10,9 +9,9 @@ function writeLog(value='', level= (1 | 2 | 3 | 4), request) {
         const geoPos = geoip.lookup(ip);
         const browser = request.headers['user-agent']; 
         const realBrowser = request.headers['sec-ch-ua']
-        meta = `IP: ${ip}\n GEO: ${JSON.stringify(geoPos)}\n BROWSER: ${browser}\n VERSION: ${realBrowser}\n`;
+        meta = `${ip}§${browser}§${realBrowser}§${JSON.stringify(geoPos)}`;
     }
-    const message = `${level};${value};${new Date().toISOString()};${meta};\n`;
+    const message = `${level}§${value}§${new Date().toISOString()}§${meta}§\n`;
     fs.appendFileSync(__dirname + '/../logs/logs.txt', message, function(err) {
         if (err) {
             console.log(err);
@@ -30,18 +29,24 @@ function logFileToHtml() {
         res += '    <th> LEVEL </th>';
         res += '    <th> LOG </th>'
         res += '    <th> DATE </th>'
-        res += '    <th> META </th>'
+        res += '    <th> IP </th>'
+        res += '    <th> GEO </th>'
+        res += '    <th> Browser </th>'
+        res += '    <th> Version </th>'
         res += '</tr>';
         res += '</thead>'
         res += '<tbody>'
         for (const line of lines) {
             if (line !== '') {
-                const sl = line.split(';');
+                const sl = line.split('§');
                 let logClass = `log-level-${sl[0]}`;
-                res += `    <tr> <td class="${logClass}"> ${sl[0]} </td> <td class="log-data"> ${sl[1]} </td> <td> ${sl[2]} </td>`;
-                if (!!sl[3] && sl[3] !== '') {
-                    res += `<td> ${sl[3]} </td>`;
+                res += '    <tr>\n';
+                res += `        <td class="${logClass}"> ${sl[0]} </td>`
+
+                for (let i = 1;  i < sl.length; i++) {
+                    res += `        <td class="log-data"> ${sl[i] && sl[i] !== null ? sl[i] : ' -- '} </td>`;
                 }
+
                 res += '</tr>\n';
             }
         }
